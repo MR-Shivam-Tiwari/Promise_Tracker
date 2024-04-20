@@ -16,8 +16,10 @@ import MyProfile from './Components/Profile/MyProfile';
 import Approvals from './Components/Approvals/Approvals';
 import Task from './Components/Task/Task';
 import MainHome from './Components/Home/MainHome';
-import { Avatar, IconButton } from '@mui/joy';
+import { Avatar, Button, DialogTitle, IconButton, Modal, ModalDialog } from '@mui/joy';
+import Add from '@mui/icons-material/Add';
 import ColorSchemeToggle from './Components/ColorToggle/ColorSchemeToggle';
+import AddTask from './Components/Task/AddTask';
 function AppRoutes() {
     const [currentRouteName, setCurrentRouteName] = useState('');
     const location = useLocation();
@@ -44,7 +46,7 @@ function AppRoutes() {
         // Do whatever you need to do when a sidebar item is clicked
         // For example, update the active component in the state
     };
-
+    const [open, setOpen] = useState(false);
     const handleItemClick = (route) => {
         navigate(route);
     };
@@ -77,8 +79,25 @@ function AppRoutes() {
                             gap: 1,
                         }}
                     >
-                        <div className='flex items-center justify-end border rounded-lg p-2 gp-6 '>
-                            <ColorSchemeToggle sx={{ marginRight:"10px" }} />
+                        <div className='flex items-center justify-end border rounded-lg p-2 gap-3 '>
+                            <Button
+                                variant="outlined"
+                                color="neutral"
+                                startDecorator={<Add />}
+                                onClick={() => setOpen(true)}
+                            >
+                                Add Task
+                            </Button>
+                            <Modal open={open} onClose={() => setOpen(false)}>
+                                <ModalDialog>
+                                    <DialogTitle>Create new project</DialogTitle>
+                                    <form onSubmit={() => setOpen(false)}>
+                                        <AddTask />
+
+                                    </form>
+                                </ModalDialog>
+                            </Modal>
+                            <ColorSchemeToggle />
                             <Box sx={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                                 <Avatar
                                     variant="outlined"
@@ -158,7 +177,7 @@ function AppRoutes() {
                     </Box>
                 </Box>
             </CssVarsProvider>
-        </div>
+        </div >
     )
 }
 

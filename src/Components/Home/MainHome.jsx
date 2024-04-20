@@ -1,4 +1,4 @@
-import { CircularProgress, Typography } from '@mui/joy'
+import { CircularProgress, LinearProgress, Typography } from '@mui/joy'
 import React from 'react'
 
 function MainHome() {
@@ -36,9 +36,134 @@ function MainHome() {
                             </div>
                         </div>
                     </div>
+
+                    <div>
+                        <main class="flex flex-col gap-6 p-6 md:p-10">
+                            <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                <div class="border bg-card text-card-foreground rounded-lg shadow-md" data-v0-t="card">
+                                    <div class="p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <h3 class="text-lg font-medium">Finish design mockups</h3>
+                                                <p class="text-gray-500">Complete the high-fidelity designs for the new homepage.</p>
+                                            </div>
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="24"
+                                                height="24"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                class="h-6 w-6 text-gray-500"
+                                            >
+                                                <rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect>
+                                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                            </svg>
+                                        </div>
+                                        <div className='p-3'>
+
+                                            <LinearProgress color='neutral' determinate value={85} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="border text-card-foreground rounded-lg shadow-md bg-[#f0f9ff]" data-v0-t="card">
+                                    <div class="p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <h3 class="text-lg font-medium">Implement new features</h3>
+                                                <p class="text-gray-500">Add the shopping cart and checkout functionality.</p>
+                                            </div>
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="24"
+                                                height="24"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                class="h-6 w-6 text-gray-500"
+                                            >
+                                                <rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect>
+                                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                            </svg>
+                                        </div>
+
+                                        <div className='p-3'>
+
+                                            <LinearProgress color='danger' determinate value={85} />
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="border text-card-foreground rounded-lg shadow-md bg-[#f4f4ff]" data-v0-t="card">
+                                    <div class="p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <h3 class="text-lg font-medium">Write blog post</h3>
+                                                <p class="text-gray-500">Publish a new blog post about the latest product updates.</p>
+                                            </div>
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="24"
+                                                height="24"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                class="h-6 w-6 text-gray-500"
+                                            >
+                                                <rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect>
+                                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                            </svg>
+                                        </div>
+                                        <div className='p-3'>
+
+                                            <LinearProgress color='neutral' determinate value={85} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="border text-card-foreground rounded-lg shadow-md bg-[#fff0f0]" data-v0-t="card">
+                                    <div class="p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <h3 class="text-lg font-medium">Refactor codebase</h3>
+                                                <p class="text-gray-500">Improve the code structure and optimize performance.</p>
+                                            </div>
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="24"
+                                                height="24"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                class="h-6 w-6 text-gray-500"
+                                            >
+                                                <rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect>
+                                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                            </svg>
+                                        </div>
+                                        <div className='p-3'>
+
+                                            <LinearProgress determinate value={65} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
                     <div className="grid ">
                         <h2 className="text-xl text-black font-semibold">Project Groups</h2>
-                        <div data-radix-scroll-area-viewport="" className=" h-full w-full border rounded-lg" style={{ overflow: "hidden", marginTop: "-60px" }}>
+                        <div data-radix-scroll-area-viewport="" className=" h-full w-full border mt-4 rounded-lg" style={{ overflow: "hidden" }}>
                             <div style={{ minWidth: "100%", display: "table" }}>
                                 <div className="p-4 space-y-4">
                                     <div className="flex items-center justify-between">
