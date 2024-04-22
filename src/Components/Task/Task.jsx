@@ -1,11 +1,12 @@
+import { Checkbox } from '@mui/joy'
 import React from 'react'
 
 function Task() {
     return (
         <div>
             <div className="flex flex-col h-full">
-                <header className="bg-gray-100 rounded-lg py-4 px-6 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
+                <header className="bg-gray-100 rounded-lg py-2 px-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4 overflow-x-auto h-14">
                         <button className="inline-flex items-center bg-gray-500 text-black  justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 rounded-md">
                             April 18
                         </button>
@@ -45,9 +46,9 @@ function Task() {
                     </div>
                 </header>
 
-                <div className='py-3'>
+                <div className=' bg-blue-50 p-3 mt-2 rounded-lg'>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 overflow-x-auto h-14">
                         <button className="inline-flex items-center justify-center bg-blue-500 text-black whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 rounded-md">
                             All
                         </button>
@@ -65,19 +66,21 @@ function Task() {
                         </button>
                     </div>
                 </div>
-                <div className="flex-1 overflow-y-auto p-6">
-                    <div className="grid gap-4">
-                        <div className="rounded-lg border bg-gray-200 bg-card text-black shadow-sm" >
+                <div className=" py-5">
+                    <div className=" gap-2">
+                        <div className=" mb-3 rounded-lg border bg-gray-200 bg-card text-black shadow-sm" >
                             <div className="flex flex-col space-y-1.5 p-6">
-                                <h3 className="whitespace-nowrap text-2xl font-semibold leading-none tracking-tight">
+                                <p className=" text-2xl font-semibold  tracking-tight">
                                     Finish the new homepage design
-                                </h3>
+                                </p>
                                 <p className="text-sm text-muted-foreground">
                                     <div className="flex items-center gap-2">
-                                        <div className="inline-flex w-fit items-center whitespace-nowrap border text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground px-2 py-1 rounded-md">
+                                        {/* <div className="inline-flex w-fit items-center whitespace-nowrap border text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground px-2 py-1 rounded-md">
                                             In Progress
-                                        </div>
-                                        <span className="text-gray-500 dark:text-gray-400">Due April 22</span>
+                                        </div> */}
+
+                                        <span className="text-black-900 ">Due April 22</span>
+                                        <Checkbox />
                                     </div>
                                 </p>
                             </div>
@@ -88,17 +91,19 @@ function Task() {
                                 </p>
                             </div>
                         </div>
-                        <div className="rounded-lg bg-gray-200 border bg-card text-black text-card-foreground shadow-sm" >
+                        <div className="rounded-lg mb-3 bg-gray-200 border bg-card text-black text-card-foreground shadow-sm" >
                             <div className="flex flex-col space-y-1.5 p-6">
-                                <h3 className="whitespace-nowrap text-2xl font-semibold leading-none tracking-tight">
+                                <p className=" text-2xl font-semibold  tracking-tight">
                                     Prepare for the client meeting
-                                </h3>
+                                </p>
                                 <p className="text-sm text-muted-foreground">
                                     <div className="flex items-center gap-2">
-                                        <div className="inline-flex w-fit items-center whitespace-nowrap border text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground px-2 py-1 rounded-md">
-                                            To Do
-                                        </div>
-                                        <span className="text-gray-500 dark:text-gray-400">Due April 20</span>
+                                        {/* <div className="inline-flex w-fit items-center whitespace-nowrap border text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground px-2 py-1 rounded-md">
+                                            In Progress
+                                        </div> */}
+
+                                        <span className="text-black-900 ">Due April 22</span>
+                                        <Checkbox />
                                     </div>
                                 </p>
                             </div>
@@ -109,17 +114,19 @@ function Task() {
                                 </p>
                             </div>
                         </div>
-                        <div className="rounded-lg bg-gray-200 border bg-card text-black text-card-foreground shadow-sm" >
+                        <div className="rounded-lg mb-3 bg-gray-200 border bg-card text-black text-card-foreground shadow-sm" >
                             <div className="flex flex-col space-y-1.5 p-6">
-                                <h3 className="whitespace-nowrap text-2xl font-semibold leading-none tracking-tight">
+                                <p className=" text-2xl font-semibold  tracking-tight">
                                     Implement the new analytics dashboard
-                                </h3>
+                                </p>
                                 <p className="text-sm text-muted-foreground">
                                     <div className="flex items-center gap-2">
-                                        <div className="inline-flex w-fit items-center whitespace-nowrap border text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground px-2 py-1 rounded-md">
-                                            Completed
-                                        </div>
-                                        <span className="text-gray-500 dark:text-gray-400">Completed April 18</span>
+                                        {/* <div className="inline-flex w-fit items-center whitespace-nowrap border text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground px-2 py-1 rounded-md">
+                                            In Progress
+                                        </div> */}
+
+                                        <span className="text-black-900 ">Due April 22</span>
+                                        <Checkbox />
                                     </div>
                                 </p>
                             </div>
@@ -130,17 +137,19 @@ function Task() {
                                 </p>
                             </div>
                         </div>
-                        <div className="rounded-lg bg-gray-200 border bg-card text-black text-card-foreground shadow-sm" >
+                        <div className="rounded-lg mb-3 bg-gray-200 border bg-card text-black text-card-foreground shadow-sm" >
                             <div className="flex flex-col space-y-1.5 p-6">
-                                <h3 className="whitespace-nowrap text-2xl font-semibold leading-none tracking-tight">
+                                <p className=" text-2xl font-semibold  tracking-tight">
                                     Cancel the upcoming marketing campaign
-                                </h3>
+                                </p>
                                 <p className="text-sm text-muted-foreground">
                                     <div className="flex items-center gap-2">
-                                        <div className="inline-flex w-fit items-center whitespace-nowrap border text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground px-2 py-1 rounded-md">
-                                            Cancelled
-                                        </div>
-                                        <span className="text-gray-500 dark:text-gray-400">Cancelled April 19</span>
+                                        {/* <div className="inline-flex w-fit items-center whitespace-nowrap border text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground px-2 py-1 rounded-md">
+                                            In Progress
+                                        </div> */}
+
+                                        <span className="text-black-900 ">Due April 22</span>
+                                        <Checkbox />
                                     </div>
                                 </p>
                             </div>

@@ -16,7 +16,7 @@ function Approvals() {
         }
       `}</style>
             <div class="flex flex-col h-screen">
-                <header class="bg-gray-100 rounded-lg px-6 py-4 flex items-center justify-between">
+                <header class="bg-gray-100 rounded-lg px-4 py-4 flex items-center justify-between">
                     <div class="flex items-center gap-4">
 
                         <div class="flex gap-2">
@@ -32,7 +32,7 @@ function Approvals() {
                         </div>
                     </div>
                 </header>
-                <main class="flex-1 overflow-auto p-6">
+                <main class="flex-1 overflow-auto p-1 mt-3">
                     <div class="grid gap-4">
                         <div class="border rounded-lg overflow-hidden">
                             <div class="relative w-full overflow-auto">

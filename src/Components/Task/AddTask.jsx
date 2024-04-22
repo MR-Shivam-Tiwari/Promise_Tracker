@@ -4,7 +4,7 @@ function AddTask() {
     return (
         <div>
             <div class="w-full">
-                <div class="max-w-3xl mx-auto p-6 md:p-10">
+                <div class="max-w-4xl mx-auto p-0 md:p-10">
                     <h1 class="text-2xl font-bold mb-6">Create New Task</h1>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -12,7 +12,7 @@ function AddTask() {
                                 class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                 for="location"
                             >
-                                Location
+                                Group
                             </label>
                             <button
                                 type="button"
@@ -25,7 +25,7 @@ function AddTask() {
                                 data-placeholder=""
                                 class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                <span style={{ pointerEvents: "none" }}>Select location</span>
+                                <span style={{ pointerEvents: "none" }}>Select Group</span>
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     width="24"

@@ -16,7 +16,7 @@ import MyProfile from './Components/Profile/MyProfile';
 import Approvals from './Components/Approvals/Approvals';
 import Task from './Components/Task/Task';
 import MainHome from './Components/Home/MainHome';
-import { Avatar, Button, DialogTitle, IconButton, Modal, ModalDialog } from '@mui/joy';
+import { Avatar, Button, DialogTitle, IconButton, Modal, ModalClose, ModalDialog } from '@mui/joy';
 import Add from '@mui/icons-material/Add';
 import ColorSchemeToggle from './Components/ColorToggle/ColorSchemeToggle';
 import AddTask from './Components/Task/AddTask';
@@ -79,45 +79,59 @@ function AppRoutes() {
                             gap: 1,
                         }}
                     >
-                        <div className='flex items-center justify-end border rounded-lg p-2 gap-3 '>
-                            <Button
-                                variant="outlined"
-                                color="neutral"
-                                startDecorator={<Add />}
-                                onClick={() => setOpen(true)}
-                            >
-                                Add Task
-                            </Button>
-                            <Modal open={open} onClose={() => setOpen(false)}>
-                                <ModalDialog>
-                                    <DialogTitle>Create new project</DialogTitle>
-                                    <form onSubmit={() => setOpen(false)}>
-                                        <AddTask />
+                        <div className='grid col border rounded-lg p-2 gap-3'>
+                            <div className="flex  lg:flex-row items-center lg:items-end  justify-between">
 
-                                    </form>
-                                </ModalDialog>
-                            </Modal>
-                            <ColorSchemeToggle />
-                            <Box sx={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                                <Avatar
-                                    variant="outlined"
-                                    size="lg"
-                                    src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286"
+                                <div className="flex gap-2  items-center">
+                                    <Button
+                                        variant="outlined"
+                                        color="neutral"
+                                        className='text-xs'
+                                        startDecorator={<Add />}
+                                        onClick={() => setOpen(true)}
+                                    >
+                                        Add Task
+                                    </Button>
+                                    <Modal className="mt-14" open={open} onClose={() => setOpen(false)}>
+                                        <ModalDialog maxWidth={1000} minWidth={1000} style={{ height: "800px", overflow: "auto" }} >
+                                            <ModalClose />
+                                            <form onSubmit={() => setOpen(false)}>
+                                                <AddTask />
+                                            </form>
+                                        </ModalDialog>
+                                    </Modal>
+                                    <ColorSchemeToggle />
+                                </div>
+                                <div className="  gap-2  " style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                    <div>
 
-                                />
-                                <Box className='flex gap-5' sx={{ minWidth: 0, flex: 1 }}>
-                                    <Typography level="body-sm">Hello</Typography>
-                                    <Typography level="title-sm">Siriwat K.</Typography>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-bell-fill" viewBox="0 0 16 16">
-                                        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901" />
-                                    </svg>
-                                </Box>
-                                <IconButton size="sm" variant="plain" color="neutral">
-                                    <LogoutRoundedIcon />
-                                </IconButton>
-                            </Box>
+                                        <Avatar
+                                            variant="outlined"
+                                            size="sm"
+                                            src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286"
+                                        />
+                                    </div>
+                                    <div>
 
+                                        <Box className='' sx={{ minWidth: 0 }}>
+                                            <Typography level="body-sm">Hello!</Typography>
+                                            <Typography level="title-sm">Siriwat Kumar.</Typography>
+
+                                        </Box>
+                                    </div>
+                                    <div>
+
+                                        <IconButton size="sm" variant="plain" color="neutral">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bell-fill" viewBox="0 0 16 16">
+                                                <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901" />
+                                            </svg>
+                                        </IconButton>
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
+
                         <Box
                             sx={{
                                 display: 'flex',
@@ -144,7 +158,7 @@ function AppRoutes() {
                                     >
                                         <HomeRoundedIcon />
                                     </Link>
-                                    <Link
+                                    {/* <Link
                                         underline="hover"
                                         color="neutral"
                                         href="#some-link"
@@ -152,7 +166,7 @@ function AppRoutes() {
                                         fontWeight={500}
                                     >
                                         Dashboard
-                                    </Link>
+                                    </Link> */}
                                     <Typography color="primary" fontWeight={500} fontSize={12}>
                                         {currentRouteName}
                                     </Typography>

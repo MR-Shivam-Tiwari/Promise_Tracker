@@ -6,26 +6,28 @@ function MainHome() {
         <div>
             <div className="flex flex-col w-full min-h-screen bg-gray-100 rounded-lg">
 
-                <main className="flex-1 p-4 md:p-8 grid gap-4 md:gap-8">
-                    <div className="grid md:grid-cols-2 gap-4 md:gap-8">
+                <main className="flex-1 p-2 md:p-8 grid gap-4 md:gap-4">
+                    <div className="grid md:grid-cols-2 gap-4 md:gap-4">
                         <div className="rounded-lg border bg-card  flex items-center justify-center shadow-sm" style={{ background: "#0A91D0" }} >
-                            <div className="flex gap-9 items-center justify-center  p-6">
+                            <div className="flex gap-9 items-center justify-center  p-2">
                                 <div className="">
                                     <div className='flex items-center justify-center'>
 
-                                        <h3 className=" text-5xl font-semibold text-black  text-start ">Your today’s task
-                                            is almost done!</h3>
+                                        <h3 className="text-1xl lg:text-3xl font-semibold text-black text-center lg:text-start">
+                                            Your today’s task is almost done!
+                                        </h3>
+
                                     </div>
                                     <div className='flex items-center justify-center'>
 
-                                        <button className=" mt-6 w-[50%] h-14   text-black   rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none   hover:bg-primary/90 h-10 px-4 py-2" style={{ background: "#EA791D" }}>
+                                        <button className=" mt-5 w-full lg:w-[50%] h-full lg:h-14   text-black   rounded-md text-sm font-medium  px-2 py-2" style={{ background: "#EA791D" }}>
                                             View tasks
                                         </button>
                                     </div>
                                 </div>
                                 <div>
-                                    <CircularProgress size="lg" sx={{ '--CircularProgress-size': '180px' }} determinate value={70}  >
-                                        <Typography className="text-black">70%</Typography>
+                                    <CircularProgress thickness={24} size="lg" sx={{ color: "red", '--CircularProgress-size': '180px', '--LinearProgress-thickness': '24px', }} determinate value={70}  >
+                                        <Typography className="text-black text-lg">70%</Typography>
                                     </CircularProgress>
                                 </div>
                             </div>
@@ -38,9 +40,9 @@ function MainHome() {
                     </div>
 
                     <div>
-                        <main class="flex flex-col gap-6 p-6 md:p-10">
+                        <main class="flex flex-col gap-6  md:p-10">
                             <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                <div class="border bg-card text-card-foreground rounded-lg shadow-md" data-v0-t="card">
+                                <div class="border bg-card text-card-foreground rounded-lg shadow-md" >
                                     <div class="p-4">
                                         <div class="flex items-center justify-between">
                                             <div>
@@ -162,8 +164,8 @@ function MainHome() {
                         </main>
                     </div>
                     <div className="grid ">
-                        <h2 className="text-xl text-black font-semibold">Project Groups</h2>
-                        <div data-radix-scroll-area-viewport="" className=" h-full w-full border mt-4 rounded-lg" style={{ overflow: "hidden" }}>
+                        <h2 className="text-xl text-black font-semibold">Task Groups</h2>
+                        <div  className="  border mt-4 rounded-lg" >
                             <div style={{ minWidth: "100%", display: "table" }}>
                                 <div className="p-4 space-y-4">
                                     <div className="flex items-center justify-between">
