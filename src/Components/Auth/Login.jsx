@@ -48,9 +48,9 @@ function Login() {
                     </svg>
                 </Box>
                 <Grid
-                    container
-                    direction="column"
-                    justifyContent="flex-end"
+                    // container
+                    // direction="column"
+                    // justifyContent="flex-end"
                     sx={{
                         minHeight: '100vh'
                     }}

@@ -115,7 +115,7 @@ function AppRoutes() {
 
                                         <Box className='' sx={{ minWidth: 0 }}>
                                             <Typography level="body-sm">Hello!</Typography>
-                                            <Typography level="title-sm">Siriwat Kumar.</Typography>
+                                            <Typography level="title-sm">Siriwat</Typography>
 
                                         </Box>
                                     </div>
