@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-
+import axios from 'axios';
 // material-ui
 import {
 
@@ -14,7 +14,9 @@ import { Box } from '@mui/joy';
 
 function Login() {
     const navigate = useNavigate();
-
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState(null);
     const [checked, setChecked] = React.useState(false);
     const theme = useTheme();
     const [showPassword, setShowPassword] = React.useState(false);
@@ -24,6 +26,23 @@ function Login() {
 
     const handleMouseDownPassword = (event) => {
         event.preventDefault();
+    };
+    const handleSignIn = async (e) => {
+        e.preventDefault();
+
+        try {
+            // Make a POST request to your server's /signin endpoint
+            const response = await axios.post('http://localhost:5000/api/signin', { email, password });
+
+            // If login is successful, save user data to localStorage
+            localStorage.setItem('userData', JSON.stringify(response.data));
+
+            // Navigate to the home page
+            navigate('/home');
+        } catch (error) {
+            // If an error occurs (e.g., invalid credentials), display the error message
+            setError(error.response.data.message);
+        }
     };
 
     return (
@@ -76,12 +95,14 @@ function Login() {
                                             Existing User
                                         </button>
                                     </div>
-                                    <form class="space-y-6 mb-6">
+                                    <form onSubmit={handleSignIn} class="space-y-6 mb-6">
                                         <div>
                                             <input
                                                 class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full"
                                                 placeholder="Email Address"
                                                 type="email"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
                                             />
                                         </div>
                                         <div>
@@ -89,15 +110,18 @@ function Login() {
                                                 class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full"
                                                 placeholder="Password"
                                                 type="password"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
                                             />
                                         </div>
                                         <a class="text-sm text-blue-600 hover:underline block text-right mb-6" href="#">
                                             Forgot password?
                                         </a>
-                                        <button onClick={()=>navigate('/home')} class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 w-full bg-[#ff8c00] hover:bg-[#ff7b00] text-white py-3">
+                                        <button type='submit' class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 w-full bg-[#ff8c00] hover:bg-[#ff7b00] text-white py-3">
                                             SIGN IN
                                         </button>
                                     </form>
+                                    {error && <p>{error}</p>}
                                     <div class="flex items-center justify-center">
                                         <div class="flex-grow border-t border-gray-300"></div>
                                         <span class="flex-shrink mx-4 text-gray-400">Or Sign In with</span>

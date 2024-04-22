@@ -76,6 +76,15 @@ export default function Sidebar({ onSidebarItemClick }) {
         // You can perform any actions here, such as navigating to a route or updating state
         console.log(`Clicked on ${itemName}, navigating to ${route}`);
     };
+
+
+    const handleLogout = () => {
+        // Clear user data from localStorage upon logout
+        localStorage.removeItem('userData');
+
+        // Optional: Redirect to the login page or any other page after logout
+        navigate('/login');
+    };
     return (
         <Sheet
             className="Sidebar"

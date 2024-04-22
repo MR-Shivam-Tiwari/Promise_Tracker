@@ -20,10 +20,121 @@ import { Avatar, Button, DialogTitle, IconButton, Modal, ModalClose, ModalDialog
 import Add from '@mui/icons-material/Add';
 import ColorSchemeToggle from './Components/ColorToggle/ColorSchemeToggle';
 import AddTask from './Components/Task/AddTask';
+import axios from 'axios';
 function AppRoutes() {
     const [currentRouteName, setCurrentRouteName] = useState('');
     const location = useLocation();
     const navigate = useNavigate();
+
+    const [userData, setUserData] = useState({});
+    const [userid, setuserid] = useState("")
+    const [selectedImage, setSelectedImage] = useState(null);
+    const defaultAvatar = 'https://via.placeholder.com/150'; // Default avatar URL
+    const [profilePic, setProfilePic] = useState(null);
+    // Function to handle file selection
+    const handleFileSelect = (event) => {
+        const file = event.target.files[0];
+        setSelectedImage(file);
+    };
+
+    // Function to handle upload button click
+    const handleUploadClick = () => {
+        document.getElementById('image-upload').click();
+    };
+    const [formData, setFormData] = useState({
+        name: '',
+        department: '',
+        designation: '',
+        mobilenumber: '',
+        profilePic: ''
+    });
+
+    useEffect(() => {
+        // Retrieve userData from localStorage
+        const userDataString = localStorage.getItem('userData');
+        if (userDataString) {
+            const userDataObj = JSON.parse(userDataString);
+            const userId = userDataObj.userId;
+            // Fetch user data using the retrieved userId
+            fetchUserData(userId);
+            console.log(userId)
+            setuserid(userId)
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchUserData(userid);
+    }, [userid]);
+
+    // Function to fetch user data
+    const fetchUserData = async (userId) => {
+        try {
+            const response = await axios.get(`http://localhost:5000/api/user/${userid}`);
+            const userData = response.data;
+            setUserData(userData);
+            setFormData({
+                name: userData.name,
+                department: userData.department,
+                designation: userData.designation,
+                mobilenumber: userData.mobilenumber,
+                profilePic: userData.profilePic,
+            });
+
+            // Convert base64 image URL to file
+            const base64Image = userData.profilePic;
+            const byteNumbers = atob(base64Image.split(','));
+            const byteArray = [];
+            for (let i = 0; i < byteNumbers.length; i++) {
+                byteArray.push(byteNumbers.charCodeAt(i));
+            }
+            const byteNumbersTypedArray = new Uint8Array(byteArray);
+            const blob = new Blob([byteNumbersTypedArray], { type: 'image/jpeg' });
+            setProfilePic(URL.createObjectURL(blob));
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        }
+    };
+
+    // Function to handle form input changes
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    // Function to handle form submission
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            // Convert selected image file to Base64
+            const reader = new FileReader();
+            reader.onload = async () => {
+                const base64Image = reader.result.split(',')[1]; // Extract Base64 string
+                const formDataWithImage = {
+                    profilePic: base64Image,
+                    name: formData.name,
+                    department: formData.department,
+                    designation: formData.designation,
+                    mobilenumber: formData.mobilenumber,
+                };
+
+                // Send JSON payload to server
+                try {
+                    const response = await axios.put(`http://localhost:5000/api/users/${userid}`, formDataWithImage);
+
+                    // Handle successful response from server
+                    console.log('User data updated successfully:', response.data);
+                    // You can also update state or perform any other action based on the response
+                } catch (error) {
+                    // Handle error from server
+                    console.error('Error updating user data:', error);
+                }
+            };
+            reader.readAsDataURL(selectedImage); // Read the selected image file as a data URL
+        } catch (error) {
+            // Handle error
+            console.error('Error updating user data:', error);
+        }
+    };
+
 
 
     const handleRouteChange = () => {
@@ -108,14 +219,14 @@ function AppRoutes() {
                                         <Avatar
                                             variant="outlined"
                                             size="sm"
-                                            src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286"
+                                            src={profilePic}
                                         />
                                     </div>
                                     <div>
 
                                         <Box className='' sx={{ minWidth: 0 }}>
                                             <Typography level="body-sm">Hello!</Typography>
-                                            <Typography level="title-sm">Siriwat</Typography>
+                                            <Typography level="title-sm">{userData?.name}</Typography>
 
                                         </Box>
                                     </div>

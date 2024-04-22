@@ -6,37 +6,140 @@ import Button from '@mui/joy/Button';
 import Divider from '@mui/joy/Divider';
 import FormControl from '@mui/joy/FormControl';
 import FormLabel from '@mui/joy/FormLabel';
-import FormHelperText from '@mui/joy/FormHelperText';
 import Input from '@mui/joy/Input';
 import IconButton from '@mui/joy/IconButton';
-import Textarea from '@mui/joy/Textarea';
 import Stack from '@mui/joy/Stack';
-import Select from '@mui/joy/Select';
-import Option from '@mui/joy/Option';
 import Typography from '@mui/joy/Typography';
-import Tabs from '@mui/joy/Tabs';
-import TabList from '@mui/joy/TabList';
-import Tab, { tabClasses } from '@mui/joy/Tab';
-import Breadcrumbs from '@mui/joy/Breadcrumbs';
-import Link from '@mui/joy/Link';
-import Card from '@mui/joy/Card';
 import CardActions from '@mui/joy/CardActions';
-import CardOverflow from '@mui/joy/CardOverflow';
 
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
-import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
-import EmailRoundedIcon from '@mui/icons-material/EmailRounded';
-import AccessTimeFilledRoundedIcon from '@mui/icons-material/AccessTimeFilledRounded';
-import VideocamRoundedIcon from '@mui/icons-material/VideocamRounded';
-import InsertDriveFileRoundedIcon from '@mui/icons-material/InsertDriveFileRounded';
-import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import axios from 'axios';
+import { Avatar, Card } from '@mui/joy';
 
-// import DropZone from './DropZone';
-// import FileUpload from './FileUpload';
-// import CountrySelector from './CountrySelector';
-// import EditorToolbar from './EditorToolbar';
+
 
 export default function MyProfile() {
+    const [userData, setUserData] = useState({});
+    const [userid, setuserid] = useState("")
+    const [selectedImage, setSelectedImage] = useState(null);
+    const defaultAvatar = 'https://via.placeholder.com/150'; // Default avatar URL
+    const [profilePic, setProfilePic] = useState(null);
+    // Function to handle file selection
+    const handleFileSelect = (event) => {
+        const file = event.target.files[0];
+        setSelectedImage(file);
+    };
+
+    // Function to handle upload button click
+    const handleUploadClick = () => {
+        document.getElementById('image-upload').click();
+    };
+    const [formData, setFormData] = useState({
+        name: '',
+        department: '',
+        designation: '',
+        mobilenumber: '',
+        profilePic: ''
+    });
+
+    useEffect(() => {
+        // Retrieve userData from localStorage
+        const userDataString = localStorage.getItem('userData');
+        if (userDataString) {
+            const userDataObj = JSON.parse(userDataString);
+            const userId = userDataObj.userId;
+            // Fetch user data using the retrieved userId
+            fetchUserData(userId);
+            console.log(userId)
+            setuserid(userId)
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchUserData(userid);
+    }, [userid]);
+
+    // Function to fetch user data
+    const fetchUserData = async (userId) => {
+        try {
+          const response = await axios.get(`http://localhost:5000/api/user/${userid}`);
+          const userData = response.data;
+          setUserData(userData);
+          setFormData({
+            name: userData.name,
+            department: userData.department,
+            designation: userData.designation,
+            mobilenumber: userData.mobilenumber,
+            profilePic: userData.profilePic,
+          });
+    
+          // Convert base64 image URL to file
+          const base64Image = userData.profilePic;
+          const byteNumbers = atob(base64Image.split(','));
+          const byteArray = [];
+          for (let i = 0; i < byteNumbers.length; i++) {
+            byteArray.push(byteNumbers.charCodeAt(i));
+          }
+          const byteNumbersTypedArray = new Uint8Array(byteArray);
+          const blob = new Blob([byteNumbersTypedArray], { type: 'image/jpeg' });
+          setProfilePic(URL.createObjectURL(blob));
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      };
+
+    // Function to handle form input changes
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    // Function to handle form submission
+    // Function to handle form submission
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+        if (!selectedImage) {
+            console.error('No image selected');
+            return;
+        }
+
+        // Convert selected image file to Base64
+        const reader = new FileReader();
+        reader.onload = async () => {
+            const base64Image = reader.result.split(',')[1]; // Extract Base64 string
+            const formDataWithImage = {
+                profilePic: base64Image,
+                name: formData.name,
+                department: formData.department,
+                designation: formData.designation,
+                mobilenumber: formData.mobilenumber,
+            };
+
+            // Send JSON payload to server
+            try {
+                const response = await axios.put(`http://localhost:5000/api/users/${userid}`, formDataWithImage);
+
+                // Handle successful response from server
+                console.log('User data updated successfully:', response.data);
+                // You can also update state or perform any other action based on the response
+            } catch (error) {
+                // Handle error from server
+                console.error('Error updating user data:', error);
+            }
+        };
+        reader.readAsDataURL(selectedImage); // Read the selected image file as a data URL
+    } catch (error) {
+        // Handle error
+        console.error('Error updating user data:', error);
+    }
+};
+
+
+
+
+    // Render loading spinner or placeholder text if userData is empty
+    // if (!userData.userId) {
+    //     return <div>Loading...</div>;
+    // }
     return (
         <Box sx={{ flex: 1, width: '100%' }}>
 
@@ -68,25 +171,26 @@ export default function MyProfile() {
                         <Divider />
                         <div className='flex items-center justify-center p-3'>
 
-                            <Stack direction="column" spacing={1}>
-                                <AspectRatio
-                                    ratio="1"
-                                    maxHeight={200}
-                                    sx={{ flex: 1, minWidth: 120, borderRadius: '100%' }}
-                                >
-                                    <img
-                                        src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286"
-                                        srcSet="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286&dpr=2 2x"
-                                        loading="lazy"
-                                        alt=""
-                                    />
-                                </AspectRatio>
+                            <Stack direction="column" spacing={1} alignItems="center">
+                                <input
+                                    accept="image/*"
+                                    id="image-upload"
+                                    type="file"
+                                    style={{ display: 'none' }}
+                                    onChange={handleFileSelect}
+                                />
+                                <Avatar
+                                    alt="Selected Image"
+                                    src={profilePic ? profilePic : defaultAvatar}
+                                    sx={{ width: 120, height: 120 }}
+                                />
                                 <IconButton
                                     aria-label="upload new picture"
                                     size="sm"
+                                    component="span"
                                     variant="outlined"
                                     color="neutral"
-
+                                    onClick={handleUploadClick}
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                                         <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
@@ -95,28 +199,39 @@ export default function MyProfile() {
                                 </IconButton>
                             </Stack>
                         </div>
+                        <Card>
+                            <div className='lg:flex items-center justify-between'>
+                                <div>
+                                    <div><p className='text-gray font-bold'>Name</p>
 
+                                        {userData.name}</div>
+                                    <div><p className='text-gray font-bold'>Department</p>  {userData.department}</div>
+                                </div>
+                                <div>
+                                    <div> <p className='text-gray font-bold'>Designation</p>  {userData.designation}</div>
+                                    <div> <p className='text-gray font-bold'>Phone number</p>  {userData.mobilenumber}</div>
+                                </div>
+                            </div>
+                        </Card>
                         <Stack
                             direction="row"
                             spacing={3}
                             sx={{ display: { md: 'flex' }, my: 1 }}
                         >
-
                             <Stack spacing={2} sx={{ flexGrow: 1 }}>
                                 <Stack spacing={1}>
                                     <FormLabel>Name</FormLabel>
                                     <FormControl
                                         sx={{ display: { sm: 'flex-column', md: 'flex-row' }, gap: 2 }}
                                     >
-                                        <Input size="sm" placeholder="Enter Your Name" />
+                                        <Input size="sm" placeholder="Enter Your Name" name="name" value={formData.name} onChange={handleChange} />
                                     </FormControl>
                                 </Stack>
-                                <Stack >
+                                <Stack>
                                     <FormControl>
                                         <FormLabel>Department</FormLabel>
-                                        <Input size="sm" placeholder='Enter Your Department' />
+                                        <Input size="sm" placeholder='Enter Your Department' name="department" value={formData.department} onChange={handleChange} />
                                     </FormControl>
-
                                 </Stack>
                                 <div>
                                     <FormControl sx={{ flexGrow: 1 }}>
@@ -124,7 +239,9 @@ export default function MyProfile() {
                                         <Input
                                             size="sm"
                                             placeholder="Enter Your Designation "
-
+                                            name="designation"
+                                            value={formData.designation}
+                                            onChange={handleChange}
                                             sx={{ flexGrow: 1 }}
                                         />
                                     </FormControl>
@@ -134,8 +251,10 @@ export default function MyProfile() {
                                         <FormLabel>Phone Number</FormLabel>
                                         <Input
                                             size="sm"
-                                            placeholder="Enter Your Phone Number "
-
+                                            placeholder="Enter Your Phone Number"
+                                            name="mobilenumber"
+                                            value={formData.mobilenumber}  // Bind input value to form data
+                                            onChange={handleChange}       // Handle input changes
                                             sx={{ flexGrow: 1 }}
                                         />
                                     </FormControl>
@@ -147,7 +266,7 @@ export default function MyProfile() {
                             <Button size="sm" variant="outlined" color="neutral">
                                 Cancel
                             </Button>
-                            <Button size="sm" variant="solid">
+                            <Button size="sm" variant="solid" onClick={handleSubmit}>
                                 Save
                             </Button>
                         </CardActions>

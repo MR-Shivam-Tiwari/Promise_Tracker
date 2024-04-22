@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-
+import * as Yup from 'yup';
+import axios from 'axios';
 // material-ui
 import {
     Button,
@@ -18,11 +19,31 @@ import {
     Typography
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import * as Yup from 'yup';
-import { Formik } from 'formik';
+
 import { Box } from '@mui/joy';
 function Register() {
-    const [checked, setChecked] = React.useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        mobilenumber: '',
+        email: '',
+        password: '',
+    });
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post('http://localhost:5000/api/registration', formData);
+            console.log(response.data);
+            navigate('/login');
+        } catch (error) {
+            console.error(error.response.data);
+        }
+    };
+
     const theme = useTheme();
     const [showPassword, setShowPassword] = React.useState(false);
     const handleClickShowPassword = () => {
@@ -38,7 +59,7 @@ function Register() {
                 <Box sx={{ minHeight: '100vh' }}>
                     <Box sx={{ position: 'absolute', filter: 'blur(18px)', zIndex: -1, bottom: 0 }}>
                         <svg width="100%" height="calc(100vh - 175px)" viewBox="0 0 405 809" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            
+
                             <path
                                 d="M-516.39 358.707L-451.914 294.23L-451.846 294.163H-330.545L-378.81 342.428L-391.272 354.889L-440.697 404.314L-434.575 410.453L-157.683 687.328L125.33 404.314L75.8879 354.889L72.4068 351.391L15.1785 294.163H136.48L136.547 294.23L187.082 344.765L246.631 404.314L-157.683 808.629L-561.998 404.314L-516.39 358.707ZM-157.683 0L75.9383 233.622H-45.3627L-157.683 121.301L-270.004 233.622H-391.305L-157.683 0Z"
                                 fill={theme.palette.success.light}
@@ -83,40 +104,53 @@ function Register() {
                                                 Existing User
                                             </button>
                                         </div>
-                                        <form class="space-y-6 mb-6">
+                                        <form onSubmit={handleSubmit} class="space-y-6 mb-6">
                                             <div>
                                                 <input
-                                                    class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full"
+                                                    class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 w-full"
                                                     placeholder="Name"
-                                                    type="Name"
+                                                    type="text"
+                                                    name="name"
+                                                    value={formData.name}
+                                                    onChange={handleChange}
                                                 />
                                             </div>
                                             <div>
                                                 <input
-                                                    class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full"
+                                                    class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 w-full"
                                                     placeholder="Mobile Number"
-                                                    type="Mobile Number"
+                                                    type="text"
+                                                    name="mobilenumber"
+                                                    value={formData.mobilenumber}
+                                                    onChange={handleChange}
                                                 />
                                             </div>
                                             <div>
                                                 <input
-                                                    class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full"
+                                                    class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 w-full"
                                                     placeholder="Email Address"
-                                                    type="Email Address "
+                                                    type="email"
+                                                    name="email"
+                                                    value={formData.email}
+                                                    onChange={handleChange}
                                                 />
                                             </div>
                                             <div>
                                                 <input
-                                                    class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full"
+                                                    class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 w-full"
                                                     placeholder="Password"
-                                                    type="Password"
+                                                    type="password"
+                                                    name="password"
+                                                    value={formData.password}
+                                                    onChange={handleChange}
                                                 />
                                             </div>
 
-                                            <button onClick={()=>navigate('')} class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 w-full bg-[#ff8c00] hover:bg-[#ff7b00] text-white py-3">
+                                            <button type="submit" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-10 px-4 w-full bg-[#ff8c00] hover:bg-[#ff7b00] text-white py-3">
                                                 SIGN UP
                                             </button>
                                         </form>
+
                                         <div class="flex items-center justify-center">
                                             <div class="flex-grow border-t border-gray-300"></div>
                                             <span class="flex-shrink mx-4 text-gray-400">Or Sign Up with</span>
@@ -157,6 +191,9 @@ function Register() {
                                                 <path d="M10 2c1 .5 2 2 2 5"></path>
                                             </svg>
                                         </div>
+                                        <Typography align="center" variant="body2" className='mt-3' gutterBottom>
+                                            Already have an account? <RouterLink className='text-blue font-bold' to="/login">Login</RouterLink>
+                                        </Typography>
                                     </div>
                                 </div>
                             </Grid>
