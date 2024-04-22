@@ -8,7 +8,7 @@ function Home() {
     const navigate = useNavigate();
     return (
         <div>
-            <Box sx={{ minHeight: '100vh' }}>
+            <Box sx={{  }}>
                 <Box sx={{ position: 'absolute', filter: 'blur(18px)', zIndex: -1, bottom: 0 }}>
                     <svg width="100%" height="calc(100vh - 175px)" viewBox="0 0 405 809" fill="none" xmlns="http://www.w3.org/2000/svg">
 
@@ -39,7 +39,7 @@ function Home() {
                 </Box>
 
 
-                <div className=' flex justify-center items-center' style={{ marginTop: "300px" }}>
+                <div className=' flex justify-center items-center' style={{ marginTop: "350px" }}>
                     <div className="flex flex-col">
                         <main className="flex-1">
                             <section className="py-12 md:py-24"> {/* Adjusted the padding */}
@@ -49,7 +49,7 @@ function Home() {
                                             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl">
                                                 Promise Tracker
                                             </h1>
-                                            <p className="mx-auto text-gray-500 md:text-xl dark:text-gray-400">
+                                            <p className="mx-auto text-gray-700  md:text-xl ">
                                                 This productive tool is designed to help you better manage your tasks project-wise
                                                 conveniently
                                             </p>
