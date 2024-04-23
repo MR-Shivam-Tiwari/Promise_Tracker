@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 // material-ui
 import {
@@ -8,9 +8,8 @@ import {
 
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-// import * as Yup from 'yup';
-// import { Formik } from 'formik';
 import { Box } from '@mui/joy';
+import { toast } from 'react-toastify';
 
 function Login() {
     const navigate = useNavigate();
@@ -32,16 +31,23 @@ function Login() {
 
         try {
             // Make a POST request to your server's /signin endpoint
-            const response = await axios.post('http://localhost:5000/api/signin', { email, password });
+            const response = await axios.post('http://192.168.29.178:5000/api/signin', { email, password });
 
             // If login is successful, save user data to localStorage
             localStorage.setItem('userData', JSON.stringify(response.data));
 
             // Navigate to the home page
             navigate('/home');
+            toast.success("Login Successfully")
+            setInterval(() => {
+                window.location.reload();
+
+            }, 500)
+
         } catch (error) {
             // If an error occurs (e.g., invalid credentials), display the error message
             setError(error.response.data.message);
+            toast.error(error.response.data.message);
         }
     };
 

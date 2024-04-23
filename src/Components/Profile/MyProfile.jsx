@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import AspectRatio from '@mui/joy/AspectRatio';
 import Box from '@mui/joy/Box';
 import Button from '@mui/joy/Button';
 import Divider from '@mui/joy/Divider';
@@ -11,7 +10,7 @@ import IconButton from '@mui/joy/IconButton';
 import Stack from '@mui/joy/Stack';
 import Typography from '@mui/joy/Typography';
 import CardActions from '@mui/joy/CardActions';
-
+import { toast } from 'react-toastify';
 import axios from 'axios';
 import { Avatar, Card } from '@mui/joy';
 
@@ -23,6 +22,13 @@ export default function MyProfile() {
     const [selectedImage, setSelectedImage] = useState(null);
     const defaultAvatar = 'https://via.placeholder.com/150'; // Default avatar URL
     const [profilePic, setProfilePic] = useState(null);
+    const [formData, setFormData] = useState({
+        name: '',
+        department: '',
+        designation: '',
+        mobilenumber: '',
+        profilePic: ''
+    });
     // Function to handle file selection
     const handleFileSelect = (event) => {
         const file = event.target.files[0];
@@ -33,13 +39,7 @@ export default function MyProfile() {
     const handleUploadClick = () => {
         document.getElementById('image-upload').click();
     };
-    const [formData, setFormData] = useState({
-        name: '',
-        department: '',
-        designation: '',
-        mobilenumber: '',
-        profilePic: ''
-    });
+
 
     useEffect(() => {
         // Retrieve userData from localStorage
@@ -48,44 +48,44 @@ export default function MyProfile() {
             const userDataObj = JSON.parse(userDataString);
             const userId = userDataObj.userId;
             // Fetch user data using the retrieved userId
-            fetchUserData(userId);
-            console.log(userId)
-            setuserid(userId)
+            setuserid(userId);
         }
     }, []);
 
     useEffect(() => {
-        fetchUserData(userid);
+        if (userid) {
+            fetchUserData(userid);
+        }
     }, [userid]);
 
     // Function to fetch user data
     const fetchUserData = async (userId) => {
         try {
-          const response = await axios.get(`http://localhost:5000/api/user/${userid}`);
-          const userData = response.data;
-          setUserData(userData);
-          setFormData({
-            name: userData.name,
-            department: userData.department,
-            designation: userData.designation,
-            mobilenumber: userData.mobilenumber,
-            profilePic: userData.profilePic,
-          });
-    
-          // Convert base64 image URL to file
-          const base64Image = userData.profilePic;
-          const byteNumbers = atob(base64Image.split(','));
-          const byteArray = [];
-          for (let i = 0; i < byteNumbers.length; i++) {
-            byteArray.push(byteNumbers.charCodeAt(i));
-          }
-          const byteNumbersTypedArray = new Uint8Array(byteArray);
-          const blob = new Blob([byteNumbersTypedArray], { type: 'image/jpeg' });
-          setProfilePic(URL.createObjectURL(blob));
+            const response = await axios.get(`http://192.168.29.178:5000/api/user/${userid}`);
+            const userData = response.data;
+            setUserData(userData);
+            setFormData({
+                name: userData.name,
+                department: userData.department,
+                designation: userData.designation,
+                mobilenumber: userData.mobilenumber,
+                profilePic: userData.profilePic,
+            });
+
+            // Convert base64 image URL to file
+            const base64Image = userData.profilePic;
+            const byteNumbers = atob(base64Image.split(','));
+            const byteArray = [];
+            for (let i = 0; i < byteNumbers.length; i++) {
+                byteArray.push(byteNumbers.charCodeAt(i));
+            }
+            const byteNumbersTypedArray = new Uint8Array(byteArray);
+            const blob = new Blob([byteNumbersTypedArray], { type: 'image/jpeg' });
+            setProfilePic(URL.createObjectURL(blob));
         } catch (error) {
-          console.error('Error fetching user data:', error);
+            console.error('Error fetching user data:', error);
         }
-      };
+    };
 
     // Function to handle form input changes
     const handleChange = (e) => {
@@ -94,44 +94,89 @@ export default function MyProfile() {
 
     // Function to handle form submission
     // Function to handle form submission
-const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-        if (!selectedImage) {
-            console.error('No image selected');
-            return;
-        }
-
-        // Convert selected image file to Base64
-        const reader = new FileReader();
-        reader.onload = async () => {
-            const base64Image = reader.result.split(',')[1]; // Extract Base64 string
-            const formDataWithImage = {
-                profilePic: base64Image,
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const formDataWithOtherData = {
                 name: formData.name,
                 department: formData.department,
                 designation: formData.designation,
                 mobilenumber: formData.mobilenumber,
             };
 
-            // Send JSON payload to server
-            try {
-                const response = await axios.put(`http://localhost:5000/api/users/${userid}`, formDataWithImage);
-
-                // Handle successful response from server
-                console.log('User data updated successfully:', response.data);
-                // You can also update state or perform any other action based on the response
-            } catch (error) {
-                // Handle error from server
-                console.error('Error updating user data:', error);
+            // Send JSON payload to server only if text data is updated
+            let updateTextData = false; // Flag to check if text data is updated
+            for (const key in formDataWithOtherData) {
+                if (formDataWithOtherData[key] !== userData[key]) {
+                    updateTextData = true;
+                    break;
+                }
             }
-        };
-        reader.readAsDataURL(selectedImage); // Read the selected image file as a data URL
-    } catch (error) {
-        // Handle error
-        console.error('Error updating user data:', error);
-    }
-};
+
+            if (updateTextData) {
+                try {
+                    const response = await axios.put(`http://192.168.29.178:5000/api/users/${userid}`, formDataWithOtherData);
+                    console.log('Text data updated successfully:', response.data);
+                    toast.success("User Details Updated");
+
+                    // Refresh the page after updating text data
+                    setInterval(() => {
+                        window.location.reload();
+                    }, 2000);
+
+                    // You can also update state or perform any other action based on the response
+                } catch (error) {
+                    console.error('Error updating text data:', error);
+                }
+            }
+
+            // Upload image only if a new image is selected
+            if (selectedImage) {
+                // Convert selected image file to Base64
+                const reader = new FileReader();
+                reader.onload = async () => {
+                    const base64Image = reader.result.split(',')[1]; // Extract Base64 string
+                    const formDataWithImage = {
+                        profilePic: base64Image,
+                    };
+
+                    // Send JSON payload to server to update image
+                    try {
+                        const response = await axios.put(`http://192.168.29.178:5000/api/users/${userid}`, formDataWithImage);
+                        console.log('User image updated successfully:', response.data);
+
+                        toast.success("User image updated successfully");
+                        // You can also update state or perform any other action based on the response
+                        setInterval(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } catch (error) {
+                        console.error('Error updating user image:', error);
+                    }
+                };
+                reader.readAsDataURL(selectedImage); // Read the selected image file as a data URL
+            } else {
+                // Use the previous profile picture if no new image is selected
+                const formDataWithoutImage = {
+                    profilePic: userData.profilePic,
+                };
+                // Send JSON payload to server to update image
+                try {
+                    const response = await axios.put(`http://192.168.29.178:5000/api/users/${userid}`, formDataWithoutImage);
+                    console.log('User data updated successfully:', response.data);
+                    // You can also update state or perform any other action based on the response
+                } catch (error) {
+                    console.error('Error updating user data:', error);
+                }
+            }
+        } catch (error) {
+            // Handle other errors
+            console.error('Error updating user data:', error);
+        }
+    };
+
+
+
 
 
 

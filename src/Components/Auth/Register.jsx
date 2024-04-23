@@ -1,26 +1,17 @@
 import React, { useState } from 'react'
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import * as Yup from 'yup';
 import axios from 'axios';
 // material-ui
 import {
-    Button,
-    Checkbox,
-    Divider,
-    FormControlLabel,
-    FormHelperText,
+
     Grid,
-    Link,
-    IconButton,
-    InputAdornment,
-    InputLabel,
-    OutlinedInput,
-    Stack,
+
     Typography
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 import { Box } from '@mui/joy';
+import { toast } from 'react-toastify';
 function Register() {
     const [formData, setFormData] = useState({
         name: '',
@@ -35,12 +26,20 @@ function Register() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        // Check if any field is empty
+        if (Object.values(formData).some(value => value === '')) {
+            toast.error("Please fill in all the fields");
+            return; // Stop further execution
+        }
+
         try {
-            const response = await axios.post('http://localhost:5000/api/registration', formData);
+            const response = await axios.post('http://192.168.29.178:5000/api/registration', formData);
             console.log(response.data);
+            toast.success("Registered Successfully");
             navigate('/login');
         } catch (error) {
             console.error(error.response.data);
+            toast.error("Registration failed. Please try again later.");
         }
     };
 

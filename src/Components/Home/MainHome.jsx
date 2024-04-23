@@ -1,7 +1,33 @@
 import { CircularProgress, LinearProgress, Typography } from '@mui/joy'
-import React from 'react'
-
+import React, { useEffect, useState } from 'react'
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import axios from 'axios';
 function MainHome() {
+    const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
+    // Set the thickness and size based on screen size
+    const progressWidth = isSmallScreen ? '12px' : '24px';
+    const progressSize = isSmallScreen ? '100px' : '180px';
+    const [taskData, setTaskData] = useState("")
+
+useEffect(() =>{
+    const fetchData = async()=>{
+        try{
+            const response = await axios.get('http://192.168.29.178:5000/api/tasks');
+            setTaskData(response.data);
+        }catch (error){
+            console.log("Error fetching Task  ",error)
+
+        }
+    };
+    fetchData();
+},[]);
+
+
+
+
     return (
         <div>
             <div className="flex flex-col w-full min-h-screen bg-gray-100 rounded-lg">
@@ -9,25 +35,36 @@ function MainHome() {
                 <main className="flex-1 p-2 md:p-8 grid gap-4 md:gap-4">
                     <div className="grid md:grid-cols-2 gap-4 md:gap-4">
                         <div className="rounded-lg border bg-card  flex items-center justify-center shadow-sm" style={{ background: "#0A91D0" }} >
-                            <div className="flex gap-9 items-center justify-center  p-2">
+                            <div className="flex gap-9 items-center justify-center  px-3">
                                 <div className="">
                                     <div className='flex items-center justify-center'>
 
-                                        <h3 className="text-1xl lg:text-3xl font-semibold text-black text-center lg:text-start">
+                                        <h3 className="text-1xl lg:text-2xl font-semibold text-white text-center lg:text-start">
                                             Your today’s task is almost done!
                                         </h3>
 
                                     </div>
-                                    <div className='flex items-center justify-center'>
+                                    <div className='flex items-center  justify-center'>
 
                                         <button className=" mt-5 w-full lg:w-[50%] h-full lg:h-14   text-black   rounded-md text-sm font-medium  px-2 py-2" style={{ background: "#EA791D" }}>
                                             View tasks
                                         </button>
                                     </div>
                                 </div>
-                                <div>
-                                    <CircularProgress thickness={24} size="lg" sx={{ color: "red", '--CircularProgress-size': '180px', '--LinearProgress-thickness': '24px', }} determinate value={70}  >
-                                        <Typography className="text-black text-lg">70%</Typography>
+                                <div className='flex items-center  justify-center p-3'>
+                                    <CircularProgress
+                                        thickness={isSmallScreen ? 10 : 24}
+                                        className="bg-gray-700"
+                                        size="lg"
+                                        sx={{
+                                            color: "",
+                                            '--CircularProgress-size': progressSize,
+                                            '--LinearProgress-thickness': progressWidth,
+                                        }}
+                                        determinate
+                                        value={70}
+                                    >
+                                        <Typography className="text-white text-lg">70%</Typography>
                                     </CircularProgress>
                                 </div>
                             </div>
@@ -40,6 +77,7 @@ function MainHome() {
                     </div>
 
                     <div>
+                        <h2 className="text-xl text-black font-semibold">In Progress</h2>
                         <main class="flex flex-col gap-6  md:p-10">
                             <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                 <div class="border bg-card text-card-foreground rounded-lg shadow-md" >
@@ -165,7 +203,7 @@ function MainHome() {
                     </div>
                     <div className="grid ">
                         <h2 className="text-xl text-black font-semibold">Task Groups</h2>
-                        <div  className="  border mt-4 rounded-lg" >
+                        <div className="  border mt-4 rounded-lg" >
                             <div style={{ minWidth: "100%", display: "table" }}>
                                 <div className="p-4 space-y-4">
                                     <div className="flex items-center justify-between">

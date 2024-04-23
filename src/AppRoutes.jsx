@@ -11,12 +11,11 @@ import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import Sidebar from './Components/Sidebar/Sidebar';
 import Header from './Components/Header/Header';
-import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import MyProfile from './Components/Profile/MyProfile';
 import Approvals from './Components/Approvals/Approvals';
 import Task from './Components/Task/Task';
 import MainHome from './Components/Home/MainHome';
-import { Avatar, Button, DialogTitle, IconButton, Modal, ModalClose, ModalDialog } from '@mui/joy';
+import { Avatar, Button, IconButton, Modal, ModalClose, ModalDialog } from '@mui/joy';
 import Add from '@mui/icons-material/Add';
 import ColorSchemeToggle from './Components/ColorToggle/ColorSchemeToggle';
 import AddTask from './Components/Task/AddTask';
@@ -69,7 +68,7 @@ function AppRoutes() {
     // Function to fetch user data
     const fetchUserData = async (userId) => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/user/${userid}`);
+            const response = await axios.get(`http://192.168.29.178:5000/api/user/${userid}`);
             const userData = response.data;
             setUserData(userData);
             setFormData({
@@ -118,7 +117,7 @@ function AppRoutes() {
 
                 // Send JSON payload to server
                 try {
-                    const response = await axios.put(`http://localhost:5000/api/users/${userid}`, formDataWithImage);
+                    const response = await axios.put(`http://192.168.29.178:5000/api/users/${userid}`, formDataWithImage);
 
                     // Handle successful response from server
                     console.log('User data updated successfully:', response.data);

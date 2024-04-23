@@ -1,38 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import GlobalStyles from '@mui/joy/GlobalStyles';
-import Avatar from '@mui/joy/Avatar';
 import Box from '@mui/joy/Box';
-import Button from '@mui/joy/Button';
-import Card from '@mui/joy/Card';
-import Chip from '@mui/joy/Chip';
-import Divider from '@mui/joy/Divider';
 import IconButton from '@mui/joy/IconButton';
-import Input from '@mui/joy/Input';
-import LinearProgress from '@mui/joy/LinearProgress';
 import List from '@mui/joy/List';
 import ListItem from '@mui/joy/ListItem';
 import ListItemButton, { listItemButtonClasses } from '@mui/joy/ListItemButton';
 import ListItemContent from '@mui/joy/ListItemContent';
 import Typography from '@mui/joy/Typography';
 import Sheet from '@mui/joy/Sheet';
-import Stack from '@mui/joy/Stack';
-import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
-import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
-import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded';
-import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
-import QuestionAnswerRoundedIcon from '@mui/icons-material/QuestionAnswerRounded';
-import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
-import SupportRoundedIcon from '@mui/icons-material/SupportRounded';
-import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
-import BrightnessAutoRoundedIcon from '@mui/icons-material/BrightnessAutoRounded';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import SummarizeIcon from '@mui/icons-material/Summarize';
-import ColorSchemeToggle from '../ColorToggle/ColorSchemeToggle';
 import { closeSidebar } from './utils';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function Toggler({ defaultExpanded = false, renderToggle, children }) {
     const [open, setOpen] = useState(defaultExpanded);
@@ -65,25 +44,29 @@ export default function Sidebar({ onSidebarItemClick }) {
             const routeName = location.pathname.split('/').pop().replace(/-/g, ' ');
             setCurrentRouteName(routeName.charAt(0).toUpperCase() + routeName.slice(1));
         };
-
+        console.log(currentRouteName)
         // Call handleRouteChange initially and add listener for subsequent changes
         handleRouteChange();
         return () => {
             // Clean up listener when component unmounts
         };
     }, [location.pathname]);
-    const handleItemClick = (itemName, route) => {
-        // You can perform any actions here, such as navigating to a route or updating state
-        console.log(`Clicked on ${itemName}, navigating to ${route}`);
-    };
+    // const handleItemClick = (itemName, route) => {
+    //     // You can perform any actions here, such as navigating to a route or updating state
+    //     console.log(`Clicked on ${itemName}, navigating to ${route}`);
+    // };
 
 
     const handleLogout = () => {
-        // Clear user data from localStorage upon logout
+        // Clear user data from localStorage upon logout 
         localStorage.removeItem('userData');
-
+        toast.error("Logout Successfully")
         // Optional: Redirect to the login page or any other page after logout
         navigate('/login');
+        setInterval(() =>{
+
+            window.location.reload();
+        },1000);
     };
     return (
         <Sheet
@@ -138,8 +121,8 @@ export default function Sidebar({ onSidebarItemClick }) {
                 onClick={() => closeSidebar()}
             />
             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                <Typography style={{fontSize:"27px", fontWeight:"bold"}}>Promise Tracker</Typography>
-                
+                <Typography style={{ fontSize: "27px", fontWeight: "bold" }}>Promise Tracker</Typography>
+
             </Box>
             {/* <Input size="sm" startDecorator={<SearchRoundedIcon />} placeholder="Search" /> */}
             <Box
@@ -253,7 +236,14 @@ export default function Sidebar({ onSidebarItemClick }) {
 
             </Box>
 
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'start' }}>
 
+
+                <IconButton onClick={handleLogout} size="sm" className='flex px-5 gap-3 items-center ' variant="plain" color="neutral">
+                    <Typography style={{ fontSize: "30px" }}>Logout</Typography>
+                    <LogoutRoundedIcon style={{ fontSize: "30px" }} />
+                </IconButton>
+            </Box>
         </Sheet >
     );
 }
