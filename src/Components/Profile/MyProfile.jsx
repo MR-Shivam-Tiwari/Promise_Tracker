@@ -13,12 +13,14 @@ import CardActions from '@mui/joy/CardActions';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { Avatar, Card } from '@mui/joy';
+import { useNavigate } from 'react-router-dom';
 
 
 
 export default function MyProfile() {
     const [userData, setUserData] = useState({});
     const [userid, setuserid] = useState("")
+    const navigate = useNavigate();
     const [selectedImage, setSelectedImage] = useState(null);
     const defaultAvatar = 'https://via.placeholder.com/150'; // Default avatar URL
     const [profilePic, setProfilePic] = useState(null);
@@ -61,7 +63,7 @@ export default function MyProfile() {
     // Function to fetch user data
     const fetchUserData = async (userId) => {
         try {
-            const response = await axios.get(`http://192.168.29.178:5000/api/user/${userid}`);
+            const response = await axios.get(`http://localhost:5000/api/user/${userid}`);
             const userData = response.data;
             setUserData(userData);
             setFormData({
@@ -115,7 +117,7 @@ export default function MyProfile() {
 
             if (updateTextData) {
                 try {
-                    const response = await axios.put(`http://192.168.29.178:5000/api/users/${userid}`, formDataWithOtherData);
+                    const response = await axios.put(`http://localhost:5000/api/users/${userid}`, formDataWithOtherData);
                     console.log('Text data updated successfully:', response.data);
                     toast.success("User Details Updated");
 
@@ -142,14 +144,18 @@ export default function MyProfile() {
 
                     // Send JSON payload to server to update image
                     try {
-                        const response = await axios.put(`http://192.168.29.178:5000/api/users/${userid}`, formDataWithImage);
+                        const response = await axios.put(`http://localhost:5000/api/users/${userid}`, formDataWithImage);
                         console.log('User image updated successfully:', response.data);
 
                         toast.success("User image updated successfully");
                         // You can also update state or perform any other action based on the response
                         setInterval(() => {
                             window.location.reload();
-                        }, 2000);
+                        }, 1000);
+                        setInterval(() => {
+                            navigate("/profile")
+                        }, 1000);
+                        
                     } catch (error) {
                         console.error('Error updating user image:', error);
                     }
@@ -162,7 +168,7 @@ export default function MyProfile() {
                 };
                 // Send JSON payload to server to update image
                 try {
-                    const response = await axios.put(`http://192.168.29.178:5000/api/users/${userid}`, formDataWithoutImage);
+                    const response = await axios.put(`http://localhost:5000/api/users/${userid}`, formDataWithoutImage);
                     console.log('User data updated successfully:', response.data);
                     // You can also update state or perform any other action based on the response
                 } catch (error) {

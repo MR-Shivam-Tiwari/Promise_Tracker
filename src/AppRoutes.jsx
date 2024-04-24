@@ -68,7 +68,7 @@ function AppRoutes() {
     // Function to fetch user data
     const fetchUserData = async (userId) => {
         try {
-            const response = await axios.get(`http://192.168.29.178:5000/api/user/${userid}`);
+            const response = await axios.get(`http://localhost:5000/api/user/${userid}`);
             const userData = response.data;
             setUserData(userData);
             setFormData({
@@ -117,7 +117,7 @@ function AppRoutes() {
 
                 // Send JSON payload to server
                 try {
-                    const response = await axios.put(`http://192.168.29.178:5000/api/users/${userid}`, formDataWithImage);
+                    const response = await axios.put(`http://localhost:5000/api/users/${userid}`, formDataWithImage);
 
                     // Handle successful response from server
                     console.log('User data updated successfully:', response.data);

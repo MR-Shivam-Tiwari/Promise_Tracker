@@ -16,40 +16,28 @@ function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
-    const [checked, setChecked] = React.useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const theme = useTheme();
-    const [showPassword, setShowPassword] = React.useState(false);
-    const handleClickShowPassword = () => {
-        setShowPassword(!showPassword);
-    };
 
-    const handleMouseDownPassword = (event) => {
-        event.preventDefault();
-    };
+
     const handleSignIn = async (e) => {
         e.preventDefault();
-
         try {
-            // Make a POST request to your server's /signin endpoint
-            const response = await axios.post('http://192.168.29.178:5000/api/signin', { email, password });
-
-            // If login is successful, save user data to localStorage
+            const response = await axios.post('http://localhost:5000/api/signin', { email, password });
             localStorage.setItem('userData', JSON.stringify(response.data));
-
-            // Navigate to the home page
             navigate('/home');
-            toast.success("Login Successfully")
-            setInterval(() => {
+            toast.success("Login Successfully");
+            setTimeout(() => {
                 window.location.reload();
-
-            }, 500)
-
+            }, 500);
         } catch (error) {
-            // If an error occurs (e.g., invalid credentials), display the error message
-            setError(error.response.data.message);
-            toast.error(error.response.data.message);
+            const errorMessage = error.response?.data.message || error.message || "An unexpected error occurred.";
+            setError(errorMessage);
+            toast.error(errorMessage);
         }
     };
+
+
 
     return (
         <div>

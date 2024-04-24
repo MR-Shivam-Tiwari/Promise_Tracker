@@ -15,7 +15,7 @@ function MainHome() {
 useEffect(() =>{
     const fetchData = async()=>{
         try{
-            const response = await axios.get('http://192.168.29.178:5000/api/tasks');
+            const response = await axios.get('http://localhost:5000/api/tasks');
             setTaskData(response.data);
         }catch (error){
             console.log("Error fetching Task  ",error)
