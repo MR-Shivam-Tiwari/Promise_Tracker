@@ -61,9 +61,7 @@ function AppRoutes() {
         }
     }, []);
 
-    useEffect(() => {
-        fetchUserData(userid);
-    }, [userid]);
+  
 
     // Function to fetch user data
     const fetchUserData = async (userId) => {
@@ -93,47 +91,11 @@ function AppRoutes() {
             console.error('Error fetching user data:', error);
         }
     };
-
+    useEffect(() => {
+        fetchUserData(userid);
+    }, [userid]);
     // Function to handle form input changes
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    // Function to handle form submission
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            // Convert selected image file to Base64
-            const reader = new FileReader();
-            reader.onload = async () => {
-                const base64Image = reader.result.split(',')[1]; // Extract Base64 string
-                const formDataWithImage = {
-                    profilePic: base64Image,
-                    name: formData.name,
-                    department: formData.department,
-                    designation: formData.designation,
-                    mobilenumber: formData.mobilenumber,
-                };
-
-                // Send JSON payload to server
-                try {
-                    const response = await axios.put(`http://localhost:5000/api/users/${userid}`, formDataWithImage);
-
-                    // Handle successful response from server
-                    console.log('User data updated successfully:', response.data);
-                    // You can also update state or perform any other action based on the response
-                } catch (error) {
-                    // Handle error from server
-                    console.error('Error updating user data:', error);
-                }
-            };
-            reader.readAsDataURL(selectedImage); // Read the selected image file as a data URL
-        } catch (error) {
-            // Handle error
-            console.error('Error updating user data:', error);
-        }
-    };
-
+  
 
 
     const handleRouteChange = () => {
@@ -203,7 +165,7 @@ function AppRoutes() {
                                         Add Task
                                     </Button>
                                     <Modal className="mt-14" open={open} onClose={() => setOpen(false)}>
-                                        <ModalDialog maxWidth={1000} minWidth={1000} style={{ height: "800px", overflow: "auto" }} >
+                                        <ModalDialog className="bg-gray-200" maxWidth={1000} minWidth={1000} style={{ height: "800px", overflow: "auto" }} >
                                             <ModalClose />
                                             <form onSubmit={() => setOpen(false)}>
                                                 <AddTask />

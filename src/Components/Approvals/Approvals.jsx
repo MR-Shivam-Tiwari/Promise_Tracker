@@ -9,19 +9,26 @@ function Approvals() {
     const [tasks, setTasks] = useState([]);
     const [open, setOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
+    const [shouldRefreshData, setShouldRefreshData] = useState(false); // State variable to track whether data should be refreshed
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/tasks');
+            setTasks(response.data);
+        } catch (error) {
+            console.error('Error fetching tasks:', error);
+        }
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get('http://localhost:5000/api/tasks');
-                setTasks(response.data);
-            } catch (error) {
-                console.error('Error fetching tasks:', error);
-            }
-        };
-
         fetchData();
     }, []);
+
+    const handleCloseModal = () => {
+        setOpen(false);
+        setSelectedTask(null);
+        fetchData(); // Call fetchData function when modal is closed
+    };
 
     // Filtered tasks based on selected status
     const filteredTasks = selectedStatus === 'All' ? tasks : tasks.filter(task => task.category === selectedStatus);
@@ -29,6 +36,7 @@ function Approvals() {
         setSelectedTask(task);
         setOpen(true);
     };
+
     return (
         <div>
             <style>{`
@@ -157,7 +165,7 @@ function Approvals() {
                                                         >
                                                             <ModalDialog maxWidth={600} minWidth={300} style={{ height: "520px", overflow: "auto" }} >
                                                                 <ModalClose variant="plain" />
-                                                                {selectedTask && <EditApprovals task={selectedTask} taskId={selectedTask?._id} />}
+                                                                {selectedTask && <EditApprovals task={selectedTask} taskId={selectedTask?._id} onClose={handleCloseModal} />}
                                                             </ModalDialog>
                                                         </Modal>
 

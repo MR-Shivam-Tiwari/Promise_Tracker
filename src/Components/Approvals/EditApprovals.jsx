@@ -3,44 +3,72 @@ import React, { useState } from 'react'
 import { toast } from 'react-toastify';
 
 
-function EditApprovals({ taskId, task }) {
-    const [remark, setRemark] = useState('');
+function EditApprovals({ taskId, task, onClose }) {
     const [status, setStatus] = useState('');
-    const [isLoading, setIsLoading] = useState(false);  // Declare and initialize isLoading state here
     // const [toast, setToast] = useState('');
-    console.log("Task ID :", task?._id);
+    console.log("Task ID :", taskId);
+    const [remark, setRemark] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
     const handleApprove = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.put(`http://localhost:5000/api/category/${task?._id}`, {
-                category: 'approved',
-                status,
-                remark
+            const response = await fetch(`http://localhost:5000/api/category/${taskId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    categoryAction: 'Approved',
+                    remark: remark,
+                }),
             });
-            toast.success('Task approved successfully!');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            // Handle successful response
+            console.log('Task approved successfully');
+            toast.success('Task approved successfully');
+            onClose(true);
+
         } catch (error) {
-            console.error(error);
-            toast.error('Failed to approve task.');
+            console.error('There was a problem with the request:', error);
+            toast.error('There was a problem with the request:', error);
+            // Handle error
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     };
 
     const handleUnapprove = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.put(`http://localhost:5000/api/category/${task?._id}`, {
-                category: 'unapproved',
-                status,
-                remark
+            const response = await fetch(`http://localhost:5000/api/category/${taskId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    categoryAction: 'Unapproved',
+                    remark: remark,
+                }),
             });
-            toast.success('Task unapproved successfully!');
-        } catch (error) {
-            console.error(error);
-            toast.error('Failed to unapprove task.');
-        }
-        setIsLoading(false);
-    };
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            // Handle successful response
+            console.log('Task unapproved successfully');
+            toast.warn('Task unapproved successfully');
+            onClose(true);
 
+        } catch (error) {
+            console.error('There was a problem with the request:', error);
+            toast.error('There was a problem with the request:', error);
+            // Handle error
+        } finally {
+            setIsLoading(false);
+        }
+    };
     return (
         <div>
             <div>
@@ -84,16 +112,16 @@ function EditApprovals({ taskId, task }) {
                         <button
                             className="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-red-500 text-white hover:bg-red-600 disabled:bg-red-300"
                             onClick={handleUnapprove}
-                            disabled={isLoading}  // Disable the button based on isLoading state
+                            disabled={isLoading}
                         >
-                            Unapprove
+                            Unapproved
                         </button>
                         <button
                             className="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-green-500 text-white hover:bg-green-600 disabled:bg-green-300"
                             onClick={handleApprove}
-                            disabled={isLoading}  // Disable the button based on isLoading state
+                            disabled={isLoading}
                         >
-                            Approve
+                            Approved
                         </button>
 
                     </div>
