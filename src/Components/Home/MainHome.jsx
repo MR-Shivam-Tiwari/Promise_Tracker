@@ -10,8 +10,10 @@ import { useNavigate } from 'react-router-dom';
 import AddTask from '../Task/AddTask';
 import Add from '@mui/icons-material/Add';
 import CreateGroups from '../Group/CreateGroups';
+import EditGroup from '../Group/EditGroup';
 function MainHome() {
     const [open, setOpen] = useState(false);
+    const [EditModal, setEditModal] = useState(false);
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
     const navigate = useNavigate();
@@ -181,10 +183,29 @@ function MainHome() {
                                     color="neutral"
                                     className='text-lg'
                                     startDecorator={<Add />}
+                                    onClick={() => setOpen(true)}
                                 >
                                     Add Groups
                                 </Button>
                             </div>
+                            <Modal className="mt-14" open={open} onClose={() => setOpen(false)}>
+                                <ModalDialog className=" px-5 max-w-md rounded-lg bg-white shadow-lg dark:bg-gray-900" minWidth={500} style={{ height: "600px", overflow: "auto" }} >
+
+                                    <form onSubmit={() => setOpen(false)}>
+                                        <div class=" w-full max-w-md bg-white  dark:bg-gray-900 ">
+                                            <div class="mb-6 flex items-center justify-between">
+                                                <h2 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Create New Group</h2>
+
+                                                <ModalClose />
+
+
+                                            </div>
+
+                                            <CreateGroups />
+                                        </div>
+                                    </form>
+                                </ModalDialog>
+                            </Modal>
                         </div>
                         <div className="  border mt-4 rounded-lg" >
                             <div style={{ minWidth: "100%", display: "table" }}>
@@ -298,28 +319,19 @@ function MainHome() {
                                                         </form>
                                                     </ModalDialog>
                                                 </Modal>
-                                                <Button onClick={() => setOpen(true)} variant="outlined"
+                                                <Button onClick={() => setEditModal(true)} variant="outlined"
                                                     color="neutral" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gray-200 text-black hover:bg-primary/90 h-10 px-4 py-2">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                                                         <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
                                                         <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
                                                     </svg>
                                                 </Button>
-                                                <Modal className="mt-14" open={open} onClose={() => setOpen(false)}>
-                                                    <ModalDialog className=" px-5 max-w-md rounded-lg bg-white shadow-lg dark:bg-gray-900" minWidth={500} style={{ height: "600px", overflow: "auto" }} >
+                                                <Modal className="mt-14" open={EditModal} onClose={() => setEditModal(false)}>
+                                                    <ModalDialog className="" minWidth={500} style={{ height: "600px", overflow: "auto" }} >
 
-                                                        <form onSubmit={() => setOpen(false)}>
-                                                            <div class=" w-full max-w-md bg-white  dark:bg-gray-900 ">
-                                                                <div class="mb-6 flex items-center justify-between">
-                                                                    <h2 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Create New Group</h2>
-
-                                                                    <ModalClose />
-
-
-                                                                </div>
-
-                                                                <CreateGroups />
-                                                            </div>
+                                                        <ModalClose />
+                                                        <form onSubmit={() => setEditModal(false)}>
+                                                            <EditGroup />
                                                         </form>
                                                     </ModalDialog>
                                                 </Modal>
@@ -332,17 +344,25 @@ function MainHome() {
                                                     </svg>
                                                 </Button>
                                                 <Modal className="mt-14" open={deletemodal} onClose={() => setDeletemodal(false)}>
-                                                    <ModalDialog className="" minWidth={500} style={{ overflow: "auto" }} >
+                                                    <ModalDialog className="" minWidth={300} style={{ height: "200px" }} >
 
                                                         <form onSubmit={() => setDeletemodal(false)}>
 
                                                             <ModalClose />
 
-                                                            <div>
-                                                                <h3> Are You Sure? </h3>
+                                                            <div className='p-3 mt-2'>
+                                                                <h1 className='text-lg font-bold '>Are you sure <br /> you want to delete this Group?
+                                                                </h1>
+
+                                                                <div class="flex justify-between gap-2 mt-6">
+                                                                    <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:bg-yellow-200 h-10 px-4 py-2">
+                                                                        Cancel
+                                                                    </button>
+                                                                    <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-red-600  text-white hover:bg-red-800 h-10 px-4 py-2">
+                                                                        Delete
+                                                                    </button>
+                                                                </div>
                                                             </div>
-
-
                                                         </form>
                                                     </ModalDialog>
                                                 </Modal>
