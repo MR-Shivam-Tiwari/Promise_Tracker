@@ -1,198 +1,167 @@
-import React from 'react'
+import { Autocomplete, Button } from '@mui/joy'
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
+import { toast } from 'react-toastify';
 
-function EditGroup() {
+function EditGroup({Editid}) {
+    const [departmentHeads, setDepartmentHeads] = useState([]);
+    const [selectProjectLead, setProjectLead] = useState([]);
+    const [selectmembers, setMembers] = useState([]);
+    const [userNamesEmail, setUserNamesEmail] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [formData, setFormData] = useState({
+        groupName: '',
+        deptHead: [],
+        projectLead: [],
+        members: [],
+        profilePic: null
+    });
+
+    const handleChange = (e, value, fieldName) => {
+        // Map selected user names to corresponding user objects
+        const selectedUsers = value.map((name) => {
+            return selectmembers.find((member) => member.name === name);
+        });
+        setFormData({ ...formData, [fieldName]: selectedUsers });
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            setFormData({ ...formData, profilePic: reader.result });
+        };
+        reader.onerror = (error) => {
+            console.error('Error reading the file:', error);
+        };
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await axios.put(`http://localhost:5000/api/TGroup/${Editid}`, formData);
+            // Optionally, you can redirect or display a success message here
+            toast.success("Successfully updated Group")
+            setInterval(() =>{
+                window.location.reload();
+            }, 2000)
+        } catch (error) {
+            console.error('Error updating group:', error);
+            toast.error('Error updating group:', error);
+            // Handle error appropriately
+        }
+    };
+//  console.log("groupidedit", Editid)
+    useEffect(() => {
+        const fetchRegisteredNames = async () => {
+            try {
+                const response = await axios.get("http://localhost:5000/api/userData");
+                setUserNamesEmail(response.data);
+                const filteredDepartmentHeads = response.data.filter(
+                    (user) => user.userRole === 1
+                );
+                setDepartmentHeads(filteredDepartmentHeads);
+                const filteredProjectlead = response.data.filter(
+                    (user) => user.userRole === 2
+                );
+                setProjectLead(filteredProjectlead);
+                const filtermember = response.data.filter(
+                    (user) => user.userRole === 3
+                );
+                setMembers(filtermember);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                setError("Internal Server Error");
+                setLoading(false);
+            }
+        };
+
+        fetchRegisteredNames();
+    }, []);
     return (
         <div>
-            <h2 class="text-2xl font-bold tracking-tight ">Edit Group</h2>
-            <div>
-                <label for="group-name" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
-                    Group Name
-                </label>
-                <input
-                    id="group-name"
-                    class=" w-full rounded-lg border border-gray-300  p-2.5 text-gray-900  "
-                    placeholder="Enter group name"
-                    required=""
-                    type="text"
-                />
-            </div>
-            <div>
-                <label for="department-head" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
-                    Department Head
-                </label>
-                <div class="relative">
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <svg
-                            aria-hidden="true"
-                            class="h-5 w-5 text-gray-500 dark:text-gray-400"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-
-                        </svg>
-                    </div>
-                    <select
+            <h2 class="text-2xl font-bold tracking-tight ">Update Group</h2>
+            <form className="space-y-6" onSubmit={handleSubmit}>
+                <div >
+                    <label class="mb-2 block text-sm font-medium text-gray-900 dark:text-white" for="profile-pic">
+                        Profile Pic
+                    </label>
+                    <input
+                        id="profile-pic"
+                        className="block w-full rounded-lg border p-2.5 text-gray-900 bg-white"
+                        type="file"
+                        onChange={handleImageChange}
+                    />
+                </div>
+                <div>
+                    <label for="group-name" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                        Group Name
+                    </label>
+                    <input
+                        id="group-name"
+                        className="block w-full rounded-lg border border-gray-300 bg-white p-1.5 text-gray-900    dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                        placeholder="Enter group name"
+                        required=""
+                        type="text"
+                        name="groupName"
+                        value={formData.groupName}
+                        onChange={(e) => setFormData({ ...formData, groupName: e.target.value })}
+                    />
+                </div>
+                <div>
+                    <label for="department-head" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                        Department Head
+                    </label>
+                    <Autocomplete
                         id="department-head"
-                        class=" w-full rounded-lg border border-gray-300  p-2.5 text-gray-900"
-                    >
-                        <option>Select department head</option>
-                        <option value="john-doe">John Doe</option>
-                        <option value="jane-smith">Jane Smith</option>
-                        <option value="bob-johnson">Bob Johnson</option>
-                    </select>
+                        className="mb-3"
+                        options={departmentHeads.map((head) => head.name)}
+                        multiple
+                        onChange={(e, value) => handleChange(e, value, 'deptHead')}
+                        renderInput={(params) => <input {...params} className="flex w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm" />}
+                    />
                 </div>
-            </div>
-            <div>
-                <label for="project-lead" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
-                    Project Lead
-                </label>
-                <div class="relative">
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <svg
-                            aria-hidden="true"
-                            class="h-5 w-5 text-gray-500 dark:text-gray-400"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-
-                        </svg>
-                    </div>
-                    <select
-                        multiple=""
+                <div>
+                    <label for="project-lead" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                        Project Lead
+                    </label>
+                    <Autocomplete
                         id="project-lead"
-                        class=" w-full rounded-lg border border-gray-300  p-2.5 text-gray-900"
-                    >
-                        <option value="john-doe">John Doe</option>
-                        <option value="jane-smith">Jane Smith</option>
-                        <option value="bob-johnson">Bob Johnson</option>
-                    </select>
-                </div>
-                <div class="mt-2 flex flex-wrap gap-2">
-                    <div class="flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800 dark:bg-blue-800 dark:text-blue-100">
-                        John Doe
-                        <button
-                            type="button"
-                            class="ml-2 inline-flex h-4 w-4 items-center justify-center rounded-full bg-blue-800 text-white hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 dark:focus:ring-offset-gray-900"
-                        >
-                            <span class="sr-only">Remove John Doe</span>
-                            <svg class="h-2 w-2" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true">
-                                <path d="M1 1l6 6M7 1L1 7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800 dark:bg-blue-800 dark:text-blue-100">
-                        Jane Smith
-                        <button
-                            type="button"
-                            class="ml-2 inline-flex h-4 w-4 items-center justify-center rounded-full bg-blue-800 text-white hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 dark:focus:ring-offset-gray-900"
-                        >
-                            <span class="sr-only">Remove Jane Smith</span>
-                            <svg class="h-2 w-2" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true">
-                                <path d="M1 1l6 6M7 1L1 7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800 dark:bg-blue-800 dark:text-blue-100">
-                        Bob Johnson
-                        <button
-                            type="button"
-                            class="ml-2 inline-flex h-4 w-4 items-center justify-center rounded-full bg-blue-800 text-white hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 dark:focus:ring-offset-gray-900"
-                        >
-                            <span class="sr-only">Remove Bob Johnson</span>
-                            <svg class="h-2 w-2" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true">
-                                <path d="M1 1l6 6M7 1L1 7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <label for="members" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
-                    Members
-                </label>
-                <div class="relative">
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <svg
-                            aria-hidden="true"
-                            class="h-5 w-5 text-gray-500 dark:text-gray-400"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
+                        className="mb-3"
+                        options={selectProjectLead.map((lead) => lead.name)}
+                        multiple
+                        onChange={(e, value) => handleChange(e, value, 'projectLead')}
+                        renderInput={(params) => <input {...params} className="flex w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm" />}
+                    />
 
-                        </svg>
-                    </div>
-                    <select
-                        multiple=""
-                        id="members"
-                        class=" w-full rounded-lg border border-gray-300  p-2.5 text-gray-900"
+                </div>
+                <div>
+                    <label for="members" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                        Members
+                    </label>
+
+                    <Autocomplete
+                        placeholder="Search Members"
+                        renderInput={(params) => <input {...params} className="flex w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm" />}
+                        options={selectmembers.map((lead) => lead.name)}
+                        onChange={(e, value) => handleChange(e, value, 'members')}
+                        multiple
+                    // sx={{ width: 300 }}
+                    />
+                </div>
+
+                <div className='flex justify-end' >
+                    <Button
+                        type='submit'
                     >
-                        <option value="john-doe">John Doe</option>
-                        <option value="jane-smith">Jane Smith</option>
-                        <option value="bob-johnson">Bob Johnson</option>
-                        <option value="alice-williams">Alice Williams</option>
-                        <option value="tom-wilson">Tom Wilson</option>
-                    </select>
+                        Create Group
+                    </Button>
                 </div>
-                <div class="mt-2 flex flex-wrap gap-2">
-                    <div class="flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800 dark:bg-blue-800 dark:text-blue-100">
-                        John Doe
-                        <button
-                            type="button"
-                            class="ml-2 inline-flex h-4 w-4 items-center justify-center rounded-full bg-blue-800 text-white hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 dark:focus:ring-offset-gray-900"
-                        >
-                            <span class="sr-only">Remove John Doe</span>
-                            <svg class="h-2 w-2" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true">
-                                <path d="M1 1l6 6M7 1L1 7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800 dark:bg-blue-800 dark:text-blue-100">
-                        Jane Smith
-                        <button
-                            type="button"
-                            class="ml-2 inline-flex h-4 w-4 items-center justify-center rounded-full bg-blue-800 text-white hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 dark:focus:ring-offset-gray-900"
-                        >
-                            <span class="sr-only">Remove Jane Smith</span>
-                            <svg class="h-2 w-2" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true">
-                                <path d="M1 1l6 6M7 1L1 7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800 dark:bg-blue-800 dark:text-blue-100">
-                        Bob Johnson
-                        <button
-                            type="button"
-                            class="ml-2 inline-flex h-4 w-4 items-center justify-center rounded-full bg-blue-800 text-white hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 dark:focus:ring-offset-gray-900"
-                        >
-                            <span class="sr-only">Remove Bob Johnson</span>
-                            <svg class="h-2 w-2" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true">
-                                <path d="M1 1l6 6M7 1L1 7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div id="ub429ftt8e">
-                <label class="mb-2 block text-sm font-medium text-gray-900 dark:text-white" for="profile-pic">
-                    Profile Pic
-                </label>
-                <input
-                    class=" w-full rounded-lg border border-gray-300  p-2.5 text-gray-900"
-                    id="profile-pic"
-                    type="file"
-                />
-            </div>
-            <div class="flex justify-end mt-6">
-                <button
-                    type="submit"
-                    class="bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition-colors"
-                >
-                    Create Group
-                </button>
-            </div>
+                <div></div>
+            </form>
         </div>
     )
 }
