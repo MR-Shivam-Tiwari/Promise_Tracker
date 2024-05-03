@@ -136,7 +136,7 @@ function AppRoutes() {
                         component="main"
                         className="MainContent"
                         sx={{
-                            px: { xs: 2, md: 6 },
+                            px: { xs: 1, md: 6 },
                             pt: {
                                 xs: 'calc(12px + var(--Header-height))',
                                 sm: 'calc(12px + var(--Header-height))',

@@ -20,7 +20,7 @@ function MainHome() {
     const navigate = useNavigate();
     // Set the thickness and size based on screen size
     const progressWidth = isSmallScreen ? '12px' : '24px';
-    const progressSize = isSmallScreen ? '100px' : '180px';
+    const progressSize = isSmallScreen ? '120px' : '180px';
     const [taskData, setTaskData] = useState("")
     const [groupData, setGroupData] = useState("")
     const [openModal, setOpenModal] = useState(false); // State to manage modal visibility
@@ -108,10 +108,29 @@ function MainHome() {
         fetchGroupData();
     }, []);
 
+    const spacing = 1;
 
-    // console.log('taskData', taskData)
-    // console.log('groupData', groupData)
-    // console.log('taskData', taskData)
+
+    // Convert hex color to RGB
+    // Define colors
+    const color1 = '#EF7F1A4D';
+    const color2 = '#0A91D04D';
+
+    // Define the randomColor object as a function
+    const randomColor = {
+        marginRight: spacing + 'em',
+        get backgroundColor() {
+            // Generate a random number between 0 and 1
+            const randomNumber = Math.random();
+            // Use color1 if random number is less than 0.5, otherwise use color2
+            return randomNumber < 0.5 ? color1 : color2;
+        },
+        // Add more style properties as needed
+    };
+
+
+
+
 
 
     return (
@@ -119,20 +138,20 @@ function MainHome() {
             <div className="flex flex-col w-full min-h-screen bg-gray-100 rounded-lg">
 
                 <main className="flex-1 p-2 md:p-8 grid gap-4 md:gap-4">
-                    <div className="grid md:grid-cols-2 gap-4 md:gap-4">
-                        <div className="rounded-lg border bg-card  flex items-center justify-center shadow-sm" style={{ background: "#0A91D0" }} >
-                            <div className="flex gap-9 items-center justify-center  px-3">
+                    <div className=" gap-4 md:gap-4">
+                        <div className="rounded-lg border bg-card    shadow-sm" style={{ background: "#0A91D0" }} >
+                            <div className="flex gap-9 items-center justify-between lg:justify-center  p-8">
                                 <div className="">
                                     <div className='flex items-center justify-center'>
 
-                                        <h3 className="text-1xl lg:text-2xl font-semibold text-white text-center lg:text-start">
+                                        <h3 className="text-1xl lg:text-5xl font-semibold text-white text-center lg:text-start">
                                             Your today’s task is almost done!
                                         </h3>
 
                                     </div>
-                                    <div className='flex items-center  justify-center'>
+                                    <div className='flex items-center lg:m-3  justify-center'>
 
-                                        <button onClick={() => navigate("/task")} className=" mt-5 w-full lg:w-[50%] h-full lg:h-14   text-black   rounded-md text-sm font-medium  px-2 py-2" style={{ background: "#EA791D" }}>
+                                        <button onClick={() => navigate("/task")} className=" mt-5 w-full lg:w-[50%] h-full lg:h-14   text-black lg:text-lg   rounded-md text-sm font-medium  px-2 py-2" style={{ background: "#EA791D" }}>
                                             View tasks
                                         </button>
                                     </div>
@@ -155,35 +174,35 @@ function MainHome() {
                                 </div>
                             </div>
                         </div>
-                        <div className="rounded-lg border bg-card shadow-sm" style={{ background: "#0A91D0" }}>
-                            <div className="p-6 text-black flex items-center justify-center  text-lg font-medium">
-                                No tasks for today
-                            </div>
-                        </div>
+
                     </div>
 
                     <div>
-                        <h2 className="text-xl text-black font-semibold">In Progress</h2>
-                        <main class="flex flex-col gap-6  md:p-10">
+                        <h2 className="text-xl text-black font-semibold mb-2">In Progress</h2>
+                        <main class="flex flex-col gap-6 justify-center  md:p-10">
                             <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 
                                 {Array.isArray(taskData) && taskData
                                     .filter(task => task.status === "In Progress") // Filter tasks with status "In Progress"
                                     .map(task => (
-                                        <div key={task?.id} class="border bg-card text-card-foreground rounded-lg shadow-md">
-                                            <div class="p-2">
+
+                                        <div key={task?.id} class="border  bg-card text-card-foreground w-full rounded-lg shadow-md"
+                                            style={randomColor}
+
+                                        >
+                                            <div class="p-2  h-[150px]">
                                                 <div class="flex items-center justify-between">
                                                     <div>
                                                         <h3 class="text-lg text-black font-medium">{task?.taskGroup}</h3>
                                                     </div>
-                                                    <div className="flex text-black items-center gap-2">
-                                                        <span className="text-black flex items-center gap-2 "><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-alarm" viewBox="0 0 16 16">
+                                                    <div className="flex  items-center gap-2">
+                                                        <span className=" flex items-center gap-2 "><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-alarm" viewBox="0 0 16 16">
                                                             <path d="M8.5 5.5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9z" />
                                                             <path d="M6.5 0a.5.5 0 0 0 0 1H7v1.07a7.001 7.001 0 0 0-3.273 12.474l-.602.602a.5.5 0 0 0 .707.708l.746-.746A6.97 6.97 0 0 0 8 16a6.97 6.97 0 0 0 3.422-.892l.746.746a.5.5 0 0 0 .707-.708l-.601-.602A7.001 7.001 0 0 0 9 2.07V1h.5a.5.5 0 0 0 0-1zm1.038 3.018a6 6 0 0 1 .924 0 6 6 0 1 1-.924 0M0 3.5c0 .753.333 1.429.86 1.887A8.04 8.04 0 0 1 4.387 1.86 2.5 2.5 0 0 0 0 3.5M13.5 1c-.753 0-1.429.333-1.887.86a8.04 8.04 0 0 1 3.527 3.527A2.5 2.5 0 0 0 13.5 1" />
                                                         </svg> {task?.reminder}</span>
                                                     </div>
                                                 </div>
-                                                <div className='flex text-black items-center mt-2  gap-2'>
+                                                {/* <div className='flex text-black items-center mt-2  gap-2'>
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
                                                         <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z" />
                                                     </svg>
@@ -191,13 +210,19 @@ function MainHome() {
                                                         {task && task.owner && task.owner.name}
                                                     </div>
 
-                                                </div>
-                                                <p class="text-gray-500 mt-2">{task?.taskName}</p>
-                                                <div className=''>
-                                                    <div className=' grid gap-2 mt-2'>
-                                                        <p class="text-gray-500 bg-green-200 px-3 rounded-lg">{task?.category}</p>
-                                                        {/* <p class="text-gray-500 bg-yellow-200 px-3 rounded-lg">{task?.status}</p> */}
+                                                </div> */}
+                                                <p class="text-gray-500 px-2 font-bold mt-3">{task?.taskName}</p>
+                                                <div className='flex items-center gap-2   justify-start px-2 rounded-lg  mt-3'>
+                                                <div className='flex items-center gap-2  bg-blue-200 justify-start px-2 rounded-lg  mt-2'>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                                                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
+                                                        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
+                                                    </svg>
+                                                    <div>
+                                                        {task?.status}
                                                     </div>
+
+                                                </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -364,7 +389,7 @@ function MainHome() {
                                                         <ModalClose />
                                                         <div onSubmit={() => setEditModal(false)}>
                                                             {editedgroup && (
-                                                                <EditGroup Editid = {editedgroup?._id} />
+                                                                <EditGroup Editid={editedgroup?._id} />
                                                             )}
                                                         </div>
                                                     </ModalDialog>
