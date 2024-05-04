@@ -3,30 +3,40 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import ModalClose from '@mui/joy/ModalClose';
 import ViewTask from './ViewTask';
+import DragAndDropComponent from './Task Mange/DragAndDropComponent';
 function Task() {
     const [tasks, setTasks] = useState([]);
-    const [selectedStatus, setSelectedStatus] = useState('All');
+    const [selectedStatus, setSelectedStatus] = useState('To Do');
     const [selectedDate, setSelectedDate] = useState('');
     const [open, setOpen] = React.useState(false);
-    const handleDateClick = (date) => {
-        setSelectedDate(date);
-    };
+    const [userid, setuserid] = useState("")
 
     // Define button classes based on whether the date is selected or today's date
 
     const buttonClass = (index) => {
         const currentDate = new Date();
         currentDate.setDate(currentDate.getDate() - 2 + index);
-        const formattedDate = currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const formattedDate = currentDate.toISOString().split('T')[0];
         const isSelected = selectedDate === formattedDate;
-        const isToday = formattedDate === new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const isToday = formattedDate === new Date().toISOString().split('T')[0];
 
         let className = `inline-flex items-center ${isSelected ? 'bg-blue-500' : isToday ? 'bg-blue-200' : 'bg-gray-200'} text-black justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 rounded-md`;
 
         return className;
     };
 
+    useEffect(() => {
+        // Retrieve userData from localStorage
+        const userDataString = localStorage.getItem('userData');
+        if (userDataString) {
+            const userDataObj = JSON.parse(userDataString);
+            const userId = userDataObj.userId;
 
+            setuserid(userId);
+        }
+    }, []);
+
+    // Assuming tasks is an array containing the task objects
 
 
 
@@ -35,37 +45,51 @@ function Task() {
         const fetchData = async () => {
             try {
                 const response = await axios.get('http://localhost:5000/api/tasks');
-                setTasks(response.data);
+                // Filter tasks created today
+                const today = new Date().toISOString().split('T')[0]; // Get today's date in "YYYY-MM-DD" format
+                const todayTasks = response.data.filter(task => {
+                    const createdAtDate = new Date(task.createdAt).toISOString().split('T')[0]; // Get the createdAt date
+                    return createdAtDate === today; // Return true if the task was created today
+                });
+                setTasks(todayTasks); // Set state with tasks created today
             } catch (error) {
                 console.error('Error fetching tasks:', error);
             }
         };
 
         fetchData();
-
-        // Set the initial state of selectedDate to today's date
-        const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        setSelectedDate(today);
     }, []);
+  
+
+    // console.log("userid1:", userid);
     // Filter tasks based on selected status and selected date
     const filteredTasks = tasks.filter(task => {
-        // Split the startDate string into day, month, and year parts
-        const [day, month, year] = task.startDate.split('/');
-        // Construct a new Date object with the correct order of month, day, and year
-        const taskDate = new Date(`${month}/${day}/${year}`);
-        // Format the task date to match the selected date format
-        const formattedTaskDate = taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
-        if (selectedStatus === 'To Do') {
-            // If selected status is 'To Do', filter tasks with status other than 'Completed' and 'Cancelled'
-            return (task.status !== 'Completed' && task.status !== 'Cancelled') &&
-                (selectedDate === '' || formattedTaskDate === selectedDate);
-        } else {
-            // Otherwise, filter tasks based on selected status and date
-            return (selectedStatus === 'All' || task.status === selectedStatus) &&
-                (selectedDate === '' || formattedTaskDate === selectedDate);
+        // Check if the task has an owner and if the owner's id matches the userid
+        if (task.owner && task.owner.id === userid) {
+            // Get the createdAt date in the format "YYYY-MM-DD"
+            const createdAtDate = new Date(task.createdAt).toISOString().split('T')[0];
+        
+            // Filter tasks based on selected status and date
+            if (selectedStatus === 'To Do') {
+                // If selected status is 'To Do', filter tasks with status other than 'Completed' and 'Cancelled'
+                return (task.status !== 'Completed' && task.status !== 'Cancelled') &&
+                    (selectedDate === '' || createdAtDate === selectedDate);
+            } else {
+                // Otherwise, filter tasks based on selected status and date
+                return (task.status === selectedStatus) &&
+                    (selectedDate === '' || createdAtDate === selectedDate);
+            }
         }
+        return false;
     });
+    
+
+
+
+    const handleDateClick = (formattedDate) => {
+        setSelectedDate(formattedDate);
+    };
+
 
 
 
@@ -78,7 +102,8 @@ function Task() {
                         {[...Array(33).keys()].map((index) => {
                             const currentDate = new Date();
                             currentDate.setDate(currentDate.getDate() - 2 + index);
-                            const formattedDate = currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            const formattedDate = currentDate.toISOString().split('T')[0];
+
 
                             return (
                                 <button
@@ -90,6 +115,8 @@ function Task() {
                                 </button>
                             );
                         })}
+
+
                     </div>
                 </header>
 
@@ -97,7 +124,7 @@ function Task() {
 
                 <div className=' bg-blue-50 p-3 mt-2 rounded-lg'>
                     <div className="flex items-center gap-4 overflow-x-auto h-14">
-                        {['All', 'To Do', 'In Progress', 'Completed', 'Cancelled'].map(status => (
+                        {['To Do', 'In Progress', 'Completed', 'Cancelled'].map(status => (
                             <button
                                 key={status}
                                 className={`inline-flex items-center justify-center bg-blue-200 text-black whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 rounded-md ${selectedStatus === status ? 'bg-blue-500 text-white' : ''}`}
@@ -107,6 +134,7 @@ function Task() {
                             </button>
                         ))}
                     </div>
+
                 </div>
 
                 <div className=" py-5">
@@ -158,6 +186,8 @@ function Task() {
                                 </div>
                             </div>
                         ))}
+
+                        {/* <DragAndDropComponent /> */}
                     </div>
                 </div>
             </div>
