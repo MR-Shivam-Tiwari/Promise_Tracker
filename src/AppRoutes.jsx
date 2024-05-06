@@ -20,6 +20,7 @@ import Add from '@mui/icons-material/Add';
 import ColorSchemeToggle from './Components/ColorToggle/ColorSchemeToggle';
 import AddTask from './Components/Task/AddTask';
 import axios from 'axios';
+import MainTask from './Components/Task/MainTask';
 function AppRoutes() {
     const [currentRouteName, setCurrentRouteName] = useState('');
     const location = useLocation();
@@ -168,7 +169,7 @@ function AppRoutes() {
                                         <ModalDialog className="bg-gray-200" maxWidth={1000} minWidth={1000} style={{ height: "800px", overflow: "auto" }} >
                                             <ModalClose />
                                             <form onSubmit={() => setOpen(false)}>
-                                                <AddTask />
+                                                <AddTask setOpen={setOpen} />
                                             </form>
                                         </ModalDialog>
                                     </Modal>

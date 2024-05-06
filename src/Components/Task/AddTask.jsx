@@ -3,7 +3,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
 
-function AddTask() {
+function AddTask({setOpen}) {
     const [GroupData, setGrouptData] = useState("")
     const [departmentHeads, setDepartmentHeads] = useState([]);
     const [userid, setuserid] = useState("")
@@ -72,7 +72,8 @@ function AddTask() {
             const response = await axios.post("http://localhost:5000/api/tasks", formData);
             console.log(response.data);
             resetForm();
-            toast.success("Group created successfully!");
+            setOpen(false)
+            toast.success("Task created successfully!");
             // setInterval(() => {
             //     window.location.reload();
             // }, 2000)
