@@ -1,6 +1,6 @@
 import { Button, Checkbox, Chip, Modal, ModalDialog, Sheet, Typography } from '@mui/joy'
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ModalClose from '@mui/joy/ModalClose';
 import ViewTask from './ViewTask';
 import DragAndDropComponent from './Task Mange/DragAndDropComponent';
@@ -10,6 +10,8 @@ function Task() {
     const [selectedDate, setSelectedDate] = useState('');
     const [open, setOpen] = React.useState(false);
     const [userid, setuserid] = useState("")
+    const selectedDateRef = useRef(null);
+    // const [filteredTask, setFilteredTasks] = useState([]);
 
     // Define button classes based on whether the date is selected or today's date
 
@@ -41,25 +43,33 @@ function Task() {
 
 
 
+    const handleDateClick = (formattedDate) => {
+        setSelectedDate(formattedDate);
+        // filteredTasks ko refresh karne ke liye useEffect hook mein selectedDateRef.current ko update karenge
+        selectedDateRef.current = formattedDate;
+    };
+    
+    // useEffect hook mein selectedDateRef.current ka use karenge taaki selected date ke changes ko track kar sake
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await axios.get('http://localhost:5000/api/tasks');
-                // Filter tasks created today
-                const today = new Date().toISOString().split('T')[0]; // Get today's date in "YYYY-MM-DD" format
-                const todayTasks = response.data.filter(task => {
+                const selectedDate = selectedDateRef.current; // Get the selected date
+                const selectedTasks = response.data.filter(task => {
                     const createdAtDate = new Date(task.createdAt).toISOString().split('T')[0]; // Get the createdAt date
-                    return createdAtDate === today; // Return true if the task was created today
+                    return createdAtDate === selectedDate; // Return true if the createdAt date matches the selected date
                 });
-                setTasks(todayTasks); // Set state with tasks created today
+                setTasks(selectedTasks); // Set state with tasks matching the selected date
             } catch (error) {
                 console.error('Error fetching tasks:', error);
             }
         };
-
+    
         fetchData();
-    }, []);
-  
+    }, [selectedDateRef.current]); // Fetch data when selected date changes
+    
+    
+
 
     // console.log("userid1:", userid);
     // Filter tasks based on selected status and selected date
@@ -68,28 +78,42 @@ function Task() {
         if (task.owner && task.owner.id === userid) {
             // Get the createdAt date in the format "YYYY-MM-DD"
             const createdAtDate = new Date(task.createdAt).toISOString().split('T')[0];
-        
-            // Filter tasks based on selected status and date
+    
+            // Check if createdAtDate matches the selected date
+            if (selectedDate !== '' && createdAtDate !== selectedDate) {
+                return false; // If not matched, exclude the task
+            }
+    
+            // Filter tasks based on selected status
             if (selectedStatus === 'To Do') {
                 // If selected status is 'To Do', filter tasks with status other than 'Completed' and 'Cancelled'
-                return (task.status !== 'Completed' && task.status !== 'Cancelled') &&
-                    (selectedDate === '' || createdAtDate === selectedDate);
+                return (task.status !== 'Completed' && task.status !== 'Cancelled');
             } else {
-                // Otherwise, filter tasks based on selected status and date
-                return (task.status === selectedStatus) &&
-                    (selectedDate === '' || createdAtDate === selectedDate);
+                // Otherwise, filter tasks based on selected status
+                return task.status === selectedStatus;
             }
         }
-        return false;
+        return false; // Exclude tasks without owner or with owner id not matching userid
     });
     
 
 
-
-    const handleDateClick = (formattedDate) => {
-        setSelectedDate(formattedDate);
-    };
-
+    useEffect(() => {
+        // Retrieve userData from localStorage
+        const userDataString = localStorage.getItem('userData');
+        if (userDataString) {
+            const userDataObj = JSON.parse(userDataString);
+            const userId = userDataObj.userId;
+    
+            setuserid(userId);
+    
+            // Set selected date as today's date
+            const today = new Date().toISOString().split('T')[0];
+            setSelectedDate(today);
+            selectedDateRef.current = today; // Update selectedDateRef
+        }
+    }, []);
+    
 
 
 
