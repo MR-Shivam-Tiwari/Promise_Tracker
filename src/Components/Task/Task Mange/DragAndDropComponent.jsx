@@ -1,9 +1,11 @@
-import { Button, Chip } from '@mui/joy';
+import { Button, CardContent, Chip, Dropdown, IconButton, Menu, MenuButton, MenuItem, Modal, ModalDialog, Sheet, Typography } from '@mui/joy';
 import React, { useState, useEffect } from 'react';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
+import ModalClose from '@mui/joy/ModalClose';
+import ViewTask from '../ViewTask';
 const ItemTypes = {
     CARD: 'card',
 };
@@ -17,14 +19,14 @@ const Section = ({ title, cards, moveCard }) => {
     });
 
     return (
-        <div className="flex flex-col mt-10 gap-4 rounded-lg border h-[full] w-full" ref={drop}>
+        <div className="flex flex-col mt-10  gap-4 rounded-lg border h-[600px] w-full" ref={drop}>
             <div className="flex items-center justify-between bg-gray-100 px-4 py-3 ">
                 <h3 className="text-lg font-medium">{title}</h3>
                 <div className="inline-flex w-fit items-center whitespace-nowrap border font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground rounded-full px-3 py-1 text-sm">
                     {cards.length}
                 </div>
             </div>
-            <div className="flex-1 flex flex-col gap-4 p-2">
+            <div className="flex-1 flex flex-col gap-4 p-4  overflow-y-scroll">
                 {cards.map((card) => (
 
 
@@ -36,6 +38,29 @@ const Section = ({ title, cards, moveCard }) => {
 };
 
 const Card = ({ id, text, status, card }) => {
+    const [showOptions, setShowOptions] = useState(false);
+    const [selectedOption, setSelectedOption] = useState('');
+    const navigate = useNavigate()
+    const [open, setOpen] = React.useState(false);
+    const handleClick = (option) => {
+        setSelectedOption(option);
+        setShowOptions(false);
+
+        // Navigate to corresponding page based on selected option
+        switch (option) {
+            case 'Option1':
+                navigate('/option1');
+                break;
+            case 'Option2':
+                navigate('/option2');
+                break;
+            case 'Option3':
+                navigate('/option3');
+                break;
+            default:
+                break;
+        }
+    };
     const [{ isDragging }, drag] = useDrag({
         type: ItemTypes.CARD,
         item: () => {
@@ -51,16 +76,51 @@ const Card = ({ id, text, status, card }) => {
     return (
         <div ref={drag} style={{ opacity }}>
             {/* {text} - {status} */}
-            <div className="flex-1 shadow-md flex flex-col gap-4  border bg-blue-50 p-2 rounded" >
+            <div className="flex-1 shadow-md flex flex-col gap-4  border bg-blue-50 p-4 rounded" >
                 <div className='mb-1 flex justify-between items-center font-bold text-xs'>
                     <p>{card?.taskName}</p>
                     <div>
-                        <Button variant="outlined"
-                            color="neutral" className='p-1 rounded-full' size='small'>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
-                                <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
-                            </svg>
-                        </Button>
+                        <Dropdown>
+                            <MenuButton
+                                slots={{ root: IconButton }}
+                                slotProps={{ root: { variant: 'outlined', color: 'neutral' } }}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
+                                    <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                                </svg>
+                            </MenuButton>
+
+                            <Menu className=''>
+                                <MenuItem>Edit</MenuItem>
+                                <MenuItem onClick={() => setOpen(true)}>View</MenuItem>
+                            </Menu>
+                        </Dropdown>
+                        <Modal
+                            aria-labelledby="modal-title"
+                            aria-describedby="modal-desc"
+                            open={open}
+                            onClose={() => setOpen(false)}
+                            sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                        >
+                            <Sheet
+                                variant="outlined"
+                                className='overflow-auto h-[700px]'
+                                sx={{
+                                    width: 1200,
+                                    height: 800,
+                                    borderRadius: 'md',
+                                    p: 3,
+                                    boxShadow: 'lg',
+                                }}
+                            >
+                                <ModalClose variant="plain" sx={{ m: 1 }} />
+
+                                <div >
+
+                                    <ViewTask task={card} />
+                                </div>
+                            </Sheet>
+                        </Modal>
                     </div>
                 </div>
                 <div className='flex justify-between mt-1 items-center'>

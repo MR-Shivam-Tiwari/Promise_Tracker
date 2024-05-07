@@ -13,6 +13,12 @@ function ViewTask({ task, status }) {
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                         <div>
+                            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Task Name</h2>
+                            <p class="  ">
+                                {task?.taskName}
+                            </p>
+                        </div>
+                        <div>
                             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Task Description</h2>
                             <div
                                 className="text-blue-700"
@@ -21,12 +27,6 @@ function ViewTask({ task, status }) {
                             ></div>
 
                         </div>
-                        {/* <div>
-                            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Website Link</h2>
-                            <a href="#" class="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
-                                www.example.com
-                            </a>
-                        </div> */}
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                         <div>

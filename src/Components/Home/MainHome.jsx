@@ -1,4 +1,4 @@
-import { Avatar, Button, CircularProgress, IconButton, LinearProgress, Modal, ModalClose, ModalDialog, Typography } from '@mui/joy'
+import { Avatar, Button, CircularProgress, IconButton, LinearProgress, Modal, ModalClose, ModalDialog, Option, Select, Typography } from '@mui/joy'
 import React, { useEffect, useState } from 'react'
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -22,6 +22,7 @@ function MainHome() {
     const progressWidth = isSmallScreen ? '12px' : '24px';
     const progressSize = isSmallScreen ? '120px' : '180px';
     const [taskData, setTaskData] = useState("")
+    const [userid, setuserid] = useState("")
     const [groupData, setGroupData] = useState("")
     const [openModal, setOpenModal] = useState(false); // State to manage modal visibility
     const [deletemodal, setDeletemodal] = useState(false); // State to manage modal visibility
@@ -79,21 +80,42 @@ function MainHome() {
         setOpenModal(true);
     };
     useEffect(() => {
+        // Retrieve userData from localStorage
+        const userDataString = localStorage.getItem('userData');
+        if (userDataString) {
+            const userDataObj = JSON.parse(userDataString);
+            const userId = userDataObj.userId;
+            setuserid(userId);
+        }
+    }, []);
+
+    useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await axios.get('http://localhost:5000/api/tasks');
-                setTaskData(response.data);
 
+                const filteredTasks = response.data.filter(task => task.owner.id === userid);
+                setTaskData(filteredTasks);
             } catch (error) {
                 console.error('Error fetching tasks:', error);
             }
         };
 
-        fetchData();
+        if (userid) {
+            fetchData();
+        }
+    }, [userid]);
 
+    const calculateCompletionPercentage = () => {
+        if (taskData.length === 0) return 0;
 
-    }, []);
+        const completedTasks = taskData.filter(task => task.status === 'Completed');
+        const completionPercentage = (completedTasks.length / taskData.length) * 100;
 
+        return completionPercentage;
+    };
+
+    const completionPercentage = calculateCompletionPercentage();
 
     const fetchGroupData = async () => {
         try {
@@ -136,7 +158,7 @@ function MainHome() {
     return (
         <div>
             <div className="flex flex-col w-full min-h-screen bg-gray-100 rounded-lg">
-
+               
                 <main className="flex-1 p-2 md:p-8 grid gap-4 md:gap-4">
                     <div className=" gap-4 md:gap-4">
                         <div className="rounded-lg border bg-card    shadow-sm" style={{ background: "#0A91D0" }} >
@@ -167,9 +189,9 @@ function MainHome() {
                                             '--LinearProgress-thickness': progressWidth,
                                         }}
                                         determinate
-                                        value={70}
+                                        value={completionPercentage.toFixed(2)}
                                     >
-                                        <Typography className="text-white text-lg">70%</Typography>
+                                        <Typography className="text-white text-lg">{completionPercentage.toFixed(2)}%</Typography>
                                     </CircularProgress>
                                 </div>
                             </div>
@@ -186,7 +208,7 @@ function MainHome() {
                                     .filter(task => task.status === "In Progress") // Filter tasks with status "In Progress"
                                     .map(task => (
 
-                                        <div key={task?.id} class="border  bg-card text-card-foreground w-full rounded-lg shadow-md"
+                                        <div onClick={() => navigate("/task")} key={task?.id} class="border cursor-pointer  bg-card text-card-foreground w-full rounded-lg shadow-md"
                                             style={randomColor}
 
                                         >
@@ -212,17 +234,23 @@ function MainHome() {
 
                                                 </div> */}
                                                 <p class="text-gray-500 px-2 font-bold mt-3">{task?.taskName}</p>
-                                                <div className='flex items-center gap-2   justify-start px-2 rounded-lg  mt-3'>
-                                                <div className='flex items-center gap-2  bg-blue-200 justify-start px-2 rounded-lg  mt-2'>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
-                                                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
-                                                        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
-                                                    </svg>
-                                                    <div>
-                                                        {task?.status}
-                                                    </div>
+                                                <div className='flex items-center gap-2    justify-between px-2 rounded-lg  mt-3'>
+                                                    <div className='flex items-center gap-2  bg-blue-200 justify-start px-2 rounded-lg  mt-2'>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                                                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
+                                                            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
+                                                        </svg>
+                                                        <div>
+                                                            {task?.status}
+                                                        </div>
 
-                                                </div>
+                                                    </div>
+                                                    <div>
+                                                        <p className='text-sm mt-2 bg-white border px-1 rounded'>
+                                                            <strong> Start Date -</strong> {task?.startDate}
+
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

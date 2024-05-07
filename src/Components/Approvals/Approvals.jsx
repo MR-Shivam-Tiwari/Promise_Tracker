@@ -29,9 +29,19 @@ function Approvals() {
         setSelectedTask(null);
         fetchData(); // Call fetchData function when modal is closed
     };
+    const filteredTasks = (() => {
+        switch (selectedStatus) {
+            case 'All':
+                return tasks.filter(task => task.status === 'Completed');
+            case 'Approved':
+                return tasks.filter(task => task.category === 'Approved');
+            case 'Unapproved':
+                return tasks.filter(task => task.category === 'Unapproved');
+            default:
+                return [];
+        }
+    })();
 
-    // Filtered tasks based on selected status
-    const filteredTasks = selectedStatus === 'All' ? tasks : tasks.filter(task => task.category === selectedStatus);
     const handleEditClick = (task) => {
         setSelectedTask(task);
         setOpen(true);

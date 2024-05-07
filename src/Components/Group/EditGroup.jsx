@@ -86,7 +86,7 @@ function EditGroup({Editid}) {
             <h2 class="text-2xl font-bold tracking-tight ">Update Group</h2>
             <form className="space-y-6" onSubmit={handleSubmit}>
                 <div >
-                    <label class="mb-2 block text-sm font-medium text-gray-900 dark:text-white" for="profile-pic">
+                    <label class="mb-2 block text-sm font-medium " for="profile-pic">
                         Profile Pic
                     </label>
                     <input
@@ -97,7 +97,7 @@ function EditGroup({Editid}) {
                     />
                 </div>
                 <div>
-                    <label for="group-name" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                    <label for="group-name" class="mb-2 block text-sm font-medium ">
                         Group Name
                     </label>
                     <input
@@ -112,7 +112,7 @@ function EditGroup({Editid}) {
                     />
                 </div>
                 <div>
-                    <label for="department-head" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                    <label for="department-head" class="mb-2 block text-sm font-medium ">
                         Department Head
                     </label>
                     <Autocomplete
@@ -125,7 +125,7 @@ function EditGroup({Editid}) {
                     />
                 </div>
                 <div>
-                    <label for="project-lead" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                    <label for="project-lead" class="mb-2 block text-sm font-medium ">
                         Project Lead
                     </label>
                     <Autocomplete
@@ -139,7 +139,7 @@ function EditGroup({Editid}) {
 
                 </div>
                 <div>
-                    <label for="members" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                    <label for="members" class="mb-2 block text-sm font-medium ">
                         Members
                     </label>
 
@@ -157,7 +157,7 @@ function EditGroup({Editid}) {
                     <Button
                         type='submit'
                     >
-                        Create Group
+                        Update Group
                     </Button>
                 </div>
                 <div></div>
