@@ -130,6 +130,9 @@ function MainHome() {
         fetchGroupData();
     }, []);
 
+console.log("Grouptask",groupData)
+
+
     const spacing = 1;
 
 

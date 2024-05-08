@@ -21,6 +21,7 @@ import ColorSchemeToggle from './Components/ColorToggle/ColorSchemeToggle';
 import AddTask from './Components/Task/AddTask';
 import axios from 'axios';
 import MainTask from './Components/Task/MainTask';
+import Reports from './Components/Reports/Reports';
 function AppRoutes() {
     const [currentRouteName, setCurrentRouteName] = useState('');
     const location = useLocation();
@@ -175,8 +176,8 @@ function AppRoutes() {
                                     </Modal>
                                     <ColorSchemeToggle />
                                 </div>
-                                <div className="  gap-2  " style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                                    <div>
+                                <div className="cursor-pointer  border gap-2 px-2 rounded-lg shadow-sm bg-gray-100  " style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                    <div  onClick={()=> navigate("/profile")} >
 
                                         <Avatar
                                             variant="outlined"
@@ -184,7 +185,7 @@ function AppRoutes() {
                                             src={profilePic}
                                         />
                                     </div>
-                                    <div>
+                                    <div  onClick={()=> navigate("/profile")}>
 
                                         <Box className='' sx={{ minWidth: 0 }}>
                                             <Typography level="body-sm">Hello!</Typography>
@@ -257,6 +258,7 @@ function AppRoutes() {
                                 <Route path="/home" element={<MainHome />} />
                                 <Route path="/approvals" element={<Approvals />} />
                                 <Route path="/task" element={<Task />} />
+                                <Route path="/reports" element={<Reports />} />
                             </Routes>
                         </div>
 
