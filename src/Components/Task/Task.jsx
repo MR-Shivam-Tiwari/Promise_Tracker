@@ -13,17 +13,16 @@ import DragAndDropComponent from './Task Mange/DragAndDropComponent';
 function Task() {
     const [tasks, setTasks] = useState([]);
     const [selectedStatus, setSelectedStatus] = useState('To Do');
-    const [selectedDate, setSelectedDate] = useState('');
     const [userid, setuserid] = useState("")
     const selectedDateRef = useRef(null);
     const [tasksToDo, setTasksToDo] = useState([]);
     const [tasksInProgress, setTasksInProgress] = useState([]);
     const [tasksCompleted, setTasksCompleted] = useState([]);
     const [tasksCancelled, setTasksCancelled] = useState([]);
+    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const buttonContainerRef = useRef(null);
 
-    const buttonClass = (index) => {
-        const currentDate = new Date();
-        currentDate.setDate(currentDate.getDate() - 2 + index);
+    const buttonClass = (currentDate) => {
         const formattedDate = currentDate.toISOString().split('T')[0];
         const isSelected = selectedDate === formattedDate;
         const isToday = formattedDate === new Date().toISOString().split('T')[0];
@@ -33,6 +32,32 @@ function Task() {
         return className;
     };
 
+    useEffect(() => {
+        if (buttonContainerRef.current) {
+            const containerWidth = buttonContainerRef.current.offsetWidth;
+            const buttons = buttonContainerRef.current.querySelectorAll('button');
+            let selectedButton;
+            buttons.forEach(button => {
+                if (button.classList.contains('selected')) {
+                    selectedButton = button;
+                }
+            });
+            if (selectedButton) {
+                const buttonWidth = selectedButton.offsetWidth;
+                const selectedButtonOffset = selectedButton.offsetLeft;
+                const scrollLeft = selectedButtonOffset - (containerWidth / 2) + (buttonWidth / 2);
+                buttonContainerRef.current.scrollLeft = scrollLeft;
+            }
+        }
+    }, [selectedDate]);
+
+
+
+
+
+    const handleDateClick = (formattedDate) => {
+        setSelectedDate(formattedDate);
+    };
     useEffect(() => {
         // Retrieve userData from localStorage
         const userDataString = localStorage.getItem('userData');
@@ -44,17 +69,11 @@ function Task() {
         }
     }, []);
 
-
-
-
-    const handleDateClick = (formattedDate) => {
-        // Set the selected date
-        setSelectedDate(formattedDate);
-
-        selectedDateRef.current = formattedDate;
-
-
-    };
+    // const handleDateClick = (formattedDate) => {
+    //     // Set the selected date
+    //     setSelectedDate(formattedDate);
+    //     selectedDateRef.current = formattedDate;
+    // };
 
 
     useEffect(() => {
@@ -98,7 +117,6 @@ function Task() {
 
 
     useEffect(() => {
-        // Retrieve userData from localStorage
         const userDataString = localStorage.getItem('userData');
         if (userDataString) {
             const userDataObj = JSON.parse(userDataString);
@@ -106,46 +124,67 @@ function Task() {
 
             setuserid(userId);
 
-            // Set selected date as today's date
             const today = new Date().toISOString().split('T')[0];
             setSelectedDate(today);
-            selectedDateRef.current = today; // Update selectedDateRef
+            selectedDateRef.current = today;
         }
     }, []);
- 
+
+    useEffect(() => {
+        // Scroll the selected button into view after rendering
+        if (selectedDateRef.current && typeof selectedDateRef.current.scrollIntoView === 'function') {
+            selectedDateRef.current.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+        }
+    }, [selectedDate]);
+
+
+
 
     return (
         <div>
-            <div className="flex flex-col h-full">
+            <div className="flex flex-col h-full bg-white rounded text-black p-2">
                 <header className="bg-gray-100 rounded-lg py-2 px-3 flex items-center justify-between">
-                    <div className="flex items-center gap-4 overflow-x-auto h-14" style={{ overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none', scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}>
-                        {[...Array(33).keys()].map((index) => {
+                    <div ref={buttonContainerRef} className="flex items-center gap-4 overflow-x-auto h-14" style={{
+                        overflowX: 'auto',
+                        overflowY: 'hidden', // Hide vertical scrollbar
+                        scrollbarWidth: 'thin', // Thin scrollbar
+                        msOverflowStyle: 'none', // Hide scrollbar for IE and Edge
+                        scrollSnapType: 'x mandatory',
+                        WebkitOverflowScrolling: 'touch',
+                        justifyContent: 'flex-start', // Align buttons to the start
+                        cursor: 'pointer', // Change cursor to pointer
+                    }}>
+
+                        {[...Array(365).keys()].map((index) => {
                             const currentDate = new Date();
-                            currentDate.setDate(currentDate.getDate() - 2 + index);
-                            const monthNames = ["January", "February", "March", "April", "May", "June",
-                                "July", "August", "September", "October", "November", "December"];
+                            currentDate.setDate(currentDate.getDate() - 180 + index);
+                            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
                             const monthName = monthNames[currentDate.getMonth()];
                             const date = currentDate.getDate();
+
+                            const formattedDate = currentDate.toISOString().split('T')[0];
+                            const isSelected = selectedDate === formattedDate;
+                            const isToday = formattedDate === new Date().toISOString().split('T')[0];
 
                             return (
                                 <button
                                     key={index}
-                                    className={buttonClass(index)}
-                                    onClick={() => handleDateClick(currentDate.toISOString().split('T')[0])}
+                                    data-index={index}
+                                    className={`${isSelected ? 'selected' : ''} ${buttonClass(currentDate)}`}
+                                    onClick={() => handleDateClick(formattedDate)}
                                 >
                                     {monthName} {date}
                                 </button>
+
                             );
                         })}
-
-
-
                     </div>
+
                 </header>
 
 
 
-                <DragAndDropComponent tasksToDo={tasksToDo}  tasksCancelled={tasksCancelled} tasksCompleted={tasksCompleted} tasksInProgress={tasksInProgress}  />
+                <DragAndDropComponent tasksToDo={tasksToDo} tasksCancelled={tasksCancelled} tasksCompleted={tasksCompleted} tasksInProgress={tasksInProgress} />
 
             </div>
         </div>

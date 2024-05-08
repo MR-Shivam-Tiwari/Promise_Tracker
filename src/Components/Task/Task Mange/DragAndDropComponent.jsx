@@ -82,10 +82,11 @@ const Card = ({ id, text, status, card }) => {
                     <div>
                         <Dropdown>
                             <MenuButton
+                            className="rounded-[50%]"
                                 slots={{ root: IconButton }}
                                 slotProps={{ root: { variant: 'outlined', color: 'neutral' } }}
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" style={{color:"black"}} height="13" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
                                     <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
                                 </svg>
                             </MenuButton>
@@ -192,7 +193,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
     const moveCard = async (id, toSection) => {
         const newSections = { ...sections };
         const fromSection = Object.keys(newSections).find(section => newSections[section].find(card => card._id === id));
-
+    
         if (fromSection !== toSection) {
             try {
                 let updatedStatus = toSection === 'Todo' ? '' : toSection; // Set status to '' for 'Todo', otherwise use the section name
@@ -200,13 +201,17 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
                 const cardToMove = newSections[fromSection].find((card) => card._id === id);
                 newSections[fromSection] = newSections[fromSection].filter((card) => card._id !== id);
                 newSections[toSection] = [...newSections[toSection], cardToMove];
+    
+                // Update card's status with section name
+                cardToMove.status = toSection;
+    
                 setSections(newSections);
             } catch (error) {
                 console.error('Error moving card:', error);
             }
         }
     };
-
+    
 
     return (
         <DndProvider backend={HTML5Backend}>
