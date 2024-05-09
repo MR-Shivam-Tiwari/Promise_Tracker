@@ -41,7 +41,7 @@ function Approvals() {
                 return [];
         }
     })();
-
+console.log("totalTask", tasks)
     const handleEditClick = (task) => {
         setSelectedTask(task);
         setOpen(true);
