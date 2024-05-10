@@ -13,16 +13,15 @@ function NestedTable({ tasks }) {
             </thead>
             <tbody>
                 {tasks && tasks.map((task, taskIndex) => (
-                    task.groupNames.map((groupName, index) => (
-                        <tr key={`${taskIndex}-${index}`}>
-                            <td className="px-6 py-1 ">{groupName}</td>
-                        </tr>
-                    ))
+                    <tr key={taskIndex}> {/* Assuming taskIndex is unique for each task */}
+                        <td className="px-6 py-1">{task.name}</td>
+                    </tr>
                 ))}
             </tbody>
         </table>
     );
 }
+
 
 function UserReports() {
     const [userData, setUserData] = useState([]);
@@ -104,16 +103,18 @@ function UserReports() {
                                         {user.user.name}
                                     </td>
                                     <td className="px-6 py-4">
-                                        {user.groupNames.length > 0 && (
+                                        {user.groupData && user.groupData.length > 0 ? (
                                             <Button
                                                 aria-label="expand row"
                                                 variant="plain"
                                                 color="neutral"
                                                 size="sm"
-                                                onClick={() => toggleNestedTable(user.groupNames[0])} // Assuming user can be part of only one group
+                                                onClick={() => toggleNestedTable(user.user._id)} // Pass user ID instead of group name
                                             >
-                                                {selectedGroup === user.groupNames[0] && showNestedTable ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />} Group
+                                                {selectedGroup === user.user._id && showNestedTable ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />} Group
                                             </Button>
+                                        ) : (
+                                            "No group"
                                         )}
                                     </td>
                                     <td className="px-6 py-4">{user.taskCounts.total}</td>
@@ -121,18 +122,22 @@ function UserReports() {
                                     <td className="px-6 py-4">{user.taskCounts.completed}</td>
                                     <td className="px-6 py-4">{user.taskCounts.cancelled}</td>
                                 </tr>
-                                {selectedGroup === user.groupNames[0] && showNestedTable && (
-                                    <tr>
+                                {selectedGroup === user.user._id && showNestedTable && (
+                                    <tr key={`${user.user._id}-nested`}>
                                         <td colSpan="6">
                                             <NestedTable
-                                                tasks={userData.filter(u => u.groupNames.includes(selectedGroup))}
+                                                tasks={user.groupData} // Pass user's group names directly
                                             />
                                         </td>
                                     </tr>
                                 )}
                             </React.Fragment>
                         ))}
+
+
                 </tbody>
+
+
             </table>
             {/* <Button onClick={convertToCSV}>Download CSV</Button> */}
         </div>

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types';
 import IconButton from '@mui/joy/IconButton';
 import Table from '@mui/joy/Table';
@@ -7,35 +7,35 @@ import Sheet from '@mui/joy/Sheet';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
-function createData(name, calories, fat, carbs, protein, price) {
-    return {
-        name,
-        calories,
-        fat,
-        carbs,
-        protein,
-        price,
-        history: [
-            {
-                date: '2020-01-05',
-                customerId: '11091700',
-                amount: 3,
-            },
-            {
-                date: '2020-01-02',
-                customerId: 'Anonymous',
-                amount: 1,
-            },
-        ],
-    };
-}
+// function createData(name, calories, fat, carbs, protein, price) {
+//     return {
+//         name,
+//         calories,
+//         fat,
+//         carbs,
+//         protein,
+//         price,
+//         history: [
+//             {
+//                 date: '2020-01-05',
+//                 customerId: '11091700',
+//                 amount: 3,
+//             },
+//             {
+//                 date: '2020-01-02',
+//                 customerId: 'Anonymous',
+//                 amount: 1,
+//             },
+//         ],
+//     };
+// }
 
 function Row(props) {
     const { row } = props;
-    const [open, setOpen] = React.useState(props.initialOpen || false);
+    const [open, setOpen] = useState(props.initialOpen || false);
 
     return (
-        <React.Fragment>
+        <>
             <tr>
                 <td>
                     <IconButton
@@ -48,22 +48,20 @@ function Row(props) {
                         {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                     </IconButton>
                 </td>
-                <th scope="row">{row.name}</th>
-                <td>{row.calories}</td>
-                <td>{row.fat}</td>
-                <td>{row.carbs}</td>
-                <td>{row.protein}</td>
+                <td scope="row">{row.user.name}</td>
+                <td>{row.taskCounts.total}</td>
+                <td>{row.taskCounts.inProgress}</td>
+                <td>{row.taskCounts.completed}</td>
+                <td>{row.taskCounts.cancelled}</td>
             </tr>
             <tr>
                 <td style={{ height: 0, padding: 0 }} colSpan={6}>
-                    {open && (
+                    {open && row.groupData && row.groupData.length > 0 && ( // Add check for row.history
                         <Sheet
                             variant="soft"
                             sx={{ p: 1, pl: 6, boxShadow: 'inset 0 3px 6px 0 rgba(0 0 0 / 0.08)' }}
                         >
-                            <Typography level="body-lg" component="div">
-                                History
-                            </Typography>
+                            
                             <Table
                                 borderAxis="bothBetween"
                                 size="sm"
@@ -76,21 +74,22 @@ function Row(props) {
                             >
                                 <thead>
                                     <tr>
-                                        <th>Date</th>
-                                        <th>Customer</th>
-                                        <th>Amount</th>
-                                        <th>Total price ($)</th>
+                                        <th >Group Name</th>
+                                        <th>TOTAL TASK	</th>
+                                        <th>IN PROGRESS TASK	</th>
+                                        <th>COMPLETED TASK	</th>
+                                        <th>CANCELLED TASK</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {row.history.map((historyRow) => (
-                                        <tr key={historyRow.date}>
-                                            <th scope="row">{historyRow.date}</th>
-                                            <td>{historyRow.customerId}</td>
-                                            <td>{historyRow.amount}</td>
-                                            <td>
-                                                {Math.round(historyRow.amount * row.price * 100) / 100}
-                                            </td>
+                                    {row.groupData.map((historyRow , index) => (
+                                        <tr key={index}>
+                                            <th scope="row">{historyRow.name}</th>
+                                            <td>{historyRow.totalTasks}</td>
+                                            <td>{historyRow.inProgressTasks}</td>
+                                            <td>{historyRow.completedTasks}</td>
+                                            <td>{historyRow.cancelledTasks}</td>
+                                           
                                         </tr>
                                     ))}
                                 </tbody>
@@ -99,9 +98,10 @@ function Row(props) {
                     )}
                 </td>
             </tr>
-        </React.Fragment>
+        </>
     );
 }
+
 
 Row.propTypes = {
     initialOpen: PropTypes.bool,
@@ -122,45 +122,70 @@ Row.propTypes = {
     }).isRequired,
 };
 
-const rows = [
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0, 3.99),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3, 4.99),
-    createData('Eclair', 262, 16.0, 24, 6.0, 3.79),
-    createData('Cupcake', 305, 3.7, 67, 4.3, 2.5),
-    createData('Gingerbread', 356, 16.0, 49, 3.9, 1.5),
-];
 function ApprovalReports() {
+    const [userData, setUserData] = useState([]);
+    const [loading, setLoading] = useState(true); // Add loading state
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/allassignuser');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setUserData(data);
+                setLoading(false); // Set loading to false when data is fetched
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                setLoading(false); // Set loading to false in case of error
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return <div>Loading...</div>; // Render loading indicator while fetching data
+    }
+
+    if (!userData || !Array.isArray(userData) || userData.length === 0) {
+        return <div>No data available.</div>; // Handle case where userData is empty or not an array
+    }
+
     return (
         <Sheet>
-        <Table
-            aria-label="collapsible table"
-            sx={{
-                '& > thead > tr > th:nth-child(n + 3), & > tbody > tr > td:nth-child(n + 3)':
-                    { textAlign: 'right' },
-                '& > tbody > tr:nth-child(odd) > td, & > tbody > tr:nth-child(odd) > th[scope="row"]':
-                {
-                    borderBottom: 0,
-                },
-            }}
-        >
-            <thead>
-                <tr>
-                    <th style={{ width: 40 }} aria-label="empty" />
-                    <th style={{ width: '40%' }}>Dessert (100g serving)</th>
-                    <th>Calories</th>
-                    <th>Fat&nbsp;(g)</th>
-                    <th>Carbs&nbsp;(g)</th>
-                    <th>Protein&nbsp;(g)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {rows.map((row, index) => (
-                    <Row key={row.name} row={row} initialOpen={index === 0} />
-                ))}
-            </tbody>
-        </Table>
-    </Sheet>
-    )
+            <Table
+                aria-label="collapsible table"
+                sx={{
+                    '& > thead > tr > th:nth-child(n + 3), & > tbody > tr > td:nth-child(n + 3)':
+                        { textAlign: 'right' },
+                    '& > tbody > tr:nth-child(odd) > td, & > tbody > tr:nth-child(odd) > th[scope="row"]':
+                    {
+                        borderBottom: 0,
+                    },
+                }}
+            >
+                <thead>
+                    <tr>
+                        {/* <th style={{ width: 40 }} aria-label="empty" /> */}
+                        <th style={{ width: 100 }} >Groups</th>
+                        <th >User Name</th>
+                        <th>TOTAL TASK	</th>
+                        <th>IN PROGRESS TASK	</th>
+                        <th>COMPLETED TASK	</th>
+                        <th>CANCELLED TASK</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {userData.map((row, index) => (
+                        <Row key={index} row={row} initialOpen={index === 0} />
+                    ))}
+                </tbody>
+            </Table>
+        </Sheet>
+    );
 }
 
-export default ApprovalReports
+
+export default ApprovalReports;

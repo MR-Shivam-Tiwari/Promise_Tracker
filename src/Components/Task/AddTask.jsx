@@ -3,7 +3,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
 
-function AddTask({setOpen}) {
+function AddTask({ setOpen }) {
     const [GroupData, setGrouptData] = useState("")
     const [departmentHeads, setDepartmentHeads] = useState([]);
     const [userid, setuserid] = useState("")
@@ -60,6 +60,7 @@ function AddTask({setOpen}) {
             }));
         }
     };
+
 
 
 
@@ -142,7 +143,7 @@ function AddTask({setOpen}) {
         <div >
             <div class="w-full bg-gray-200 text-black rounded-lg">
                 <div class="max-w-4xl mx-auto p-0 md:p-10">
-                    <h1 class="text-2xl font-bold mb-6">Create New Task</h1> 
+                    <h1 class="text-2xl font-bold mb-6">Create New Task</h1>
                     <form class="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleSubmit}>
                         <div>
                             <label
@@ -253,10 +254,10 @@ function AddTask({setOpen}) {
                                 placeholder="Search Members"
                                 renderInput={(params) => <input {...params} className="flex w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm" />}
                                 options={selectmembers.map((lead) => lead.name)}
-                                onChange={(e, value) => handleChange(e, value, 'people')}
+                                onChange={(e, value) => handleChange('people', value)} // Ensure 'people' is passed as fieldName
                                 multiple
-                            // sx={{ width: 300 }}
                             />
+
 
                         </div>
                         <div>
