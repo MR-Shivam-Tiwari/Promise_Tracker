@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import IconButton from '@mui/joy/IconButton';
 import Table from '@mui/joy/Table';
@@ -6,29 +6,7 @@ import Typography from '@mui/joy/Typography';
 import Sheet from '@mui/joy/Sheet';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-
-// function createData(name, calories, fat, carbs, protein, price) {
-//     return {
-//         name,
-//         calories,
-//         fat,
-//         carbs,
-//         protein,
-//         price,
-//         history: [
-//             {
-//                 date: '2020-01-05',
-//                 customerId: '11091700',
-//                 amount: 3,
-//             },
-//             {
-//                 date: '2020-01-02',
-//                 customerId: 'Anonymous',
-//                 amount: 1,
-//             },
-//         ],
-//     };
-// }
+import { Button } from '@mui/joy';
 
 function Row(props) {
     const { row } = props;
@@ -56,40 +34,37 @@ function Row(props) {
             </tr>
             <tr>
                 <td style={{ height: 0, padding: 0 }} colSpan={6}>
-                    {open && row.groupData && row.groupData.length > 0 && ( // Add check for row.history
+                    {open && row.groupData && Object.keys(row.groupData).length > 0 && (
                         <Sheet
                             variant="soft"
                             sx={{ p: 1, pl: 6, boxShadow: 'inset 0 3px 6px 0 rgba(0 0 0 / 0.08)' }}
                         >
-                            
                             <Table
                                 borderAxis="bothBetween"
                                 size="sm"
                                 aria-label="purchases"
                                 sx={{
-                                    '& > thead > tr > th:nth-child(n + 3), & > tbody > tr > td:nth-child(n + 3)':
-                                        { textAlign: 'right' },
+                                    '& > thead > tr > th:nth-child(n + 3), & > tbody > tr > td:nth-child(n + 3)': { textAlign: 'right' },
                                     '--TableCell-paddingX': '0.5rem',
                                 }}
                             >
                                 <thead>
                                     <tr>
-                                        <th >Group Name</th>
-                                        <th>TOTAL TASK	</th>
-                                        <th>IN PROGRESS TASK	</th>
-                                        <th>COMPLETED TASK	</th>
+                                        <th>Group Name</th>
+                                        <th>TOTAL TASK</th>
+                                        <th>IN PROGRESS TASK</th>
+                                        <th>COMPLETED TASK</th>
                                         <th>CANCELLED TASK</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {row.groupData.map((historyRow , index) => (
+                                    {Object.keys(row.groupData).map((groupName, index) => (
                                         <tr key={index}>
-                                            <th scope="row">{historyRow.name}</th>
-                                            <td>{historyRow.totalTasks}</td>
-                                            <td>{historyRow.inProgressTasks}</td>
-                                            <td>{historyRow.completedTasks}</td>
-                                            <td>{historyRow.cancelledTasks}</td>
-                                           
+                                            <td>{groupName}</td>
+                                            <td>{row.groupData[groupName].totalTasks}</td>
+                                            <td>{row.groupData[groupName].inProgressTasks}</td>
+                                            <td>{row.groupData[groupName].completedTasks}</td>
+                                            <td>{row.groupData[groupName].cancelledTasks}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -102,78 +77,148 @@ function Row(props) {
     );
 }
 
-
 Row.propTypes = {
     initialOpen: PropTypes.bool,
     row: PropTypes.shape({
-        calories: PropTypes.number.isRequired,
-        carbs: PropTypes.number.isRequired,
-        fat: PropTypes.number.isRequired,
-        history: PropTypes.arrayOf(
-            PropTypes.shape({
-                amount: PropTypes.number.isRequired,
-                customerId: PropTypes.string.isRequired,
-                date: PropTypes.string.isRequired,
-            }),
-        ).isRequired,
-        name: PropTypes.string.isRequired,
-        price: PropTypes.number.isRequired,
-        protein: PropTypes.number.isRequired,
+        user: PropTypes.shape({
+            name: PropTypes.string.isRequired,
+        }).isRequired,
+        taskCounts: PropTypes.shape({
+            total: PropTypes.number.isRequired,
+            inProgress: PropTypes.number.isRequired,
+            completed: PropTypes.number.isRequired,
+            cancelled: PropTypes.number.isRequired,
+        }).isRequired,
+        groupData: PropTypes.object.isRequired,
     }).isRequired,
 };
 
 function ApprovalReports() {
     const [userData, setUserData] = useState([]);
-    const [loading, setLoading] = useState(true); // Add loading state
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/allassignuser');
+                const response = await fetch('http://localhost:5000/api/allusertask');
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
                 const data = await response.json();
                 setUserData(data);
-                setLoading(false); // Set loading to false when data is fetched
+                setLoading(false);
             } catch (error) {
                 console.error('Error fetching user data:', error);
-                setLoading(false); // Set loading to false in case of error
+                setLoading(false);
             }
         };
 
         fetchData();
     }, []);
 
+    const convertToCSV = () => {
+        // Initialize CSV rows array with header
+        const csvRows = ["User Name,Total Task,In progress Task,Completed Task,Cancelled Task,Group Name,Group Total Task,Group In Progress Task,Group Completed Task,Group Cancelled Task"];
+
+        // Iterate through user data
+        userData.forEach(user => {
+            const userName = user.user.name;
+            const userTaskCounts = user.taskCounts;
+
+            // Construct CSV row for user data
+            const userCSVRow = [
+                userName,
+                userTaskCounts.total,
+                userTaskCounts.inProgress,
+                userTaskCounts.completed,
+                userTaskCounts.cancelled,
+                '', // Empty space for group data
+                '', // Empty space for group data
+                '', // Empty space for group data
+                '', // Empty space for group data
+                ''  // Empty space for group data
+            ];
+            csvRows.push(userCSVRow.join(","));
+
+            // Iterate through group data for the current user
+            Object.keys(user.groupData).forEach(groupName => {
+                const group = user.groupData[groupName];
+
+                // Construct CSV row for each group
+                const groupCSVRow = [
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    groupName,
+                    group.totalTasks,
+                    group.inProgressTasks,
+                    group.completedTasks,
+                    group.cancelledTasks
+                ];
+
+                // Push the CSV row to the array
+                csvRows.push(groupCSVRow.join(","));
+            });
+        });
+
+        // Combine rows into a single CSV string
+        const csvContent = "data:text/csv;charset=utf-8," + csvRows.join("\n");
+
+        // Create download link and trigger click event
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "group_reports.csv");
+        document.body.appendChild(link);
+        link.click();
+    };
+
+
+
+
     if (loading) {
-        return <div>Loading...</div>; // Render loading indicator while fetching data
+        return <div>Loading...</div>;
     }
 
     if (!userData || !Array.isArray(userData) || userData.length === 0) {
-        return <div>No data available.</div>; // Handle case where userData is empty or not an array
+        return <div>No data available.</div>;
     }
 
     return (
         <Sheet>
+            <div className='flex justify-end p-2  ' style={{ marginTop: "" }}>
+
+                <button
+
+                    className={` inline-flex gap-2 text-gray-800 items-center justify-center bg-blue-200 text-black whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 rounded-md `}
+                    onClick={convertToCSV}
+                >
+                    Download File <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16">
+                        <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z" />
+                        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z" />
+                    </svg>
+                </button>
+            </div>
             <Table
                 aria-label="collapsible table"
                 sx={{
-                    '& > thead > tr > th:nth-child(n + 3), & > tbody > tr > td:nth-child(n + 3)':
-                        { textAlign: 'right' },
-                    '& > tbody > tr:nth-child(odd) > td, & > tbody > tr:nth-child(odd) > th[scope="row"]':
-                    {
+                    '& > thead > tr > th:nth-child(n + 3), & > tbody > tr > td:nth-child(n + 3)': { textAlign: 'right' },
+                    '& > tbody > tr:nth-child(odd) > td, & > tbody > tr:nth-child(odd) > th[scope="row"]': {
                         borderBottom: 0,
                     },
                 }}
             >
                 <thead>
+
+
                     <tr>
-                        {/* <th style={{ width: 40 }} aria-label="empty" /> */}
-                        <th style={{ width: 100 }} >Groups</th>
-                        <th >User Name</th>
-                        <th>TOTAL TASK	</th>
-                        <th>IN PROGRESS TASK	</th>
-                        <th>COMPLETED TASK	</th>
+                        <th style={{ width: 100 }}>Groups</th>
+                        <th>User Name</th>
+                        <th>TOTAL TASK</th>
+                        <th>IN PROGRESS TASK</th>
+                        <th>COMPLETED TASK</th>
                         <th>CANCELLED TASK</th>
                     </tr>
                 </thead>
@@ -187,5 +232,7 @@ function ApprovalReports() {
     );
 }
 
-
 export default ApprovalReports;
+
+
+

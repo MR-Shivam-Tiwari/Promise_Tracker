@@ -55,9 +55,6 @@ function Task() {
 
 
 
-    const handleDateClick = (formattedDate) => {
-        setSelectedDate(formattedDate);
-    };
     useEffect(() => {
         // Retrieve userData from localStorage
         const userDataString = localStorage.getItem('userData');
@@ -75,44 +72,61 @@ function Task() {
     //     selectedDateRef.current = formattedDate;
     // };
 
+ useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/tasks');
+            console.log('Response data:', response.data);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get('http://localhost:5000/api/tasks');
-                console.log('Response data:', response.data);
+            const selectedTasks = response.data.filter(task => {
+                try {
+                    // Get the startDate from the task
+                    const startDate = task.startDate;
 
-                const selectedTasks = response.data.filter(task => {
-                    try {
-                        const startDate = new Date(task.startDate).toISOString().split('T')[0]; // Get the startDate from the task in "YYYY-MM-DD" format
-                        // console.log('Start Date:', startDate);
-                        // console.log('Selected Date:', selectedDate);
-                        return startDate === selectedDate; // Return true if the startDate matches the selectedDate
-                    } catch (error) {
-                        console.error('Error parsing start date:', error);
-                        return false; // Exclude tasks with invalid start dates
-                    }
-                });
-                setTasks(selectedTasks); // Set state with tasks matching the selectedDate
+                    // Log the startDate and selectedDate for debugging
+                    console.log('Start Date:', startDate);
+                    console.log('Selected Date:', selectedDate);
 
-                // Separate filtered tasks based on status and set them in their corresponding states
-                const todoTasks = selectedTasks.filter(task => !task.status || task.status === 'To Do');
-                const inProgressTasks = selectedTasks.filter(task => task.status === 'In Progress');
-                const completedTasks = selectedTasks.filter(task => task.status === 'Completed');
-                const cancelledTasks = selectedTasks.filter(task => task.status === 'Cancelled');
+                    // Compare the startDate with the selectedDate
+                    return startDate === selectedDate;
+                } catch (error) {
+                    console.error('Error parsing start date:', error);
+                    return false; // Exclude tasks with invalid start dates
+                }
+            });
 
-                setTasksToDo(todoTasks);
-                setTasksInProgress(inProgressTasks);
-                setTasksCompleted(completedTasks);
-                setTasksCancelled(cancelledTasks);
-            } catch (error) {
-                console.error('Error fetching tasks:', error);
-            }
-        };
+            // Log the length of selectedTasks array for debugging
+            console.log('Selected Tasks:', selectedTasks.length);
+
+            // Set state with tasks matching the selectedDate
+            setTasks(selectedTasks);
+
+            // Separate filtered tasks based on status and set them in their corresponding states
+            const todoTasks = selectedTasks.filter(task => !task.status || task.status === 'To Do');
+            const inProgressTasks = selectedTasks.filter(task => task.status === 'In Progress');
+            const completedTasks = selectedTasks.filter(task => task.status === 'Completed');
+            const cancelledTasks = selectedTasks.filter(task => task.status === 'Cancelled');
+            setTasksToDo(todoTasks);
+            setTasksInProgress(inProgressTasks);
+            setTasksCompleted(completedTasks);
+            setTasksCancelled(cancelledTasks);
+        } catch (error) {
+            console.error('Error fetching tasks:', error);
+        }
+    };
+
+    fetchData();
+}, [selectedDate]);
+
+    
+    console.log("taskby userid " , tasks)
 
 
-        fetchData();
-    }, [selectedDate]); // Fetch data whenever selectedDate changes
+
+    // Handle click on date button
+    const handleDateClick = (formattedDate) => {
+        setSelectedDate(formattedDate);
+    };
 
 
 
@@ -175,9 +189,9 @@ function Task() {
                                 >
                                     {monthName} {date}
                                 </button>
-
                             );
                         })}
+
                     </div>
 
                 </header>

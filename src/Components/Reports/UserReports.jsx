@@ -1,32 +1,110 @@
-import { Button, IconButton } from '@mui/joy';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react'
+import PropTypes from 'prop-types';
+import IconButton from '@mui/joy/IconButton';
+import Table from '@mui/joy/Table';
+import Typography from '@mui/joy/Typography';
+import Sheet from '@mui/joy/Sheet';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
-function NestedTable({ tasks }) {
+
+
+function Row(props) {
+    const { row } = props;
+    const [open, setOpen] = useState(props.initialOpen || false);
+
     return (
-        <table className="w-full bg-gray-200 text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-700 uppercase">
-                <tr>
-                    <th scope="col" className="px-6 py-3">Group Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                {tasks && tasks.map((task, taskIndex) => (
-                    <tr key={taskIndex}> {/* Assuming taskIndex is unique for each task */}
-                        <td className="px-6 py-1">{task.name}</td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
+        <>
+            <tr>
+                <td>
+                    <IconButton
+                        aria-label="expand row"
+                        variant="plain"
+                        color="neutral"
+                        size="sm"
+                        onClick={() => setOpen(!open)}
+                    >
+                        {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                    </IconButton>
+                </td>
+                <td scope="row">{row.user.name}</td>
+                <td>{row.taskCounts.total}</td>
+                <td>{row.taskCounts.inProgress}</td>
+                <td>{row.taskCounts.completed}</td>
+                <td>{row.taskCounts.cancelled}</td>
+            </tr>
+            <tr>
+                <td style={{ height: 0, padding: 0 }} colSpan={6}>
+                    {open && row.groupData && row.groupData.length > 0 && ( // Add check for row.history
+                        <Sheet
+                            variant="soft"
+                            sx={{ p: 1, pl: 6, boxShadow: 'inset 0 3px 6px 0 rgba(0 0 0 / 0.08)' }}
+                        >
+
+                            <Table
+                                borderAxis="bothBetween"
+                                size="sm"
+                                aria-label="purchases"
+                                sx={{
+                                    '& > thead > tr > th:nth-child(n + 3), & > tbody > tr > td:nth-child(n + 3)':
+                                        { textAlign: 'right' },
+                                    '--TableCell-paddingX': '0.5rem',
+                                }}
+                            >
+                                <thead>
+                                    <tr>
+                                        <th >Group Name</th>
+                                        <th>TOTAL TASK	</th>
+                                        <th>IN PROGRESS TASK	</th>
+                                        <th>COMPLETED TASK	</th>
+                                        <th>CANCELLED TASK</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {row.groupData.map((historyRow, index) => (
+                                        <tr key={index}>
+                                            <th scope="row">{historyRow.name}</th>
+                                            <td>{historyRow.totalTasks}</td>
+                                            <td>{historyRow.inProgressTasks}</td>
+                                            <td>{historyRow.completedTasks}</td>
+                                            <td>{historyRow.cancelledTasks}</td>
+
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </Table>
+                        </Sheet>
+                    )}
+                </td>
+            </tr>
+        </>
     );
 }
 
 
+Row.propTypes = {
+    initialOpen: PropTypes.bool,
+    row: PropTypes.shape({
+        calories: PropTypes.number.isRequired,
+        carbs: PropTypes.number.isRequired,
+        fat: PropTypes.number.isRequired,
+        history: PropTypes.arrayOf(
+            PropTypes.shape({
+                amount: PropTypes.number.isRequired,
+                customerId: PropTypes.string.isRequired,
+                date: PropTypes.string.isRequired,
+            }),
+        ).isRequired,
+        name: PropTypes.string.isRequired,
+        price: PropTypes.number.isRequired,
+        protein: PropTypes.number.isRequired,
+    }).isRequired,
+};
+
+
 function UserReports() {
     const [userData, setUserData] = useState([]);
-    const [selectedGroup, setSelectedGroup] = useState(null);
-    const [showNestedTable, setShowNestedTable] = useState(false); // State to toggle visibility
+    const [loading, setLoading] = useState(true); // Add loading state
 
     useEffect(() => {
         const fetchData = async () => {
@@ -37,37 +115,87 @@ function UserReports() {
                 }
                 const data = await response.json();
                 setUserData(data);
+                setLoading(false); // Set loading to false when data is fetched
             } catch (error) {
                 console.error('Error fetching user data:', error);
+                setLoading(false); // Set loading to false in case of error
             }
         };
 
         fetchData();
     }, []);
 
-    const toggleNestedTable = (groupName) => {
-        setSelectedGroup(groupName);
-        setShowNestedTable(!showNestedTable); // Toggle the state
-    };
-
     const convertToCSV = () => {
-        const csvContent = "data:text/csv;charset=utf-8," +
-            "User Name,Total Task,In Progress Task,Completed Task,Cancelled Task,Group Name\n" +
-            userData.map(user => (
-                `${user.user.name},${user.taskCounts.total},${user.taskCounts.inProgress},${user.taskCounts.completed},${user.taskCounts.cancelled},"${user.groupNames.join(', ')}"`
-            )).join('\n');
+        // Initialize CSV rows array with header
+        const csvRows = ["User Name,Total Task,In progress Task,Completed Task,Cancelled Task,Group Name,Group Total Task,Group In Progress Task,Group Completed Task,Group Cancelled Task"];
 
+        // Iterate through user data
+        userData.forEach(user => {
+            const userName = user.user.name;
+            const userTaskCounts = user.taskCounts;
+
+            // Construct CSV row for user data
+            const userCSVRow = [
+                userName,
+                userTaskCounts.total,
+                userTaskCounts.inProgress,
+                userTaskCounts.completed,
+                userTaskCounts.cancelled,
+                '', // Empty space for group data
+                '', // Empty space for group data
+                '', // Empty space for group data
+                '', // Empty space for group data
+                ''  // Empty space for group data
+            ];
+            csvRows.push(userCSVRow.join(","));
+
+            // Iterate through group data for the current user
+            Object.keys(user.groupData).forEach(groupName => {
+                const group = user.groupData[groupName];
+
+                // Construct CSV row for each group
+                const groupCSVRow = [
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    group.name,
+                    group.totalTasks,
+                    group.inProgressTasks,
+                    group.completedTasks,
+                    group.cancelledTasks
+                ];
+
+                // Push the CSV row to the array
+                csvRows.push(groupCSVRow.join(","));
+            });
+        });
+
+        // Combine rows into a single CSV string
+        const csvContent = "data:text/csv;charset=utf-8," + csvRows.join("\n");
+
+        // Create download link and trigger click event
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "user_reports.csv");
+        link.setAttribute("download", "group_reports.csv");
         document.body.appendChild(link);
         link.click();
     };
 
 
+
+    if (loading) {
+        return <div>Loading...</div>; // Render loading indicator while fetching data
+    }
+
+    if (!userData || !Array.isArray(userData) || userData.length === 0) {
+        return <div>No data available.</div>; // Handle case where userData is empty or not an array
+    }
+
     return (
-        <div className="relative overflow-x-auto shadow-md text-black bg-white sm:rounded-lg">
+        <Sheet>
             <div className='flex justify-end p-2  ' style={{ marginTop: "" }}>
 
                 <button
@@ -81,66 +209,35 @@ function UserReports() {
                     </svg>
                 </button>
             </div>
-            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                <thead className="text-xs text-gray-700 uppercase">
+            <Table
+                aria-label="collapsible table"
+                sx={{
+                    '& > thead > tr > th:nth-child(n + 3), & > tbody > tr > td:nth-child(n + 3)':
+                        { textAlign: 'right' },
+                    '& > tbody > tr:nth-child(odd) > td, & > tbody > tr:nth-child(odd) > th[scope="row"]':
+                    {
+                        borderBottom: 0,
+                    },
+                }}
+            >
+                <thead>
                     <tr>
-                        <th scope="col" className="px-6 py-3">User Name</th>
-                        <th scope="col" className="px-6 py-3">Groups</th>
-                        <th scope="col" className="px-6 py-3">Total Task</th>
-                        <th scope="col" className="px-6 py-3">In Progress Task</th>
-                        <th scope="col" className="px-6 py-3">Completed Task</th>
-                        <th scope="col" className="px-6 py-3">Cancelled Task</th>
+                        {/* <th style={{ width: 40 }} aria-label="empty" /> */}
+                        <th style={{ width: 100 }} >Groups</th>
+                        <th >User Name</th>
+                        <th>TOTAL TASK	</th>
+                        <th>IN PROGRESS TASK	</th>
+                        <th>COMPLETED TASK	</th>
+                        <th>CANCELLED TASK</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {userData
-                        .slice() // Create a copy of the array to avoid mutating the original array
-                        .sort((a, b) => a.user.name.localeCompare(b.user.name)) // Sort the array alphabetically based on user's name
-                        .map((user) => (
-                            <React.Fragment key={user.user._id}>
-                                <tr className="bg-white border-b">
-                                    <td className="px-6 py-4 font-medium text-black whitespace-nowrap">
-                                        {user.user.name}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        {user.groupData && user.groupData.length > 0 ? (
-                                            <Button
-                                                aria-label="expand row"
-                                                variant="plain"
-                                                color="neutral"
-                                                size="sm"
-                                                onClick={() => toggleNestedTable(user.user._id)} // Pass user ID instead of group name
-                                            >
-                                                {selectedGroup === user.user._id && showNestedTable ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />} Group
-                                            </Button>
-                                        ) : (
-                                            "No group"
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4">{user.taskCounts.total}</td>
-                                    <td className="px-6 py-4">{user.taskCounts.inProgress}</td>
-                                    <td className="px-6 py-4">{user.taskCounts.completed}</td>
-                                    <td className="px-6 py-4">{user.taskCounts.cancelled}</td>
-                                </tr>
-                                {selectedGroup === user.user._id && showNestedTable && (
-                                    <tr key={`${user.user._id}-nested`}>
-                                        <td colSpan="6">
-                                            <NestedTable
-                                                tasks={user.groupData} // Pass user's group names directly
-                                            />
-                                        </td>
-                                    </tr>
-                                )}
-                            </React.Fragment>
-                        ))}
-
-
+                    {userData.map((row, index) => (
+                        <Row key={index} row={row} initialOpen={index === 0} />
+                    ))}
                 </tbody>
-
-
-            </table>
-            {/* <Button onClick={convertToCSV}>Download CSV</Button> */}
-        </div>
+            </Table>
+        </Sheet>
     );
 }
 
