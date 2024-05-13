@@ -19,7 +19,7 @@ const Section = ({ title, cards, moveCard }) => {
     });
 
     return (
-        <div className="flex flex-col mt-10  gap-4 rounded-lg border h-[600px] w-full" ref={drop}>
+        <div className="flex flex-col mt-5  gap-4 rounded-lg border h-[700px] w-full" ref={drop}>
             <div className="flex items-center justify-between bg-gray-100 px-4 py-3 ">
                 <h3 className="text-lg font-medium">{title}</h3>
                 <div className="inline-flex w-fit items-center whitespace-nowrap border font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground rounded-full px-3 py-1 text-sm">
@@ -73,6 +73,14 @@ const Card = ({ id, text, status, card }) => {
 
     const opacity = isDragging ? 0.5 : 1;
 
+    const startDate = new Date(card.startDate);
+    // Get day of the month
+    const day = startDate.getDate();
+    // Get abbreviated month name
+    const month = startDate.toLocaleString('default', { month: 'short' });
+    const endDate = new Date(card.endDate);
+    const endday = endDate.getDate();
+    const endMonth = endDate.toLocaleString('default', { month: 'short' })
     return (
         <div ref={drag} style={{ opacity }}>
             {/* {text} - {status} */}
@@ -82,11 +90,11 @@ const Card = ({ id, text, status, card }) => {
                     <div>
                         <Dropdown>
                             <MenuButton
-                            className="rounded-[50%]"
+                                className="rounded-[50%]"
                                 slots={{ root: IconButton }}
                                 slotProps={{ root: { variant: 'outlined', color: 'neutral' } }}
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="13" style={{color:"black"}} height="13" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" style={{ color: "black" }} height="13" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
                                     <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
                                 </svg>
                             </MenuButton>
@@ -124,6 +132,22 @@ const Card = ({ id, text, status, card }) => {
                         </Modal>
                     </div>
                 </div>
+                <div className="flex items-start">
+                    <p className='text-sm mt-2 flex  gap-1 bg-gray-200 text-black border px-1 rounded-lg'>
+                        <svg width="20px" height="20px" viewBox="0 0 32 32" id="icon" xmlns="http://www.w3.org/2000/svg">
+                            <defs></defs>
+                            <title>alarm</title>
+                            <path d="M16,28A11,11,0,1,1,27,17,11,11,0,0,1,16,28ZM16,8a9,9,0,1,0,9,9A9,9,0,0,0,16,8Z" />
+                            <polygon points="18.59 21 15 17.41 15 11 17 11 17 16.58 20 19.59 18.59 21" />
+                            <rect fill="#000000" x="3.96" y="5.5" width="5.07" height="2" transform="translate(-2.69 6.51) rotate(-45.06)" />
+                            <rect fill="#000000" x="24.5" y="3.96" width="2" height="5.07" transform="translate(2.86 19.91) rotate(-44.94)" />
+                            <rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" fill="none" width="32" height="32" />
+                        </svg>
+
+                        {day} {month} - {endday} {endMonth}
+                    </p>
+                </div>
+
                 <div className='flex justify-between mt-1 items-center'>
                     <div className='flex font-bold text-gray-500 text-sm'>
 
@@ -193,7 +217,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
     const moveCard = async (id, toSection) => {
         const newSections = { ...sections };
         const fromSection = Object.keys(newSections).find(section => newSections[section].find(card => card._id === id));
-    
+
         if (fromSection !== toSection) {
             try {
                 let updatedStatus = toSection === 'Todo' ? '' : toSection; // Set status to '' for 'Todo', otherwise use the section name
@@ -201,17 +225,17 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
                 const cardToMove = newSections[fromSection].find((card) => card._id === id);
                 newSections[fromSection] = newSections[fromSection].filter((card) => card._id !== id);
                 newSections[toSection] = [...newSections[toSection], cardToMove];
-    
+
                 // Update card's status with section name
                 cardToMove.status = toSection;
-    
+
                 setSections(newSections);
             } catch (error) {
                 console.error('Error moving card:', error);
             }
         }
     };
-    
+
 
     return (
         <DndProvider backend={HTML5Backend}>

@@ -93,8 +93,11 @@ function MainHome() {
         const fetchData = async () => {
             try {
                 const response = await axios.get('http://localhost:5000/api/tasks');
-
-                const filteredTasks = response.data.filter(task => task.owner.id === userid);
+                const filteredTasks = response.data.filter(task => {
+                    // Check if any of the people in the task match the user's ID
+                    return task.people.some(person => person._id === userid);
+                });
+                // const filteredTasks = response.data.filter(task => task.people.id === userid);
                 setTaskData(filteredTasks);
             } catch (error) {
                 console.error('Error fetching tasks:', error);
@@ -216,6 +219,11 @@ function MainHome() {
                                         const day = startDate.getDate();
                                         // Get abbreviated month name
                                         const month = startDate.toLocaleString('default', { month: 'short' });
+                                      const endDate = new Date(task.endDate);
+                                      const endday = endDate.getDate();
+                                      const endMonth = endDate.toLocaleString('default' , { month: 'short' })
+
+
 
                                         return (
                                             <div onClick={() => navigate("/task")} key={task?.id} class="border cursor-pointer  bg-card text-card-foreground w-full rounded-lg shadow-md" style={randomColor}>
@@ -243,8 +251,18 @@ function MainHome() {
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <p className='text-sm mt-2 bg-white text-black border px-1 rounded'>
-                                                                <strong> Start Date -</strong> {day} {month}
+                                                            <p className='text-sm mt-2 flex gap-2  bg-white text-black border px-1 rounded'>
+                                                                <svg width="20px" height="20px" viewBox="0 0 32 32" id="icon" xmlns="http://www.w3.org/2000/svg">
+                                                                    <defs></defs>
+                                                                    <title>alarm</title>
+                                                                    <path d="M16,28A11,11,0,1,1,27,17,11,11,0,0,1,16,28ZM16,8a9,9,0,1,0,9,9A9,9,0,0,0,16,8Z" />
+                                                                    <polygon points="18.59 21 15 17.41 15 11 17 11 17 16.58 20 19.59 18.59 21" />
+                                                                    <rect fill="#000000" x="3.96" y="5.5" width="5.07" height="2" transform="translate(-2.69 6.51) rotate(-45.06)" />
+                                                                    <rect fill="#000000" x="24.5" y="3.96" width="2" height="5.07" transform="translate(2.86 19.91) rotate(-44.94)" />
+                                                                    <rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" fill="none" width="32" height="32" />
+                                                                </svg>
+
+                                                                {day} {month} - {endday} {endMonth}
                                                             </p>
                                                         </div>
                                                     </div>
