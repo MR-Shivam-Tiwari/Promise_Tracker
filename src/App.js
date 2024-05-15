@@ -16,7 +16,7 @@ export default function App() {
     const userDataObj = userDataString ? JSON.parse(userDataString) : null;
     // Update isLoggedIn state based on the presence of userId in userData
     setIsLoggedIn(userDataObj && userDataObj.userId);
-  }, []);
+  }, []);  
 
   return (
     <div>
