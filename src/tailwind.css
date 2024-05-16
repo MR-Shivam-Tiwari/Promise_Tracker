@@ -9,7 +9,7 @@
     width: 6px;
     border-radius: 5px;
 }
- 
+    
 /* Track */
 ::-webkit-scrollbar-track {
     background: #f1f1f1; /* Color of the scrollbar track */
