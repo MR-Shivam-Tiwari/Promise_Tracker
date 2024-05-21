@@ -104,7 +104,7 @@ function AddTask({ setOpen }) {
     useEffect(() => {
         const fetchGroupData = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/tgroups');
+                const response = await axios.get('http://localhost:5000/api/groups');
                 setGrouptData(response.data);
             } catch (error) {
                 console.log("Error fetching Task: ", error);

@@ -122,7 +122,7 @@ function MainHome() {
 
     const fetchGroupData = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/tgroups');
+            const response = await axios.get('http://localhost:5000/api/groups');
             setGroupData(response.data);
         } catch (error) {
             console.log("Error fetching Task: ", error);
@@ -219,9 +219,9 @@ function MainHome() {
                                         const day = startDate.getDate();
                                         // Get abbreviated month name
                                         const month = startDate.toLocaleString('default', { month: 'short' });
-                                      const endDate = new Date(task.endDate);
-                                      const endday = endDate.getDate();
-                                      const endMonth = endDate.toLocaleString('default' , { month: 'short' })
+                                        const endDate = new Date(task.endDate);
+                                        const endday = endDate.getDate();
+                                        const endMonth = endDate.toLocaleString('default', { month: 'short' })
 
 
 
@@ -311,10 +311,10 @@ function MainHome() {
                         <div className="  border mt-4 rounded-lg" >
                             <div style={{ minWidth: "100%", display: "table" }}>
                                 <div className="p-4 space-y-4">
-                                    {Array.isArray(groupData) && groupData.map(task => (
+                                    {Array.isArray(groupData) && groupData.map((task, index)  => (
 
 
-                                        <div key={task?.id} className="flex items-center justify-between">
+                                        <div key={index} className="flex items-center justify-between">
                                             <div className="flex items-center gap-4">
                                                 <span className="relative flex-shrink-0 overflow-hidden rounded-full h-10 w-10">
                                                     <Avatar className="flex items-center justify-center h-full w-full rounded-full border text-black bg-gray-200 " src={task?.profilePic} />
@@ -326,92 +326,94 @@ function MainHome() {
                                             </div>
                                             <div className='gap-3 flex '>
 
-                                                <Button onClick={() => handleGroupClick(task)} variant="outlined" color="neutral" className="items-center justify-center whitespace-nowrap rounded-md text-lg font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gray-200 text-black hover:bg-primary/90 h-10 px-4 py-2">
+                                                <Button
+                                                    onClick={() => handleGroupClick(task)}
+                                                    variant="outlined"
+                                                    color="neutral"
+                                                    className="items-center justify-center whitespace-nowrap rounded-md text-lg font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gray-200 text-black hover:bg-primary/90 h-10 px-4 py-2"
+                                                >
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-eye" viewBox="0 0 16 16">
                                                         <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
                                                         <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
                                                     </svg>
                                                 </Button>
+
                                                 <Modal open={openModal} onClose={handleCloseModal}>
-                                                    <ModalDialog className="bg-gray-200 mt-10 " maxWidth={500} minWidth={700} style={{ overflow: "auto" }}>
+                                                    <ModalDialog className="bg-gray-200 mt-10" maxWidth={500} minWidth={700} style={{ overflow: "auto" }}>
                                                         <ModalClose />
                                                         <form onSubmit={handleCloseModal}>
                                                             {selectedGroup && (
                                                                 <div>
-
-                                                                    <main class="w-full max-w-5xl mx-auto px-4 py-6   border ">
-                                                                        <div class="grid  gap-6 md:gap-6 lg:gap-8">
-                                                                            <div class="grid gap-2">
+                                                                    <main className="w-full max-w-5xl mx-auto px-4 py-6 border">
+                                                                        <div className="grid gap-6 md:gap-6 lg:gap-8">
+                                                                            <div className="grid gap-2">
                                                                                 <div className='flex gap-5 items-end'>
-
-                                                                                    <Avatar className="flex items-center justify-center  rounded-full border text-black bg-gray-100 " src={selectedGroup?.profilePic} />
-
-                                                                                    <h1 class="text-4xl font-bold ">{selectedGroup?.groupName}</h1>
-                                                                                    <div class="flex items-center gap-4 text-gray-600 text-bold ">
+                                                                                    <Avatar className="flex items-center justify-center rounded-full border text-black bg-gray-100" src={selectedGroup?.profilePic} />
+                                                                                    <h1 className="text-4xl font-bold">{selectedGroup?.groupName}</h1>
+                                                                                    <div className="flex items-center gap-4 text-gray-600 text-bold">
                                                                                         <span>{createdAt ? formatDate(createdAt) : ''}</span>
-
-                                                                                        {/* <span>Managed by John Doe</span> */}
-
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
                                                                             <div>
-                                                                                <h2 class="text-2xl font-bold  mb-4">Department Head</h2>
-                                                                                <div class="flex flex-wrap gap-2">
-                                                                                    <span> <strong></strong>
-
-                                                                                        {selectedGroup?.deptHead.map((person, index) => (
-                                                                                            <span
-                                                                                                key={index}
-                                                                                                className={`inline-block  py-1 rounded-full mr-2 px-4 mb-2 ${index % 2 === 0 ? 'bg-yellow-500 text-white' : 'bg-purple-500 text-white'
-                                                                                                    }`}
-                                                                                            >
-                                                                                                {person.name}
-                                                                                            </span>
-                                                                                        ))}
-
+                                                                                <h2 className="text-2xl font-bold mb-4">Department Head</h2>
+                                                                                <div className="flex flex-wrap gap-2">
+                                                                                    <span>
+                                                                                        {selectedGroup?.deptHead?.length ? (
+                                                                                            selectedGroup.deptHead.map((person, index) => (
+                                                                                                person ? (
+                                                                                                    <span
+                                                                                                        key={index}
+                                                                                                        className={`inline-block py-1 rounded-full mr-2 px-4 mb-2 ${index % 2 === 0 ? 'bg-yellow-500 text-white' : 'bg-purple-500 text-white'}`}
+                                                                                                    >
+                                                                                                        {person.name}
+                                                                                                    </span>
+                                                                                                ) : null
+                                                                                            ))
+                                                                                        ) : (
+                                                                                            <span>No department heads available.</span>
+                                                                                        )}
                                                                                     </span>
-
-
 
                                                                                 </div>
                                                                             </div>
                                                                             <div>
-                                                                                <h2 class="text-2xl font-bold  mb-4">Members</h2>
-                                                                                <div class="flex flex-wrap gap-2">
-                                                                                    <div className="text-white  py-1 rounded-full text-sm font-medium">
-                                                                                        {selectedGroup?.members.map((person, index) => (
+                                                                                <h2 className="text-2xl font-bold mb-4">Members</h2>
+                                                                                <div className="flex flex-wrap gap-2">
+                                                                                    <div className="text-white py-1 rounded-full text-sm font-medium">
+                                                                                        {selectedGroup?.members?.map((person, index) => (
                                                                                             <span
                                                                                                 key={index}
-                                                                                                className={`inline-block px-2 py-1 rounded-full mr-2 px-4 mb-2 ${index % 2 === 0 ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'
-                                                                                                    }`}
+                                                                                                className={`inline-block px-2 py-1 rounded-full mr-2 px-4 mb-2 ${index % 2 === 0 ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'}`}
                                                                                             >
                                                                                                 {person.name}
                                                                                             </span>
                                                                                         ))}
                                                                                     </div>
-
-
-
                                                                                 </div>
                                                                             </div>
                                                                             <div>
-                                                                                <h2 class="text-2xl font-bold  mb-4">Project Lead</h2>
-                                                                                <div class="flex items-center font-bold gap-4">
-                                                                                    <span class="     " style={{ fontWeight: "bold" }}>
-                                                                                        {selectedGroup?.projectLead.map((person, index) => (
-                                                                                            <span
-                                                                                                key={index}
-                                                                                                className={`inline-block px-2 py-1 rounded-full mr-2 px-4 mb-2 ${index % 2 === 0 ? 'bg-orange-500 text-white' : 'bg-red-500 text-white'
-                                                                                                    }`}
-                                                                                            >
-                                                                                                {person.name}
-                                                                                            </span>
-                                                                                        ))}
-
-
+                                                                                <h2 className="text-2xl font-bold mb-4">Project Lead</h2>
+                                                                                <div className="flex flex-wrap gap-2">
+                                                                                    <span>
+                                                                                        {selectedGroup?.projectLead?.length ? (
+                                                                                            selectedGroup.projectLead.map((person, index) => (
+                                                                                                person ? (
+                                                                                                    <span
+                                                                                                        key={index}
+                                                                                                        className={`inline-block py-1 rounded-full mr-2 px-4 mb-2 ${index % 2 === 0 ? 'bg-yellow-500 text-white' : 'bg-purple-500 text-white'}`}
+                                                                                                    >
+                                                                                                        {person.name}
+                                                                                                    </span>
+                                                                                                ) : null
+                                                                                            ))
+                                                                                        ) : (
+                                                                                            <span>No department heads available.</span>
+                                                                                        )}
                                                                                     </span>
+
                                                                                 </div>
+                                                                                
                                                                             </div>
                                                                         </div>
                                                                     </main>
@@ -420,6 +422,7 @@ function MainHome() {
                                                         </form>
                                                     </ModalDialog>
                                                 </Modal>
+
                                                 <Button onClick={() => handleEditGroup(task)} variant="outlined"
                                                     color="neutral" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gray-200 text-black hover:bg-primary/90 h-10 px-4 py-2">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
