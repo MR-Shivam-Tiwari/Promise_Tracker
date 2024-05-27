@@ -5,8 +5,8 @@ function ViewTask({ task, status }) {
     console.log("status", status)
     return (
         <div>
-            <div class="container mx-auto my-8  p-0 lg:px-8">
-                <div class="bg-white rounded-lg shadow-md p-2 lg:px-8">
+            <div class="container mx-auto   p-0 ">
+                <div class="bg-white rounded-lg shadow-md p-2 py-6 lg:px-8">
                     <div class="flex items-center justify-between mb-6">
                         <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-700">{task?.taskGroup}</h1>
 

@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ModalClose from '@mui/joy/ModalClose';
 import ViewTask from '../ViewTask';
+import EditTask from '../EditTask';
 const ItemTypes = {
     CARD: 'card',
 };
@@ -42,6 +43,7 @@ const Card = ({ id, text, status, card }) => {
     const [selectedOption, setSelectedOption] = useState('');
     const navigate = useNavigate()
     const [open, setOpen] = React.useState(false);
+    const [edit, setedit] = React.useState(false);
     const handleClick = (option) => {
         setSelectedOption(option);
         setShowOptions(false);
@@ -100,10 +102,33 @@ const Card = ({ id, text, status, card }) => {
                             </MenuButton>
 
                             <Menu className=''>
-                                <MenuItem>Edit</MenuItem>
+                                <MenuItem onClick={() => setedit(true)}>Edit</MenuItem>
                                 <MenuItem onClick={() => setOpen(true)}>View</MenuItem>
                             </Menu>
                         </Dropdown>
+                        <Modal
+                            aria-labelledby="modal-title"
+                            aria-describedby="modal-desc"
+                            open={edit}
+                            onClose={() => setedit(false)}
+                            sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                        >
+                            <Sheet
+                                className='overflow-auto bg-white '
+                                sx={{
+                                    
+                                    borderRadius: 'md',
+                                    boxShadow: 'lg',
+                                }}
+                            >
+                                <ModalClose variant="plain" sx={{ m: 1 }} />
+
+                                <div >
+
+                                    <EditTask  setedit = {setedit} task={card} Taskid={id} />
+                                </div>
+                            </Sheet>
+                        </Modal>
                         <Modal
                             aria-labelledby="modal-title"
                             aria-describedby="modal-desc"
@@ -112,13 +137,11 @@ const Card = ({ id, text, status, card }) => {
                             sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                         >
                             <Sheet
-                                variant="outlined"
-                                className='overflow-auto h-[700px]'
+                                className='overflow-auto bg-white h-[700px]'
                                 sx={{
                                     width: 1200,
                                     height: 800,
                                     borderRadius: 'md',
-                                    p: 3,
                                     boxShadow: 'lg',
                                 }}
                             >

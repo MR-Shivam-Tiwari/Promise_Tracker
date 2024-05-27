@@ -122,18 +122,21 @@ function MainHome() {
 
     const fetchGroupData = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/groups');
+            const response = await axios.get(`http://localhost:5000/api/allgroups/${userid}`);
             setGroupData(response.data);
         } catch (error) {
-            console.log("Error fetching Task: ", error);
+            console.log("Error fetching Group Data: ", error);
         }
     };
+
     useEffect(() => {
+        if (userid) {
+            fetchGroupData();
+        }
+    }, [userid]);
 
-        fetchGroupData();
-    }, []);
 
-    console.log("Grouptask", groupData)
+    console.log("Grouptask", userid)
 
 
     const spacing = 1;
@@ -311,7 +314,7 @@ function MainHome() {
                         <div className="  border mt-4 rounded-lg" >
                             <div style={{ minWidth: "100%", display: "table" }}>
                                 <div className="p-4 space-y-4">
-                                    {Array.isArray(groupData) && groupData.map((task, index)  => (
+                                    {Array.isArray(groupData) && groupData.map((task, index) => (
 
 
                                         <div key={index} className="flex items-center justify-between">
@@ -413,7 +416,7 @@ function MainHome() {
                                                                                     </span>
 
                                                                                 </div>
-                                                                                
+
                                                                             </div>
                                                                         </div>
                                                                     </main>
