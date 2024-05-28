@@ -1,4 +1,4 @@
-import { Button, CardContent, Chip, Dropdown, IconButton, Menu, MenuButton, MenuItem, Modal, ModalDialog, Sheet, Typography } from '@mui/joy';
+import { Button, Chip, Dropdown, IconButton, Menu, MenuButton, MenuItem, Modal, Sheet, Typography } from '@mui/joy';
 import React, { useState, useEffect } from 'react';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import ModalClose from '@mui/joy/ModalClose';
 import ViewTask from '../ViewTask';
 import EditTask from '../EditTask';
+
 const ItemTypes = {
     CARD: 'card',
 };
@@ -29,8 +30,6 @@ const Section = ({ title, cards, moveCard }) => {
             </div>
             <div className="flex-1 flex flex-col gap-4 p-4  overflow-y-scroll">
                 {cards.map((card) => (
-
-
                     <Card key={card._id} card={card} id={card._id} text={card.taskName} status={card.status} />
                 ))}
             </div>
@@ -42,8 +41,9 @@ const Card = ({ id, text, status, card }) => {
     const [showOptions, setShowOptions] = useState(false);
     const [selectedOption, setSelectedOption] = useState('');
     const navigate = useNavigate()
-    const [open, setOpen] = React.useState(false);
-    const [edit, setedit] = React.useState(false);
+    const [open, setOpen] = useState(false);
+    const [edit, setEdit] = useState(false);
+
     const handleClick = (option) => {
         setSelectedOption(option);
         setShowOptions(false);
@@ -63,6 +63,7 @@ const Card = ({ id, text, status, card }) => {
                 break;
         }
     };
+
     const [{ isDragging }, drag] = useDrag({
         type: ItemTypes.CARD,
         item: () => {
@@ -76,17 +77,15 @@ const Card = ({ id, text, status, card }) => {
     const opacity = isDragging ? 0.5 : 1;
 
     const startDate = new Date(card.startDate);
-    // Get day of the month
     const day = startDate.getDate();
-    // Get abbreviated month name
     const month = startDate.toLocaleString('default', { month: 'short' });
     const endDate = new Date(card.endDate);
-    const endday = endDate.getDate();
-    const endMonth = endDate.toLocaleString('default', { month: 'short' })
+    const endDay = endDate.getDate();
+    const endMonth = endDate.toLocaleString('default', { month: 'short' });
+
     return (
         <div ref={drag} style={{ opacity }}>
-            {/* {text} - {status} */}
-            <div className="flex-1 shadow-md flex flex-col gap-4  border bg-blue-50 p-4 rounded" >
+            <div className="flex-1 shadow-md flex flex-col gap-4  border bg-blue-50 p-4 rounded">
                 <div className='mb-1 flex justify-between items-center font-bold text-xs'>
                     <p>{card?.taskName}</p>
                     <div>
@@ -96,13 +95,13 @@ const Card = ({ id, text, status, card }) => {
                                 slots={{ root: IconButton }}
                                 slotProps={{ root: { variant: 'outlined', color: 'neutral' } }}
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="13" style={{ color: "black" }} height="13" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" style={{ color: "black" }} height="13" fill="currentColor" className="bi bi-three-dots" viewBox="0 0 16 16">
                                     <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
                                 </svg>
                             </MenuButton>
 
                             <Menu className=''>
-                                <MenuItem onClick={() => setedit(true)}>Edit</MenuItem>
+                                <MenuItem onClick={() => setEdit(true)}>Edit</MenuItem>
                                 <MenuItem onClick={() => setOpen(true)}>View</MenuItem>
                             </Menu>
                         </Dropdown>
@@ -110,25 +109,21 @@ const Card = ({ id, text, status, card }) => {
                             aria-labelledby="modal-title"
                             aria-describedby="modal-desc"
                             open={edit}
-                            onClose={() => setedit(false)}
+                            onClose={() => setEdit(false)}
                             sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                         >
                             <Sheet
                                 className='overflow-auto bg-white '
                                 sx={{
-                                    
                                     borderRadius: 'md',
                                     boxShadow: 'lg',
                                 }}
                             >
-                                <ModalClose variant="plain" sx={{ m: 1 }} />
-
-                                <div >
-
-                                    <EditTask  setedit = {setedit} task={card} Taskid={id} />
-                                </div>
+                                <ModalClose variant="plain" sx={{ m: 1 }} onClick={() => setEdit(false)} />
+                                <EditTask data={card} />
                             </Sheet>
                         </Modal>
+
                         <Modal
                             aria-labelledby="modal-title"
                             aria-describedby="modal-desc"
@@ -137,20 +132,14 @@ const Card = ({ id, text, status, card }) => {
                             sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                         >
                             <Sheet
-                                className='overflow-auto bg-white h-[700px]'
+                                className='overflow-auto bg-white'
                                 sx={{
-                                    width: 1200,
-                                    height: 800,
                                     borderRadius: 'md',
                                     boxShadow: 'lg',
                                 }}
                             >
-                                <ModalClose variant="plain" sx={{ m: 1 }} />
-
-                                <div >
-
-                                    <ViewTask task={card} />
-                                </div>
+                                <ModalClose variant="plain" sx={{ m: 1 }} onClick={() => setOpen(false)} />
+                                <ViewTask data={card} />
                             </Sheet>
                         </Modal>
                     </div>
@@ -167,10 +156,9 @@ const Card = ({ id, text, status, card }) => {
                             <rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" fill="none" width="32" height="32" />
                         </svg>
 
-                        {day} {month} - {endday} {endMonth}
+                        {day} {month} - {endDay} {endMonth}
                     </p>
                 </div>
-
                 <div className='flex justify-between mt-1 items-center'>
                     <div className='flex font-bold text-gray-500 text-sm'>
 
@@ -204,6 +192,11 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
         'Cancelled': tasksCancelled,
     });
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentCard, setCurrentCard] = useState(null);
+    const [remarks, setRemarks] = useState('');
+    const [selectedDate, setSelectedDate] = useState(new Date());
+
     useEffect(() => {
         setSections({
             'Todo': tasksToDo,
@@ -213,28 +206,20 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
         });
     }, [tasksToDo, tasksInProgress, tasksCompleted, tasksCancelled]);
 
-    const updateTaskStatus = async (taskId, status) => {
-        try {
-            const response = await fetch(`http://localhost:5000/api/tasks/${taskId}/status`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ status }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update task status');
-            }
-
-            const updatedTask = await response.json();
-            toast.success("Task Status Updated")
-            return updatedTask;
-        } catch (error) {
-            console.error('Error updating task status:', error);
-            toast.error('Error updating task status:', error);
-            throw error;
+    const updateTaskStatus = async (id, status, remark) => {
+        const response = await fetch(`http://localhost:5000/api/tasks/${id}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status, remark }), // Include remark as an object
+        });
+        toast.success("Task Status Updated");
+        if (!response.ok) {
+            throw new Error('Failed to update task status');
         }
+
+        return response.json();
     };
 
     const moveCard = async (id, toSection) => {
@@ -242,16 +227,19 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
         const fromSection = Object.keys(newSections).find(section => newSections[section].find(card => card._id === id));
 
         if (fromSection !== toSection) {
+            if (toSection === 'Cancelled') {
+                const cardToMove = newSections[fromSection].find((card) => card._id === id);
+                setCurrentCard({ ...cardToMove, fromSection });
+                setIsModalOpen(true);
+                return;
+            }
             try {
-                let updatedStatus = toSection === 'Todo' ? '' : toSection; // Set status to '' for 'Todo', otherwise use the section name
+                let updatedStatus = toSection === 'Todo' ? '' : toSection;
                 const updatedTask = await updateTaskStatus(id, updatedStatus);
                 const cardToMove = newSections[fromSection].find((card) => card._id === id);
                 newSections[fromSection] = newSections[fromSection].filter((card) => card._id !== id);
                 newSections[toSection] = [...newSections[toSection], cardToMove];
-
-                // Update card's status with section name
                 cardToMove.status = toSection;
-
                 setSections(newSections);
             } catch (error) {
                 console.error('Error moving card:', error);
@@ -259,6 +247,53 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
         }
     };
 
+    const handleCancelModalSubmit = async () => {
+        if (!remarks || !selectedDate) {
+            console.error('Remark text and date are required');
+            return;
+        }
+
+        if (currentCard) {
+            try {
+                const response = await fetch(`http://localhost:5000/api/tasks/${currentCard._id}/cancel`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        remark: { text: remarks, date: selectedDate.toISOString().split('T')[0] },
+                    }),
+
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update task status');
+                }
+
+                const updatedTask = await response.json();
+                toast.success("Task Status Updated");
+
+                const newSections = { ...sections };
+                newSections[currentCard.fromSection] = newSections[currentCard.fromSection].filter((card) => card._id !== currentCard._id);
+                newSections['Cancelled'] = [...newSections['Cancelled'], { ...currentCard, status: 'Cancelled' }];
+                setSections(newSections);
+                setIsModalOpen(false);
+                setCurrentCard(null);
+                setRemarks('');
+                setSelectedDate(new Date());
+            } catch (error) {
+                console.error('Error updating task status:', error);
+                toast.error('Error updating task status');
+            }
+        }
+    };
+
+    const handleCancelModalClose = () => {
+        setIsModalOpen(false);
+        setCurrentCard(null);
+        setRemarks('');
+        setSelectedDate(new Date()); // Reset selectedDate as a Date object
+    };
 
     return (
         <DndProvider backend={HTML5Backend}>
@@ -267,8 +302,78 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
                     <Section key={title} title={title} cards={cards} moveCard={moveCard} />
                 ))}
             </div>
+
+            {isModalOpen && (
+                <Modal
+                    aria-labelledby="modal-title"
+                    aria-describedby="modal-desc"
+                    open={isModalOpen}
+                    onClose={handleCancelModalClose}
+                    sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                >
+                    <Sheet
+                        variant="outlined"
+                        sx={{
+                            maxWidth: 1000,
+                            borderRadius: 'md',
+                            p: 3,
+                            boxShadow: 'lg',
+                            width:400
+                        }}
+                    >
+                        <ModalClose
+                            variant="outlined"
+                            sx={{
+                                top: 'calc(-1/4 * var(--IconButton-size))',
+                                right: 'calc(-1/4 * var(--IconButton-size))',
+                                boxShadow: '0 2px 12px 0 rgba(0 0 0 / 0.2)',
+                                borderRadius: '50%',
+                                bgcolor: 'background.body',
+                            }}
+                        />
+                        <Typography
+                            component="h2"
+                            id="modal-title"
+                            level="h4"
+                            textColor="inherit"
+                            fontWeight="lg"
+                            mb={1}
+                        >
+                            Reason to Cancel
+                        </Typography>
+                        <div className="grid gap-4">
+                            <div className="gap-2 grid">
+                                <label>Remarks</label>
+                                <input type="text" name="remarks" className='flex h-10 w-full bg-gray-300 text-black rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2' id="remarks" value={remarks} onChange={(e) => setRemarks(e.target.value)} />
+                            </div>
+                            <div className="gap-2 grid">
+                                <label>Select New Deadline  Date</label>
+                                <input
+                                    type="date"
+                                    className='flex h-10 w-full bg-gray-300 text-black rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                                    name="selectedDate"
+                                    id="selectedDate"
+                                    value={selectedDate.toISOString().split('T')[0]} // Convert date to string
+                                    onChange={(e) => setSelectedDate(new Date(e.target.value))} // Set selectedDate as Date object
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-2 mt-4">
+                            <Button onClick={handleCancelModalClose} variant="plain">Cancel</Button>
+                            <Button onClick={handleCancelModalSubmit}>Submit</Button>
+                        </div>
+                    </Sheet>
+                </Modal>
+            )}
         </DndProvider>
     );
 };
+
+
+
+
+
+
 
 export default DragAndDropComponent;
