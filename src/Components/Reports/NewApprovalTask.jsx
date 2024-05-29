@@ -2,15 +2,15 @@ import { IconButton, Modal, ModalClose, ModalDialog } from '@mui/joy';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import ViewTask from '../Task/ViewTask';
-import EditApprovals from './EditApprovals';
+import EditApprovals from '../Approvals/EditApprovals';
 
-function Approvals() {
+function NewApprovalTask() {
     const [selectedStatus, setSelectedStatus] = useState('All');
     const [tasks, setTasks] = useState([]);
     const [open, setOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
     const [shouldRefreshData, setShouldRefreshData] = useState(false); // State variable to track whether data should be refreshed
-    const [userid, setuserid] = useState("")
+
     const fetchData = async () => {
         try {
             const response = await axios.get('http://localhost:5000/api/tasks');
@@ -29,38 +29,26 @@ function Approvals() {
         setSelectedTask(null);
         fetchData(); // Call fetchData function when modal is closed
     };
-    useEffect(() => {
-        // Retrieve userData from localStorage
-        const userDataString = localStorage.getItem('userData');
-        if (userDataString) {
-            const userDataObj = JSON.parse(userDataString);
-            const userId = userDataObj.userId;
-            console.log(userId)
-            setuserid(userId)
-        }
-    }, []);
-    const filteredTasks = (() => {
-        switch (selectedStatus) {
-            case 'All':
-                return tasks.filter(task => task.status === 'Completed');
-            case 'Approved':
-                return tasks.filter(task => task.category === 'Approved');
-            case 'Unapproved':
-                return tasks.filter(task => task.category === 'Unapproved');
-            case 'New Task Approval':
-                return tasks.filter(task => task.status === 'Cancelled' && task.owner.id === userid);
-            default:
-                return [];
-        }
-    })();
-    console.log("totalTask", tasks)
+    // const filteredTasks = (() => {
+    //     switch (selectedStatus) {
+    //         case 'All':
+    //             return tasks.filter(task => task.status === 'Completed');
+    //         case 'Approved':
+    //             return tasks.filter(task => task.category === 'Approved');
+    //         case 'Unapproved':
+    //             return tasks.filter(task => task.category === 'Unapproved');
+    //         default:
+    //             return [];
+    //     }
+    // })();
+console.log("totalTask", tasks)
     const handleEditClick = (task) => {
         setSelectedTask(task);
         setOpen(true);
     };
-
-    return (
-        <div>
+  return (
+    <div>
+       <div>
             <style>{`
         h1, h2, h3, h4, h5, h6 {
           font-family: 'Inter', sans-serif;
@@ -74,12 +62,12 @@ function Approvals() {
         }
       `}</style>
             <div class="flex flex-col h-screen">
-                <header class="bg-gray-100 rounded-lg px-4 flex items-center justify-between">
+                {/* <header class="bg-gray-100 rounded-lg px-4 flex items-center justify-between">
                     <div class="flex items-center gap-4">
 
                         <div className=' bg-blue-50  py-1 rounded-lg'>
                             <div className="flex items-center gap-4 overflow-x-auto h-14">
-                                {['All', 'Approved', 'Unapproved', 'New Task Approval'].map(status => (
+                                {['All', 'Approved', 'Unapproved'].map(status => (
                                     <button
                                         key={status}
                                         className={`inline-flex items-center justify-center bg-blue-200 text-black whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 rounded-md ${selectedStatus === status ? 'bg-blue-500 text-white' : ''}`}
@@ -91,7 +79,7 @@ function Approvals() {
                             </div>
                         </div>
                     </div>
-                </header>
+                </header> */}
                 <main class="flex-1 overflow-auto p-1 mt-3">
                     <div class="grid gap-4">
                         <div class="border rounded-lg overflow-hidden">
@@ -119,7 +107,7 @@ function Approvals() {
                                             </th>
                                         </tr>
                                     </thead>
-                                    {filteredTasks.map(task => {
+                                    {tasks.map(task => {
                                         // console.log("Task ID:", task?._id); // Log task ID
                                         return (
                                             <tbody key={task?._id} class="[&amp;_tr:last-child]:border-0">
@@ -192,7 +180,25 @@ function Approvals() {
                                                         </Modal>
 
 
-
+                                                        {/* <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10 text-red-500">
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            width="24"
+                                                            height="24"
+                                                            viewBox="0 0 24 24"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            stroke-width="2"
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="h-4 w-4"
+                                                        >
+                                                            <path d="M3 6h18"></path>
+                                                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                                        </svg>
+                                                        <span class="sr-only">Delete</span>
+                                                    </button> */}
                                                     </td>
                                                 </tr>
 
@@ -208,7 +214,8 @@ function Approvals() {
                 </main>
             </div>
         </div>
-    )
+    </div>
+  )
 }
 
-export default Approvals
+export default NewApprovalTask

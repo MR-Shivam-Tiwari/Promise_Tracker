@@ -132,7 +132,7 @@ const Card = ({ id, text, status, card }) => {
                             sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                         >
                             <Sheet
-                                className='overflow-auto bg-white'
+                                className='overflow-auto bg-white h-[70%]'
                                 sx={{
                                     borderRadius: 'md',
                                     boxShadow: 'lg',
