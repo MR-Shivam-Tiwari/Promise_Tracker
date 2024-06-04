@@ -122,7 +122,7 @@ function Task() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/tasks');
+                const response = await axios.get('http://3.85.170.118:5000/api/tasks');
                 console.log('Response data:', response.data);
     
                 // Filter tasks based on the user's ID

@@ -46,7 +46,13 @@ function AcceptApprovals({ taskId, task, onClose }) {
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <h4 class="text-sm font-medium">  Date</h4>
+                            <h4 class="text-sm font-medium">Remark</h4>
+                            <p class="text-gray-500 dark:text-gray-400">{task.remark[0].text}</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="text-sm font-medium"> New Date</h4>
                             <p class="text-gray-500 dark:text-gray-400">{task.remark[0].date}</p>
                         </div>
                     </div>
