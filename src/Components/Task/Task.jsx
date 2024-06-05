@@ -75,7 +75,7 @@ function Task() {
     //  useEffect(() => {
     //     const fetchData = async () => {
     //         try {
-    //             const response = await axios.get('http://localhost:5000/api/tasks');
+    //             const response = await axios.get('http://3.85.170.118:5000/api/tasks');
     //             console.log('Response data:', response.data);
 
     //             // const selectedTasks = response.data.filter(task => {
@@ -128,7 +128,7 @@ function Task() {
                 // Filter tasks based on the user's ID
                 const userTasks = response.data.filter(task => {
                     // Check if any of the people in the task match the user's ID
-                    return task.people.some(person => person._id === userid);
+                    return task.people.some(person => person.userId === userid);
                 });
     
                 // Set state with tasks matching the user's ID

@@ -101,7 +101,7 @@ const Card = ({ id, text, status, card }) => {
                             </MenuButton>
 
                             <Menu className=''>
-                                <MenuItem onClick={() => setEdit(true)}>Edit</MenuItem>
+                                {/* <MenuItem onClick={() => setEdit(true)}>Edit</MenuItem> */}
                                 <MenuItem onClick={() => setOpen(true)}>View</MenuItem>
                             </Menu>
                         </Dropdown>
@@ -207,7 +207,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
     }, [tasksToDo, tasksInProgress, tasksCompleted, tasksCancelled]);
 
     const updateTaskStatus = async (id, status, remark) => {
-        const response = await fetch(`http://localhost:5000/api/tasks/${id}/status`, {
+        const response = await fetch(`http://3.85.170.118:5000/api/tasks/${id}/status`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -255,7 +255,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
 
         if (currentCard) {
             try {
-                const response = await fetch(`http://localhost:5000/api/tasks/${currentCard._id}/cancel`, {
+                const response = await fetch(`http://3.85.170.118:5000/api/tasks/${currentCard._id}/cancel`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

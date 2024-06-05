@@ -109,7 +109,7 @@ function UserReports() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/allassignuser');
+                const response = await fetch('http://3.85.170.118:5000/api/allassignuser');
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }

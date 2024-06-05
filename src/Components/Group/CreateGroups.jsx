@@ -166,7 +166,7 @@ function CreateGroups() {
         e.preventDefault();
 
         try {
-            const response = await axios.post("http://localhost:5000/api/tgroups", formData);
+            const response = await axios.post("http://3.85.170.118:5000/api/tgroups", formData);
             console.log(response.data);
             resetForm();
             toast.success("Group created successfully!");
@@ -195,7 +195,7 @@ function CreateGroups() {
     useEffect(() => {
         const fetchRegisteredNames = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/api/userData");
+                const response = await axios.get("http://3.85.170.118:5000/api/userData");
                 setUserNamesEmail(response.data);
                 const filteredDepartmentHeads = response.data.filter(
                     (user) => user.userRole === 1

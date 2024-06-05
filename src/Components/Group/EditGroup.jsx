@@ -41,7 +41,7 @@ function EditGroup({ Editid }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(`http://localhost:5000/api/TGroup/${Editid}`, formData);
+            await axios.put(`http://3.85.170.118:5000/api/group/${Editid}`, formData);
             // Optionally, you can redirect or display a success message here
             toast.success("Successfully updated Group");
             setInterval(() => {
@@ -59,7 +59,7 @@ function EditGroup({ Editid }) {
 
         const fetchRegisteredNames = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/api/userData");
+                const response = await axios.get("http://3.85.170.118:5000/api/userData");
                 setUserNamesEmail(response.data);
                 const filteredDepartmentHeads = response.data.filter(
                     (user) => user.userRole === 1
@@ -84,7 +84,7 @@ function EditGroup({ Editid }) {
         const fetchGroupData = async () => {
             try {
                 console.log("Fetching group data...");
-                const response = await axios.get(`http://localhost:5000/api/groups/${Editid}`);
+                const response = await axios.get(`http://3.85.170.118:5000/api/groups/${Editid}`);
                 const groupData = response.data;
                 console.log("Group data:", groupData);
 

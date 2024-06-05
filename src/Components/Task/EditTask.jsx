@@ -82,7 +82,7 @@ function EditTask({ setedit, Taskid }) {
         e.preventDefault();
 
         try {
-            const response = await axios.put(`http://3.85.170.118:5000/api/tasks/${Taskid}`, formData);
+            const response = await axios.put(`http://3.85.170.118:5000/api/tasksedit/${Taskid}`, formData);
             console.log(response.data);
             setedit(false);
             toast.success("Task updated successfully!");

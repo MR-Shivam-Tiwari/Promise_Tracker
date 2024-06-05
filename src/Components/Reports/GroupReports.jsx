@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { saveAs } from 'file-saver';
+// import { saveAs } from 'file-saver';
 
 function GroupReports() {
     const [groupreport, setGroupReport] = useState([]);
@@ -8,7 +8,7 @@ function GroupReports() {
     useEffect(() => {
         const fetchGroupData = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/tasksByGroup');
+                const response = await axios.get('http://3.85.170.118:5000/api/tasksByGroup');
                 const sortedData = response.data.sort((a, b) => a._id.localeCompare(b._id));
                 setGroupReport(sortedData);
             } catch (error) {

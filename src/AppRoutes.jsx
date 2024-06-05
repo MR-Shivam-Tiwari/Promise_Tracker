@@ -40,7 +40,7 @@ function AppRoutes() {
     useEffect(() => {
         const fetchNotifications = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/notifications`);
+                const response = await axios.get(`http://3.85.170.118:5000/api/notifications`);
                 const allNotifications = response.data;
                 // Filter notifications based on userId
                 const filteredNotifications = allNotifications.filter(notification => notification.userId === userid);
@@ -69,8 +69,11 @@ function AppRoutes() {
             // Extract notification IDs from allNotifications
             const notificationIds = allNotifications.map(notification => notification._id);
             // Call the API to mark all notifications as read using the extracted IDs
-            await axios.put(`http://localhost:5000/api/notifications/mark-read`, { notificationIds });
+            await axios.put(`http://3.85.170.118:5000/api/notifications/mark-read`, { notificationIds });
             console.log("All notifications marked as read successfully");
+            setInterval(() => {
+                window.location.reload();
+            }, 1000);
             // Add any additional handling as needed, such as showing a success message
         } catch (error) {
             console.error("Error marking all notifications as read:", error);
@@ -84,7 +87,7 @@ function AppRoutes() {
 
 
 
-    console.log("notification", notifications)
+    console.log("notification", allNotifications)
     // Function to handle file selection
     const handleFileSelect = (event) => {
         const file = event.target.files[0];
@@ -121,7 +124,7 @@ function AppRoutes() {
     // Function to fetch user data
     const fetchUserData = async (userId) => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/user/${userid}`);
+            const response = await axios.get(`http://3.85.170.118:5000/api/user/${userid}`);
             const userData = response.data;
             setUserData(userData);
             setFormData({
@@ -281,22 +284,29 @@ function AppRoutes() {
                                                         <div className='overflow-auto' style={{ maxHeight: '480px' }}>
                                                             {allNotifications.reverse().map((notification, index) => (
                                                                 <Box key={index} mb={2} className="">
-                                                                    <div className="grid grid-cols-[45px_1fr_auto] text-black w-full items-center gap-4 rounded-md bg-gray-200 p-4">
+                                                                    <div className={`grid grid-cols-[45px_1fr_auto] text-black w-full items-center gap-4 rounded-md p-4 ${notification?.status === 'unread' ? 'bg-green-100' : 'bg-gray-200'}`}>
                                                                         <Avatar src={notification?.owner?.profilePic} />
                                                                         <div>
                                                                             <p className="text-sm font-medium">{notification?.title}</p>
                                                                             <p className="text-sm text-gray-600 font-medium">{notification?.description}</p>
-                                                                            <p className="text-sm text-gray-600 font-medium">{notification?.status}</p>
+                                                                            <div className='flex items-start '>
+
+                                                                            <p className="text-sm text-gray-600 px-2 font-medium bg-gray-400 flex items-center text-center rounded ">{notification?.status}</p>
+                                                                            </div>
                                                                             <p className="text-sm text-gray-500">
                                                                                 {notification?.created ? formatDate(notification.created) : ''}
                                                                             </p>
                                                                         </div>
-                                                                        <Button component="label" onClick={() => {
-                                                                            setOpennoti(false);
-                                                                            navigate("/task");
-                                                                        }}
-
-                                                                            variant="outlined" color="neutral" className="inline-flex w-14 bg-gray-300  items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 ml-auto">
+                                                                        <Button
+                                                                            component="label"
+                                                                            onClick={() => {
+                                                                                setOpennoti(false);
+                                                                                navigate("/task");
+                                                                            }}
+                                                                            variant="outlined"
+                                                                            color="neutral"
+                                                                            className="inline-flex w-14 bg-gray-300 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 ml-auto"
+                                                                        >
                                                                             View
                                                                         </Button>
                                                                     </div>

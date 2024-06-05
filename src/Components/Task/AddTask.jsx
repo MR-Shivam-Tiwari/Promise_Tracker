@@ -70,7 +70,7 @@ function AddTask({ setOpen }) {
         e.preventDefault();
 
         try {
-            const response = await axios.post("http://localhost:5000/api/tasks", formData);
+            const response = await axios.post("http://3.85.170.118:5000/api/tasksadd", formData);
             console.log(response.data);
             resetForm();
             setOpen(false)
@@ -104,8 +104,9 @@ function AddTask({ setOpen }) {
     useEffect(() => {
         const fetchGroupData = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/groups');
+                const response = await axios.get('http://3.85.170.118:5000/api/groups');
                 setGrouptData(response.data);
+                console.log("groupdata", response.data)
             } catch (error) {
                 console.log("Error fetching Task: ", error);
             }
@@ -116,7 +117,7 @@ function AddTask({ setOpen }) {
     useEffect(() => {
         const fetchRegisteredNames = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/api/userData");
+                const response = await axios.get("http://3.85.170.118:5000/api/userData");
                 setUserNamesEmail(response.data);
                 const filteredDepartmentHeads = response.data.filter(
                     (user) => user.userRole === 1
@@ -130,6 +131,7 @@ function AddTask({ setOpen }) {
                     (user) => user.userRole === 3
                 );
                 setMembers(filtermember);
+                
             } catch (error) {
                 console.error("Error fetching data:", error);
                 // setError("Internal Server Error");
@@ -139,6 +141,7 @@ function AddTask({ setOpen }) {
 
         fetchRegisteredNames();
     }, []);
+    console.log("selectmembers" , selectmembers)
     return (
         <div >
             <div class="w-full bg-gray-200 text-black rounded-lg">
@@ -209,46 +212,7 @@ function AddTask({ setOpen }) {
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             ></textarea>
                         </div>
-                        <div class="col-span-1 md:col-span-2 flex items-center gap-4">
-                            <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    class="h-5 w-5"
-                                >
-                                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
-                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                                    <line x1="12" x2="12" y1="19" y2="22"></line>
-                                </svg>
-                                Record
-                            </button>
-                            <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    class="h-5 w-5"
-                                >
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="17 8 12 3 7 8"></polyline>
-                                    <line x1="12" x2="12" y1="3" y2="15"></line>
-                                </svg>
-                                Upload File
-                            </button>
-                        </div>
+
                         <div class="col-span-1 md:col-span-2">
                             <Autocomplete
                                 placeholder="Search Members"
