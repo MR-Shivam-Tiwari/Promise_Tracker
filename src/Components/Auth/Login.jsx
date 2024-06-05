@@ -23,7 +23,7 @@ function Login() {
     const handleSignIn = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://3.85.170.118:5000/api/signin', { email, password });
+            const response = await axios.post('https://3.85.170.118:5000/api/signin', { email, password });
             localStorage.setItem('userData', JSON.stringify(response.data));
             navigate('/home');
             toast.success("Login Successfully");

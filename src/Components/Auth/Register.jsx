@@ -33,7 +33,7 @@ function Register() {
         }
 
         try {
-            const response = await axios.post('http://3.85.170.118:5000/api/registration', formData);
+            const response = await axios.post('https://3.85.170.118:5000/api/registration', formData);
             console.log(response.data);
             toast.success("Registered Successfully");
             navigate('/login');

@@ -13,7 +13,7 @@ function EditApprovals({ taskId, task, onClose }) {
     const handleApprove = async () => {
         setIsLoading(true);
         try {
-            const response = await fetch(`http://3.85.170.118:5000/api/categoryedit/${taskId}`, {
+            const response = await fetch(`https://3.85.170.118:5000/api/categoryedit/${taskId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ function EditApprovals({ taskId, task, onClose }) {
     const handleUnapprove = async () => {
         setIsLoading(true);
         try {
-            const response = await fetch(`http://3.85.170.118:5000/api/categoryedit/${taskId}`, {
+            const response = await fetch(`https://3.85.170.118:5000/api/categoryedit/${taskId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

@@ -13,7 +13,7 @@ function Approvals() {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get('http://3.85.170.118:5000/api/tasks');
+            const response = await axios.get('https://3.85.170.118:5000/api/tasks');
             setTasks(response.data);
         } catch (error) {
             console.error('Error fetching tasks:', error);
