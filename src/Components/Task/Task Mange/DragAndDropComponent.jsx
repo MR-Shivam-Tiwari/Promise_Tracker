@@ -207,7 +207,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
     }, [tasksToDo, tasksInProgress, tasksCompleted, tasksCancelled]);
 
     const updateTaskStatus = async (id, status, remark) => {
-        const response = await fetch(`https://3.85.170.118:5000/api/tasks/${id}/status`, {
+        const response = await fetch(`https://ptb.insideoutprojects.in/api/tasks/${id}/status`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -255,7 +255,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
 
         if (currentCard) {
             try {
-                const response = await fetch(`https://3.85.170.118:5000/api/tasks/${currentCard._id}/cancel`, {
+                const response = await fetch(`https://ptb.insideoutprojects.in/api/tasks/${currentCard._id}/cancel`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

@@ -70,7 +70,7 @@ function AddTask({ setOpen }) {
         e.preventDefault();
 
         try {
-            const response = await axios.post("https://3.85.170.118:5000/api/tasksadd", formData);
+            const response = await axios.post("https://ptb.insideoutprojects.in/api/tasksadd", formData);
             console.log(response.data);
             resetForm();
             setOpen(false)
@@ -104,7 +104,7 @@ function AddTask({ setOpen }) {
     useEffect(() => {
         const fetchGroupData = async () => {
             try {
-                const response = await axios.get('https://3.85.170.118:5000/api/groups');
+                const response = await axios.get('https://ptb.insideoutprojects.in/api/groups');
                 setGrouptData(response.data);
                 console.log("groupdata", response.data)
             } catch (error) {
@@ -117,7 +117,7 @@ function AddTask({ setOpen }) {
     useEffect(() => {
         const fetchRegisteredNames = async () => {
             try {
-                const response = await axios.get("https://3.85.170.118:5000/api/userData");
+                const response = await axios.get("https://ptb.insideoutprojects.in/api/userData");
                 setUserNamesEmail(response.data);
                 const filteredDepartmentHeads = response.data.filter(
                     (user) => user.userRole === 1

@@ -59,7 +59,7 @@ export default function MyProfile() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.get(`https://3.85.170.118:5000/api/user/${userid}`);
+                const response = await axios.get(`https://ptb.insideoutprojects.in/api/user/${userid}`);
                 const userData = response.data;
                 setUserData(userData);
                 setFormData({
@@ -108,7 +108,7 @@ export default function MyProfile() {
             };
 
             // Update text data
-            const response = await axios.put(`https://3.85.170.118:5000/api/users/${userid}`, formDataWithOtherData);
+            const response = await axios.put(`https://ptb.insideoutprojects.in/api/users/${userid}`, formDataWithOtherData);
             console.log('Text data updated successfully:', response.data);
             toast.success("User Details Updated");
 
@@ -127,7 +127,7 @@ export default function MyProfile() {
 
                     try {
                         // Save the image to the database
-                        const imageResponse = await axios.put(`https://3.85.170.118:5000/api/users/${userid}`, formDataWithImage);
+                        const imageResponse = await axios.put(`https://ptb.insideoutprojects.in/api/users/${userid}`, formDataWithImage);
                         console.log('User image saved successfully to database:', imageResponse.data);
 
                         // Update user data state with the new profile picture

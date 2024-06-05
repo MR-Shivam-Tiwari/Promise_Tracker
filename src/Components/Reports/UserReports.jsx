@@ -109,7 +109,7 @@ function UserReports() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('https://3.85.170.118:5000/api/allassignuser');
+                const response = await fetch('https://ptb.insideoutprojects.in/api/allassignuser');
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }

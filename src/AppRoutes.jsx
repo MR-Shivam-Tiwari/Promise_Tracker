@@ -40,7 +40,7 @@ function AppRoutes() {
     useEffect(() => {
         const fetchNotifications = async () => {
             try {
-                const response = await axios.get(`https://3.85.170.118:5000/api/notifications`);
+                const response = await axios.get(`https://ptb.insideoutprojects.in/api/notifications`);
                 const allNotifications = response.data;
                 // Filter notifications based on userId
                 const filteredNotifications = allNotifications.filter(notification => notification.userId === userid);
@@ -69,7 +69,7 @@ function AppRoutes() {
             // Extract notification IDs from allNotifications
             const notificationIds = allNotifications.map(notification => notification._id);
             // Call the API to mark all notifications as read using the extracted IDs
-            await axios.put(`https://3.85.170.118:5000/api/notifications/mark-read`, { notificationIds });
+            await axios.put(`https://ptb.insideoutprojects.in/api/notifications/mark-read`, { notificationIds });
             console.log("All notifications marked as read successfully");
             setInterval(() => {
                 window.location.reload();
@@ -124,7 +124,7 @@ function AppRoutes() {
     // Function to fetch user data
     const fetchUserData = async (userId) => {
         try {
-            const response = await axios.get(`https://3.85.170.118:5000/api/user/${userid}`);
+            const response = await axios.get(`https://ptb.insideoutprojects.in/api/user/${userid}`);
             const userData = response.data;
             setUserData(userData);
             setFormData({

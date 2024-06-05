@@ -44,7 +44,7 @@ function MainHome() {
 
     const handleDelete = async () => {
         try {
-            const response = await axios.delete(`https://3.85.170.118:5000/api/deletegroup/${groupIdToDelete}`);
+            const response = await axios.delete(`https://ptb.insideoutprojects.in/api/deletegroup/${groupIdToDelete}`);
             console.log(response.data);
             console.log("Delete Group with ID:", groupIdToDelete);
             // Handle success response, e.g., show a success message
@@ -93,7 +93,7 @@ function MainHome() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('https://3.85.170.118:5000/api/tasks');
+                const response = await axios.get('https://ptb.insideoutprojects.in/api/tasks');
                 const filteredTasks = response.data.filter(task => {
                     // Check if any of the people in the task match the user's ID
                     return task.people.some(person => person._id === userid);
@@ -123,7 +123,7 @@ function MainHome() {
 
     const fetchGroupData = async () => {
         try {
-            const response = await axios.get(`https://3.85.170.118:5000/api/groups`);
+            const response = await axios.get(`https://ptb.insideoutprojects.in/api/groups`);
             setGroupData(response.data);
         } catch (error) {
             console.log("Error fetching Group Data: ", error);

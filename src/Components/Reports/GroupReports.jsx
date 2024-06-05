@@ -8,7 +8,7 @@ function GroupReports() {
     useEffect(() => {
         const fetchGroupData = async () => {
             try {
-                const response = await axios.get('https://3.85.170.118:5000/api/tasksByGroup');
+                const response = await axios.get('https://ptb.insideoutprojects.in/api/tasksByGroup');
                 const sortedData = response.data.sort((a, b) => a._id.localeCompare(b._id));
                 setGroupReport(sortedData);
             } catch (error) {
