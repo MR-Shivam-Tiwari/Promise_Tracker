@@ -202,7 +202,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
             'Todo': tasksToDo,
             'In Progress': tasksInProgress,
             'Completed': tasksCompleted,
-            'Cancelled': tasksCancelled,
+            'Postponed': tasksCancelled,
         });
     }, [tasksToDo, tasksInProgress, tasksCompleted, tasksCancelled]);
 
