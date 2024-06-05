@@ -189,7 +189,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
         'Todo': tasksToDo,
         'In Progress': tasksInProgress,
         'Completed': tasksCompleted,
-        'Cancelled': tasksCancelled,
+        'Postponed': tasksCancelled,
     });
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -227,7 +227,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
         const fromSection = Object.keys(newSections).find(section => newSections[section].find(card => card._id === id));
 
         if (fromSection !== toSection) {
-            if (toSection === 'Cancelled') {
+            if (toSection === 'Postponed') {
                 const cardToMove = newSections[fromSection].find((card) => card._id === id);
                 setCurrentCard({ ...cardToMove, fromSection });
                 setIsModalOpen(true);
@@ -275,7 +275,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
 
                 const newSections = { ...sections };
                 newSections[currentCard.fromSection] = newSections[currentCard.fromSection].filter((card) => card._id !== currentCard._id);
-                newSections['Cancelled'] = [...newSections['Cancelled'], { ...currentCard, status: 'Cancelled' }];
+                newSections['Postponed'] = [...newSections['Postponed'], { ...currentCard, status: 'Postponed' }];
                 setSections(newSections);
                 setIsModalOpen(false);
                 setCurrentCard(null);
