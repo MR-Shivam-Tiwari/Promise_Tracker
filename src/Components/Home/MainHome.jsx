@@ -35,33 +35,39 @@ function MainHome() {
     console.log("group", groupData)
     const createdAt = selectedGroup?.createdAt;
 
-    const [groupIdToDelete, setGroupIdToDelete] = useState(null); // Add state to store the ID of the group to delete
+    const [groupIdToDelete, setGroupIdToDelete] = useState(""); // Add state to store the ID of the group to delete
     const handleClickDelete = (id) => {
         setGroupIdToDelete(id); // Set the groupIdToDelete state when the delete button is clicked
         console.log("Group ID to delete:", id); // Log the ID to verify if it's correctly set
         setDeletemodal(true); // Open the delete modal
     };
+    console.log("groupid", groupIdToDelete)
 
-    const handleDelete = async () => {
+    const handleDelete = async (groupIdToDelete) => {
+        if (!groupIdToDelete) {
+            toast.error("Group ID is required to delete a group");
+            return;
+        }
+
+        // if (!isValidObjectId(groupIdToDelete)) {
+        //     toast.error("Invalid Group ID format");
+        //     return;
+        // }
+
         try {
-            const response = await axios.delete(`https://ptb.insideoutprojects.in/api/deletegroup/${groupIdToDelete}`);
+            const response = await axios.delete(`http://localhost:5000/api/deletegroup/${groupIdToDelete}`);
             console.log(response.data);
             console.log("Delete Group with ID:", groupIdToDelete);
             // Handle success response, e.g., show a success message
             toast.success("Group deleted successfully!");
             setDeletemodal(false); // Close the delete modal
-            // setInterval(() => {
-            //     window.location.reload();
-            // }, 2000);
-            fetchGroupData();
+            fetchGroupData(); // Refresh group data
         } catch (error) {
             console.error("Error deleting group:", error);
             // Handle error response, e.g., show an error message
             toast.error("Failed to delete group. Please try again later.");
         }
     };
-
-
     // Function to format date to YYYY-MM-DD
     const formatDate = (dateString) => {
         const date = new Date(dateString);

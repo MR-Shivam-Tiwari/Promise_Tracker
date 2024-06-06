@@ -41,21 +41,26 @@ function AcceptApprovals({ taskId, task, onClose }) {
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <h4 class="text-sm font-medium">Task Member</h4>
-                            <p class="text-gray-500 dark:text-gray-400">{task?.people.map(person => person.name).join(', ')}</p>
+                            <p class="text-gray-500 dark:text-gray-400">{task?.people.map(person => person?.name).join(', ')}</p>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <h4 class="text-sm font-medium">Remark</h4>
-                            <p class="text-gray-500 dark:text-gray-400">{task.remark[0].text}</p>
+                            <h4 className="text-sm font-medium">Remark</h4>
+                            <p className="text-gray-500 dark:text-gray-400">
+                                {task.remark && task.remark.length > 0 ? task.remark[0].text : 'No remarks available'}
+                            </p>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <h4 class="text-sm font-medium"> New Date</h4>
-                            <p class="text-gray-500 dark:text-gray-400">{task.remark[0].date}</p>
+                            <h4 className="text-sm font-medium">New Date</h4>
+                            <p className="text-gray-500 dark:text-gray-400">
+                                {task.remark && task.remark.length > 0 ? task.remark[0].date : 'No date available'}
+                            </p>
                         </div>
                     </div>
+
                 </div>
                 <div class="flex justify-between gap-2 border-t px-6 py-4">
                     <button
@@ -70,7 +75,7 @@ function AcceptApprovals({ taskId, task, onClose }) {
                         onClick={handleApprove}
                         disabled={isLoading}
                     >
-                        Approved
+                        Approve
                     </button>
                 </div>
             </div>

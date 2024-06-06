@@ -4,6 +4,11 @@ import React from 'react'
 function ViewTask({ data, status }) {
     console.log("status", status)
     console.log("task", data)
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString(undefined, options);
+    };
     return (
         <div>
             <div class="container mx-auto   p-0 ">
@@ -63,12 +68,22 @@ function ViewTask({ data, status }) {
                             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Assigned To</h2>
                             <div className='flex '>
 
-                            <p class="text-gray-700  bg-green-200 px-2 rounded-lg"> {data?.people.map(person => person.name).join(', ')}</p>
+                                <p class="text-gray-700  bg-green-200 px-2 rounded-lg"> {data?.people.map(person => person.name).join(', ')}</p>
                             </div>
                         </div>
                         <div>
-                            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Dates</h2>
-                            <p class="text-gray-700 dark:text-gray-400 ">Start: {data?.startDate} | End: {data?.endDate}</p>
+                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Dates</h2>
+                            <p className="text-gray-700 mb-2 gap-2 flex  ">
+                                Start:<p className='border px-2 font-bold  rounded bg-gray-200'>
+                                    {data?.startDate ? formatDate(data.startDate) : 'N/A'}
+                                </p>
+                            </p>
+                            <p className="text-gray-700 flex gap-2 ">
+
+                                End : <p style={{marginLeft:"2px"}} className='border  px-2 font-bold rounded bg-gray-200'>
+                                    {data?.endDate ? formatDate(data.endDate) : 'N/A'}
+                                </p>
+                            </p>
                         </div>
                     </div>
                     {/* <div class="mb-6">

@@ -174,7 +174,7 @@ const Card = ({ id, text, status, card }) => {
                                 card.status === 'Cancelled' ? 'danger' :
                                     'neutral'
                     }>
-                        {card.status || 'Unapproved'}
+                        {card.status === 'Cancelled' ? 'Postponed' : card.status || 'Unapproved'}
                     </Chip>
 
 
@@ -318,7 +318,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
                             borderRadius: 'md',
                             p: 3,
                             boxShadow: 'lg',
-                            width:400
+                            width: 400
                         }}
                     >
                         <ModalClose

@@ -54,7 +54,7 @@ function Row(props) {
                                         <th>TOTAL TASK</th>
                                         <th>IN PROGRESS TASK</th>
                                         <th>COMPLETED TASK</th>
-                                        <th>CANCELLED TASK</th>
+                                        <th> POSTPONED TASK</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -219,7 +219,7 @@ function ApprovalReports() {
                         <th>TOTAL TASK</th>
                         <th>IN PROGRESS TASK</th>
                         <th>COMPLETED TASK</th>
-                        <th>CANCELLED TASK</th>
+                        <th>POSTPONED TASK</th>
                     </tr>
                 </thead>
                 <tbody>

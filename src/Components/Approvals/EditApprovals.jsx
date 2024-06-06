@@ -114,14 +114,14 @@ function EditApprovals({ taskId, task, onClose }) {
                             onClick={handleUnapprove}
                             disabled={isLoading}
                         >
-                            Unapproved
+                            Unapprove
                         </button>
                         <button
                             className="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-green-500 text-white hover:bg-green-600 disabled:bg-green-300"
                             onClick={handleApprove}
                             disabled={isLoading}
                         >
-                            Approved
+                            Approve
                         </button>
 
                     </div>

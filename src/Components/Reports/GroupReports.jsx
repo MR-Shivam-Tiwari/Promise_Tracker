@@ -65,7 +65,7 @@ function GroupReports() {
                             <div className="flex items-center">Completed Task</div>
                         </th>
                         <th scope="col" className="px-6 py-3">
-                            <div className="flex items-center">Cancelled task</div>
+                            <div className="flex items-center">POSTPONED task</div>
                         </th>
                     </tr>
                 </thead>

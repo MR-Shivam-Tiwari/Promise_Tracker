@@ -44,9 +44,9 @@ function EditGroup({ Editid }) {
             await axios.put(`https://ptb.insideoutprojects.in/api/group/${Editid}`, formData);
             // Optionally, you can redirect or display a success message here
             toast.success("Successfully updated Group");
-            setInterval(() => {
-                window.location.reload();
-            }, 2000);
+            // setInterval(() => {
+            //     window.location.reload();
+            // }, 2000);
         } catch (error) {
             console.error('Error updating group:', error);
             toast.error('Error updating group:', error);
