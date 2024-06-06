@@ -75,13 +75,62 @@ const Card = ({ id, text, status, card }) => {
     });
 
     const opacity = isDragging ? 0.5 : 1;
+    const isValidDate = (date) => {
+        return date instanceof Date && !isNaN(date);
+    };
 
-    const startDate = new Date(card.startDate);
-    const day = startDate.getDate();
-    const month = startDate.toLocaleString('default', { month: 'short' });
-    const endDate = new Date(card.endDate);
-    const endDay = endDate.getDate();
-    const endMonth = endDate.toLocaleString('default', { month: 'short' });
+    // Helper function to format date as "DD MMM"
+    const formatDate = (date) => {
+        const day = date.getDate();
+        const month = date.toLocaleString('default', { month: 'short' });
+        return `${day} ${month}`;
+    };
+
+    // Helper function to format date as "YYYY-MM-DD"
+    const formatISODate = (date) => {
+        return date.toISOString().split('T')[0];
+    };
+    const startDate = new Date(card?.startDate);
+    const endDate = new Date(card?.endDate);
+
+    // Check if the dates are valid
+    const isStartDateValid = isValidDate(startDate);
+    const isEndDateValid = isValidDate(endDate);
+
+    // Format dates for display
+    const formattedDefaultDate = isStartDateValid && isEndDateValid
+        ? `${formatDate(startDate)} - ${formatDate(endDate)}`
+        : null;
+
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    const formatDatee = (dateString) => {
+        if (!dateString) return ''; // Agar date nahi milti toh empty string return karo
+        try {
+            if (dateString.includes('/')) {
+                const [day, month] = dateString.split('/');
+                return `${monthNames[parseInt(month) - 1]} ${parseInt(day)}`;
+            } else {
+                const date = new Date(dateString);
+                const day = date.getDate();
+                const month = date.getMonth();
+                return `${monthNames[month]} ${day}`;
+            }
+        } catch (error) {
+            console.error('Invalid date:', dateString);
+            return 'Invalid Date';
+        }
+    };
+
+    const formatStartDate = formatDatee(card?.startDate);
+    const formatEndDate = formatDatee(card?.endDate);
+
+    let formattedFallbackDate = '';
+    if (formatStartDate) {
+        formattedFallbackDate = formatEndDate ? `${formatStartDate} | ${formatEndDate}` : formatStartDate;
+    }
 
     return (
         <div ref={drag} style={{ opacity }}>
@@ -156,7 +205,11 @@ const Card = ({ id, text, status, card }) => {
                             <rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" fill="none" width="32" height="32" />
                         </svg>
 
-                        {day} {month} - {endDay} {endMonth}
+                        <div>
+                            <div>
+                                {formattedDefaultDate || formattedFallbackDate}
+                            </div>
+                        </div>
                     </p>
                 </div>
                 <div className='flex justify-between mt-1 items-center'>

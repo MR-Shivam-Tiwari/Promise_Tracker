@@ -34,28 +34,24 @@ function MainHome() {
     };
     console.log("group", groupData)
     const createdAt = selectedGroup?.createdAt;
-
     const [groupIdToDelete, setGroupIdToDelete] = useState(""); // Add state to store the ID of the group to delete
+
     const handleClickDelete = (id) => {
         setGroupIdToDelete(id); // Set the groupIdToDelete state when the delete button is clicked
         console.log("Group ID to delete:", id); // Log the ID to verify if it's correctly set
         setDeletemodal(true); // Open the delete modal
     };
-    console.log("groupid", groupIdToDelete)
 
-    const handleDelete = async (groupIdToDelete) => {
+    console.log("groupid", groupIdToDelete);
+
+    const handleDelete = async () => {
         if (!groupIdToDelete) {
             toast.error("Group ID is required to delete a group");
             return;
         }
 
-        // if (!isValidObjectId(groupIdToDelete)) {
-        //     toast.error("Invalid Group ID format");
-        //     return;
-        // }
-
         try {
-            const response = await axios.delete(`http://localhost:5000/api/deletegroup/${groupIdToDelete}`);
+            const response = await axios.delete(`https://ptb.insideoutprojects.in/api/deletegroup/${groupIdToDelete}`);
             console.log(response.data);
             console.log("Delete Group with ID:", groupIdToDelete);
             // Handle success response, e.g., show a success message
@@ -102,7 +98,7 @@ function MainHome() {
                 const response = await axios.get('https://ptb.insideoutprojects.in/api/tasks');
                 const filteredTasks = response.data.filter(task => {
                     // Check if any of the people in the task match the user's ID
-                    return task.people.some(person => person._id === userid);
+                    return task.people.some(person => person.userId === userid);
                 });
                 // const filteredTasks = response.data.filter(task => task.people.id === userid);
                 setTaskData(filteredTasks);
@@ -115,6 +111,8 @@ function MainHome() {
             fetchData();
         }
     }, [userid]);
+
+console.log("calculateCompletionPercentage" , taskData)
 
     const calculateCompletionPercentage = () => {
         if (taskData.length === 0) return 0;
@@ -465,20 +463,20 @@ function MainHome() {
                                                         <div> {/* Call handleDelete function when the form is submitted */}
 
                                                             <div className='p-3 mt-2'>
-                                                                <h1 className='text-lg font-bold '>Are you sure <br /> you want to delete this Group?</h1>
+                                                                <h1 className='text-lg font-bold w-[400px] '>You are about to delete a group which has active and unapproved tasks. Are you sure you want to delete all data?</h1>
                                                                 <div class="flex justify-between gap-2 mt-6">
                                                                     <button
                                                                         type="button"
                                                                         onClick={() => setDeletemodal(false)} // Close the modal without deleting
                                                                         className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:bg-yellow-200 h-10 px-4 py-2"
                                                                     >
-                                                                        Cancel
+                                                                        No, keep my data
                                                                     </button>
                                                                     <button
                                                                         onClick={handleDelete}
                                                                         className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-red-600 text-white hover:bg-red-800 h-10 px-4 py-2"
                                                                     >
-                                                                        Delete
+                                                                        Yes, delete group
                                                                     </button>
                                                                 </div>
                                                             </div>

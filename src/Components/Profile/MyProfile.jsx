@@ -251,6 +251,7 @@ export default function MyProfile() {
                                         <div> <p className='text-gray font-bold'>Phone number</p>  {userData?.mobilenumber}</div>
                                     </div>
                                 </div>
+                                        <div> <p className='text-gray font-bold'>Email</p>  {userData?.email}</div>
                             </Card>
                             <Stack
                                 direction="row"

@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 function EditGroup({ Editid }) {
     const [departmentHeads, setDepartmentHeads] = useState([]);
     const [selectProjectLead, setProjectLead] = useState([]);
-    const [selectMembers, setMembers] = useState([]);
+    const [selectmembers, setMembers] = useState([]);
     const [userNamesEmail, setUserNamesEmail] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -19,12 +19,25 @@ function EditGroup({ Editid }) {
     });
 
     const handleChange = (e, value, fieldName) => {
-        // Map selected user names to corresponding user objects
-        const selectedUsers = value.map((name) => {
-            return [...departmentHeads, ...selectProjectLead, ...selectMembers].find((member) => member.name === name);
-        });
+        let selectedUsers = [];
+
+        if (fieldName === 'deptHead') {
+            selectedUsers = value.map((name) => {
+                return departmentHeads.find((head) => head.name === name);
+            });
+        } else if (fieldName === 'projectLead') {
+            selectedUsers = value.map((name) => {
+                return selectProjectLead.find((lead) => lead.name === name);
+            });
+        } else if (fieldName === 'members') {
+            selectedUsers = value.map((name) => {
+                return selectmembers.find((member) => member.name === name);
+            });
+        }
+
         setFormData({ ...formData, [fieldName]: selectedUsers });
     };
+
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -40,19 +53,25 @@ function EditGroup({ Editid }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log("Submitting form data:", formData);
+
+        // Log form data to ensure it's correctly structured
+        console.log("Form Data: ", JSON.stringify(formData, null, 2));
+
         try {
-            await axios.put(`https://ptb.insideoutprojects.in/api/group/${Editid}`, formData);
-            // Optionally, you can redirect or display a success message here
+            const response = await axios.put(`https://ptb.insideoutprojects.in/api/group/${Editid}`, formData);
+            console.log("Response data:", response.data);
             toast.success("Successfully updated Group");
-            // setInterval(() => {
-            //     window.location.reload();
-            // }, 2000);
+            setInterval(() => {
+                window.location.reload();
+            }, 2000)
         } catch (error) {
             console.error('Error updating group:', error);
-            toast.error('Error updating group:', error);
-            // Handle error appropriately
+            toast.error('Error updating group:', error.message);
         }
     };
+
+
 
     useEffect(() => {
         console.log("Editid:", Editid);
@@ -199,7 +218,7 @@ function EditGroup({ Editid }) {
                     <label htmlFor="members" className="mb-2 block text-sm font-medium">
                         Members
                     </label>
-                    {selectMembers && selectMembers.length > 0 && (
+                    {selectmembers && selectmembers.length > 0 && (
                         <Autocomplete
                             placeholder="Search Members"
                             className=''
@@ -209,7 +228,7 @@ function EditGroup({ Editid }) {
                                     className="flex w-full items-center justify-between rounded-md border border-input m-1 px-3 py-2 text-sm"
                                 />
                             )}
-                            options={selectMembers.map((lead) => lead?.name)}
+                            options={selectmembers.map((lead) => lead?.name)}
                             onChange={(e, value) => handleChange(e, value, 'members')}
                             value={formData?.members?.map((member) => member?.name)}
                             multiple
