@@ -22,6 +22,7 @@ import axios from 'axios';
 import MainTask from './Components/Task/MainTask';
 import Reports from './Components/Reports/Reports';
 import { toast } from 'react-toastify';
+import Role from './Components/Role/Role';
 function AppRoutes() {
     const [currentRouteName, setCurrentRouteName] = useState('');
     const location = useLocation();
@@ -389,6 +390,7 @@ function AppRoutes() {
                                 <Route path="/approvals" element={<Approvals />} />
                                 <Route path="/task" element={<Task />} />
                                 <Route path="/reports" element={<Reports />} />
+                                <Route path="/roles" element={<Role />} />
                             </Routes>
                         </div>
 

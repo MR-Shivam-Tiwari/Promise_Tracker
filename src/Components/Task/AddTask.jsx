@@ -11,6 +11,8 @@ function AddTask({ setOpen }) {
     const [selectmembers, setMembers] = useState([]);
     const [formData, setFormData] = useState([])
     const [userNamesEmail, setUserNamesEmail] = useState([]);
+    const [formComplete, setFormComplete] = useState(false);
+
     useEffect(() => {
         // Retrieve userData from localStorage
         const userDataString = localStorage.getItem('userData');
@@ -69,15 +71,23 @@ function AddTask({ setOpen }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const { taskGroup, taskName, description, startDate, endDate } = formData;
+
+        // Check if any field is empty
+        if (!taskGroup || !taskName || !description || !startDate || !endDate ) {
+            toast.error('Please fill in all fields.');
+            return; // Exit the function
+        }
+
         try {
             const response = await axios.post("https://ptb.insideoutprojects.in/api/tasksadd", formData);
             console.log(response.data);
             resetForm();
-            setOpen(false)
+            setOpen(false);
             toast.success("Task created successfully!");
             setInterval(() => {
                 window.location.reload();
-            }, 1000)
+            }, 1000);
         } catch (error) {
             console.error("Error creating group:", error);
             if (error.response && error.response.data && error.response.data.error) {
@@ -87,6 +97,7 @@ function AddTask({ setOpen }) {
             }
         }
     };
+
 
     const resetForm = () => {
         setFormData({
@@ -131,7 +142,7 @@ function AddTask({ setOpen }) {
                     (user) => user.userRole === 3
                 );
                 setMembers(filtermember);
-                
+
             } catch (error) {
                 console.error("Error fetching data:", error);
                 // setError("Internal Server Error");
@@ -141,7 +152,8 @@ function AddTask({ setOpen }) {
 
         fetchRegisteredNames();
     }, []);
-    console.log("selectmembers" , selectmembers)
+    console.log("selectmembers", selectmembers)
+
     return (
         <div >
             <div class="w-full bg-gray-200 text-black rounded-lg">
@@ -215,7 +227,7 @@ function AddTask({ setOpen }) {
 
                         <div class="col-span-1 md:col-span-2">
                             <Autocomplete
-                                placeholder="Search Members"
+                                placeholder="Add Collaborator"
                                 renderInput={(params) => <input {...params} className="flex w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm" />}
                                 options={selectmembers.map((lead) => lead.name)}
                                 onChange={(e, value) => handleChange('people', value)} // Ensure 'people' is passed as fieldName
@@ -269,8 +281,11 @@ function AddTask({ setOpen }) {
                                 />
                             </div>
                         </div>
-                        <div class="col-span-1 md:col-span-2">
-                            <button onClick={handleSubmit} class="inline-flex bg-black text-white items-center justify-center whitespace-nowrap rounded-md text-sm font-medium  hover:bg-primary/90 h-10 px-4 py-2 w-full">
+                        <div className="col-span-1 md:col-span-2">
+                            <button
+                                onClick={handleSubmit}
+                                className={`inline-flex bg-black text-white items-center justify-center whitespace-nowrap rounded-md text-sm font-medium hover:bg-primary/90 h-10 px-4 py-2 w-full `}
+                            >
                                 Add Task
                             </button>
                         </div>

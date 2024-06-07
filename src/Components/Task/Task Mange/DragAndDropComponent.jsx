@@ -123,7 +123,6 @@ const Card = ({ id, text, status, card }) => {
             return 'Invalid Date';
         }
     };
-
     const formatStartDate = formatDatee(card?.startDate);
     const formatEndDate = formatDatee(card?.endDate);
 
@@ -131,6 +130,50 @@ const Card = ({ id, text, status, card }) => {
     if (formatStartDate) {
         formattedFallbackDate = formatEndDate ? `${formatStartDate} | ${formatEndDate}` : formatStartDate;
     }
+    const calculateDueMessage = (endDate) => {
+        if (!endDate) return '';
+
+        const end = new Date(endDate);
+        const today = new Date();
+        const differenceInTime = end.getTime() - today.getTime(); // Calculate the difference in milliseconds
+        const differenceInDays = Math.ceil(differenceInTime / (1000 * 60 * 60 * 24));
+
+        console.log('Difference in days:', differenceInDays);
+
+        if (differenceInDays < 0) {
+            console.log('Overdue');
+            return 'Overdue';
+        } else if (differenceInDays === 0) {
+            console.log('Due today');
+            return 'Due today';
+        } else if (differenceInDays === 1) {
+            console.log('Due tomorrow');
+            return 'Due tomorrow';
+        } else if (differenceInDays === 2) {
+            console.log('Due in 2 days');
+            return 'Due in 2 days';
+        } else {
+            console.log('No due message');
+            return '';
+        }
+    };
+
+    const formatDate2 = (dateString) => {
+        if (!dateString) return ''; // Return empty string if no date string provided
+
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+            console.error('Invalid date:', dateString);
+            return ''; // Return empty string if the date string is invalid
+        }
+
+        return date.toISOString().split('T')[0]; // Extracts the date part and returns in "YYYY-MM-DD" format
+    };
+
+
+    const endDateFormatted = formatDate2(card?.endDate);
+    const dueMessage = calculateDueMessage(endDateFormatted);
+
 
     return (
         <div ref={drag} style={{ opacity }}>
@@ -221,15 +264,34 @@ const Card = ({ id, text, status, card }) => {
                         </svg>
                         {card?.taskGroup}
                     </div>
-                    <Chip className='text-xs border' variant="soft" color={
-                        card.status === 'In Progress' ? 'warning' :
-                            card.status === 'Completed' ? 'success' :
-                                card.status === 'Cancelled' ? 'danger' :
-                                    'neutral'
-                    }>
-                        {card.status === 'Cancelled' ? 'Postponed' : card.status || 'Unapproved'}
-                    </Chip>
+                    {card.status === 'Cancelled' && (
+                        <div className='text-xs border p-1 px-2 rounded-md font-bold bg-red-400 ' >
+                            {card?.status === 'cancelled' ? 'Postponed' : 'Postponed'}
+                        </div>
 
+
+
+                    )}
+                    {card.status === 'Completed' && (
+                        <Chip
+                            className='text-xs border'
+                            variant="soft"
+                            color={
+
+                                card.category === 'Approved' ? 'success' :
+                                    card.category === 'Unapproved' ? 'danger' :
+                                        'warning'
+                            }
+                        >
+                            {card?.category || "Awaiting approval"}
+                        </Chip>
+                    )}
+
+                    {(card.status === 'In Progress' || card.status === '' || !card.status) && dueMessage && (
+                        <div className='text-xs border bg-yellow-400 px-3 font-bold rounded py-1' variant="soft" >
+                            {dueMessage}
+                        </div>
+                    )}
 
                 </div>
             </div>
