@@ -12,6 +12,7 @@ import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import { closeSidebar } from './utils';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 
 function Toggler({ defaultExpanded = false, renderToggle, children }) {
     const [open, setOpen] = useState(defaultExpanded);
@@ -37,13 +38,14 @@ function Toggler({ defaultExpanded = false, renderToggle, children }) {
 export default function Sidebar({ onSidebarItemClick }) {
     const [currentRouteName, setCurrentRouteName] = useState('');
     const location = useLocation();
+    const [userData, setUserData] = useState("")
     const navigate = useNavigate();
     const [selectedItem, setSelectedItem] = useState('home');
     useEffect(() => {
         const routeName = location.pathname.split('/').pop().replace(/-/g, ' ');
         setCurrentRouteName(routeName.charAt(0).toUpperCase() + routeName.slice(1));
     }, [location.pathname]);
-
+    const [userid, setuserid] = useState("")
     const handleLogout = () => {
         localStorage.removeItem('userData');
         toast.error("Logout Successfully");
@@ -52,10 +54,41 @@ export default function Sidebar({ onSidebarItemClick }) {
             window.location.reload();
         }, 1000);
     };
+    useEffect(() => {
+        // Retrieve userData from localStorage
+        const userDataString = localStorage.getItem('userData');
+        if (userDataString) {
+            const userDataObj = JSON.parse(userDataString);
+            const userId = userDataObj.userId;
+            setuserid(userId);
+        }
+    }, []);
 
     const handleItemClick = (itemName) => {
         setSelectedItem(itemName);
     };
+
+    const fetchUserData = async () => {
+        try {
+            const response = await axios.get('https://ptb.insideoutprojects.in/api/userData');
+            setUserData(Array.isArray(response.data) ? response.data : []);
+            console.log(response.data);
+        } catch (error) {
+            console.log("Error fetching Group Data: ", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchUserData();
+    }, []);
+
+    // Find the current user based on the frontendUserId
+    const currentUser = Array.isArray(userData) && userData.find(user => user.userId === userid);
+
+    // Check if the current user has userRole 0, 1, or 2
+    const showButton = currentUser && (currentUser.userRole === 0 || currentUser.userRole === 1);
+
+
     return (
         <Sheet
             className="Sidebar"
@@ -198,6 +231,7 @@ export default function Sidebar({ onSidebarItemClick }) {
 
                         </Toggler>
                     </ListItem>
+
                     <ListItem nested onClick={() => { navigate('/reports'); handleItemClick('reports') }}>
                         <Toggler
                             renderToggle={({ open, setOpen }) => (
@@ -217,25 +251,26 @@ export default function Sidebar({ onSidebarItemClick }) {
 
                         </Toggler>
                     </ListItem>
-                    <ListItem nested onClick={() => { navigate('/roles'); handleItemClick('roles') }}>
-                        <Toggler
-                            renderToggle={({ open, setOpen }) => (
-                                <ListItemButton selected={selectedItem === 'roles'} onClick={() => setOpen(!open)}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person-fill-gear" viewBox="0 0 16 16">
-                                        <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-9 8c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4m9.886-3.54c.18-.613 1.048-.613 1.229 0l.043.148a.64.64 0 0 0 .921.382l.136-.074c.561-.306 1.175.308.87.869l-.075.136a.64.64 0 0 0 .382.92l.149.045c.612.18.612 1.048 0 1.229l-.15.043a.64.64 0 0 0-.38.921l.074.136c.305.561-.309 1.175-.87.87l-.136-.075a.64.64 0 0 0-.92.382l-.045.149c-.18.612-1.048.612-1.229 0l-.043-.15a.64.64 0 0 0-.921-.38l-.136.074c-.561.305-1.175-.309-.87-.87l.075-.136a.64.64 0 0 0-.382-.92l-.148-.045c-.613-.18-.613-1.048 0-1.229l.148-.043a.64.64 0 0 0 .382-.921l-.074-.136c-.306-.561.308-1.175.869-.87l.136.075a.64.64 0 0 0 .92-.382zM14 12.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0" />
-                                    </svg>
-                                    <ListItemContent>
+                    {showButton && (
+                        <ListItem nested onClick={() => { navigate('/roles'); handleItemClick('roles') }}>
+                            <Toggler
+                                renderToggle={({ open, setOpen }) => (
+                                    <ListItemButton selected={selectedItem === 'roles'} onClick={() => setOpen(!open)}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person-fill-gear" viewBox="0 0 16 16">
+                                            <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-9 8c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4m9.886-3.54c.18-.613 1.048-.613 1.229 0l.043.148a.64.64 0 0 0 .921.382l.136-.074c.561-.306 1.175.308.87.869l-.075.136a.64.64 0 0 0 .382.92l.149.045c.612.18.612 1.048 0 1.229l-.15.043a.64.64 0 0 0-.38.921l.074.136c.305.561-.309 1.175-.87.87l-.136-.075a.64.64 0 0 0-.92.382l-.045.149c-.18.612-1.048.612-1.229 0l-.043-.15a.64.64 0 0 0-.921-.38l-.136.074c-.561.305-1.175-.309-.87-.87l.075-.136a.64.64 0 0 0-.382-.92l-.148-.045c-.613-.18-.613-1.048 0-1.229l.148-.043a.64.64 0 0 0 .382-.921l-.074-.136c-.306-.561.308-1.175.869-.87l.136.075a.64.64 0 0 0 .92-.382zM14 12.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0" />
+                                        </svg>
+                                        <ListItemContent>
 
-                                        <Typography style={{ fontSize: "20px", fontWeight: "bold" }}>Roles</Typography>
-                                    </ListItemContent>
+                                            <Typography style={{ fontSize: "20px", fontWeight: "bold" }}>Roles</Typography>
+                                        </ListItemContent>
 
 
-                                </ListItemButton>
-                            )}
-                        >
+                                    </ListItemButton>
+                                )}
+                            >
 
-                        </Toggler>
-                    </ListItem>
+                            </Toggler>
+                        </ListItem>)}
                     <ListItem nested onClick={() => { navigate('/profile'); handleItemClick('profile'); }}>
                         <Toggler
                             renderToggle={({ open, setOpen }) => (
