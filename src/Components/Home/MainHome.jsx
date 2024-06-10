@@ -100,36 +100,42 @@ function MainHome() {
     const [loading, setLoading] = React.useState(true);
     const [groupData, setGroupData] = useState("")
     const [openModal, setOpenModal] = useState(false); // State to manage modal visibility
-    const [deletemodal, setDeletemodal] = useState(false); // State to manage modal visibility
     const [selectedGroup, setSelectedGroup] = useState(null); // State to store selected group data
     const [editedgroup, setEditedgroup] = useState(null); // State to store selected group data
+
     const handleCloseModal = () => {
         setOpenModal(false);
         setSelectedGroup(null); // Reset selected group data when modal is closed
     };
 
 
-    const handleDelete = async () => {
-        if (!groupIdToDelete) {
-            toast.error("Group ID is required to delete a group");
-            return;
-        }
+    // const [groupIdToDelete, setGroupIdToDelete] = useState(null);
+    // const [deletemodal, setDeletemodal] = useState(false);
 
-        try {
-            const response = await axios.delete(`https://ptb.insideoutprojects.in/api/deletegroup/${groupIdToDelete}`);
-            console.log(response.data);
-            console.log("Delete Group with ID:", groupIdToDelete);
-            // Handle success response, e.g., show a success message
-            toast.success("Group deleted successfully!");
-            setDeletemodal(false); // Close the delete modal
-            fetchGroupData(); // Refresh group data
-        } catch (error) {
-            console.error("Error deleting group:", error);
-            // Handle error response, e.g., show an error message
-            toast.error("Failed to delete group. Please try again later.");
-        }
-    };
-    // Function to format date to YYYY-MM-DD
+    // const handleClickDelete = (id) => {
+    //     if (!id) {
+    //         toast.error("Group ID is required to delete a group");
+    //         return;
+    //     }
+    //     setGroupIdToDelete(id);
+    //     setDeletemodal(true); // Open the modal for confirmation
+    // };
+
+    // const handleDelete = async (id) => {
+    //     if (!id) return;
+
+    //     try {
+    //         const response = await axios.delete(`https://ptb.insideoutprojects.in/api/deletegroup/${id}`);
+    //         console.log(response.data);
+    //         console.log("Delete Group with ID:", id);
+    //         toast.success("Group deleted successfully!");
+    //         setDeletemodal(false); // Close the delete modal
+    //         fetchGroupData(); // Refresh group data
+    //     } catch (error) {
+    //         console.error("Error deleting group:", error);
+    //         toast.error("Failed to delete group. Please try again later.");
+    //     }
+    // };
 
     // Function to handle opening the modal and setting selected group data
     const handleGroupClick = (task) => {
@@ -367,7 +373,7 @@ function MainHome() {
                                                                         : 'https://images.unsplash.com/photo-1686548812883-9d3777f4c137?h=400&fit=crop&auto=format&dpr=2'
                                                                 }
                                                                 alt=""
-                                                            /> 
+                                                            />
                                                         </Skeleton>
                                                     </AspectRatio>
                                                 </Box>
@@ -548,32 +554,34 @@ function MainHome() {
                                                         </div>
                                                     </ModalDialog>
                                                 </Modal>
-                                                {/* {showButton && (
-                                                <Button variant="outlined"
+                                                {/* <Button
+                                                    variant="outlined"
                                                     onClick={() => handleClickDelete(task?._id)}
-                                                    color="neutral" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gray-200 text-black hover:bg-primary/90 h-10 px-4 py-2">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                                    color="neutral"
+                                                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gray-200 text-black hover:bg-primary/90 h-10 px-4 py-2"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trash" viewBox="0 0 16 16">
                                                         <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
                                                         <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
                                                     </svg>
-                                                </Button>)} */}
+                                                </Button>
+
                                                 <Modal className="mt-14" open={deletemodal} onClose={() => setDeletemodal(false)}>
                                                     <ModalDialog className="" minWidth={300} style={{ height: "200px" }}>
                                                         <ModalClose />
-                                                        <div> {/* Call handleDelete function when the form is submitted */}
-
+                                                        <div>
                                                             <div className='p-3 mt-2'>
                                                                 <h1 className='text-lg font-bold w-[400px] '>You are about to delete a group which has active and unapproved tasks. Are you sure you want to delete all data?</h1>
-                                                                <div class="flex justify-between gap-2 mt-6">
+                                                                <div className="flex justify-between gap-2 mt-6">
                                                                     <button
                                                                         type="button"
-                                                                        onClick={() => setDeletemodal(false)} // Close the modal without deleting
+                                                                        onClick={() => setDeletemodal(false)}
                                                                         className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:bg-yellow-200 h-10 px-4 py-2"
                                                                     >
                                                                         No, keep my data
                                                                     </button>
                                                                     <button
-                                                                        onClick={handleDelete}
+                                                                        onClick={() => handleDelete(groupIdToDelete)}
                                                                         className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-red-600 text-white hover:bg-red-800 h-10 px-4 py-2"
                                                                     >
                                                                         Yes, delete group
@@ -582,7 +590,8 @@ function MainHome() {
                                                             </div>
                                                         </div>
                                                     </ModalDialog>
-                                                </Modal>
+                                                </Modal> */}
+
                                             </div>
                                         </div>
                                     ))}

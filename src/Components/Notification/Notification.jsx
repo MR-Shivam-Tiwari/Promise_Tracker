@@ -1,6 +1,7 @@
 import { Avatar, Box, Button, Skeleton } from '@mui/joy';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Notification({ handleClose }) {
     const [allNotifications, setAllNotifications] = useState([]);
@@ -8,7 +9,7 @@ function Notification({ handleClose }) {
     const [loading, setLoading] = useState(true); // Add loading state
     const [opennoti, setOpennoti] = useState(false);
     const [userid, setuserid] = useState("");
-
+    const navigate = useNavigate();
     useEffect(() => {
         const userDataString = localStorage.getItem('userData');
         if (userDataString) {
@@ -106,7 +107,7 @@ function Notification({ handleClose }) {
                                             component="label"
                                             onClick={() => {
                                                 setOpennoti(false);
-                                                navigate("/task");
+                                                navigate("/task"); handleClose();
                                             }}
                                             variant="outlined"
                                             color="neutral"

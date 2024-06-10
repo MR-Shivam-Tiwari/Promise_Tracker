@@ -32,6 +32,7 @@
   },
   "description": "https://github.com/mui/material-ui/blob/v5.15.15/docs/data/joy/templates/order-dashboard/App.tsx",
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/plugin-transform-class-properties": "^7.24.1",
     "@babel/plugin-transform-class-static-block": "^7.24.4",
     "@babel/preset-env": "^7.24.4",
