@@ -227,7 +227,7 @@ function AddTask({ setOpen }) {
 
                         <div class="col-span-1 md:col-span-2">
                             <Autocomplete
-                                placeholder="Add Collaborator"
+                                placeholder="Assign to"
                                 renderInput={(params) => <input {...params} className="flex w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm" />}
                                 options={selectmembers.map((lead) => lead.name)}
                                 onChange={(e, value) => handleChange('people', value)} // Ensure 'people' is passed as fieldName
