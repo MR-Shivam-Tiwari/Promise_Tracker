@@ -65,26 +65,21 @@ function ViewTask({ data, status }) {
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                         <div>
+                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Assigned By</h2>
+                            <p className="text-gray-700 mb-2 gap-2 flex  ">
+                                <p class="font-bold  bg-yellow-500 px-2 rounded-sm text-black"> {data?.owner?.name}</p>
+                            </p>
+
+                        </div>
+                        <div>
                             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Assigned To</h2>
                             <div className='flex '>
 
-                                <p class="text-gray-700  bg-green-200 px-2 rounded-lg"> {data?.people.map(person => person.name).join(', ')}</p>
+                                <p class="font-bold  bg-green-500 text-black  px-2 rounded-sm"> {data?.people.map(person => person.name).join(', ')}</p>
                             </div>
                         </div>
-                        <div>
-                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Dates</h2>
-                            <p className="text-gray-700 mb-2 gap-2 flex  ">
-                                Start:<p className='border px-2 font-bold  rounded bg-gray-200'>
-                                    {data?.startDate ? formatDate(data.startDate) : 'N/A'}
-                                </p>
-                            </p>
-                            <p className="text-gray-700 flex gap-2 ">
 
-                                End : <p style={{marginLeft:"2px"}} className='border  px-2 font-bold rounded bg-gray-200'>
-                                    {data?.endDate ? formatDate(data.endDate) : 'N/A'}
-                                </p>
-                            </p>
-                        </div>
+
                     </div>
                     {/* <div class="mb-6">
                         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Comments</h2>
@@ -152,6 +147,19 @@ function ViewTask({ data, status }) {
                                 </div>
 
                             </div>
+                        </div><div>
+                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Dates</h2>
+                            <p className="text-gray-700 mb-2 gap-2 flex  ">
+                                Start:<p className='border px-2 font-bold  rounded bg-gray-200'>
+                                    {data?.startDate ? formatDate(data.startDate) : 'N/A'}
+                                </p>
+                            </p>
+                            <p className="text-gray-700 flex gap-2 ">
+
+                                End : <p style={{ marginLeft: "2px" }} className='border  px-2 font-bold rounded bg-gray-200'>
+                                    {data?.endDate ? formatDate(data.endDate) : 'N/A'}
+                                </p>
+                            </p>
                         </div>
                     </div>
                     <div className='text-black'>
@@ -165,11 +173,7 @@ function ViewTask({ data, status }) {
 
 
 
-                    <div class="flex items-center justify-end space-x-2">
-                        <button class="px-4 py-2 w-[140px] rounded-md text-sm font-medium text-white  bg-black  hover:bg-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-gray-400">
-                            Save
-                        </button>
-                    </div>
+
                 </div>
 
             </div>

@@ -194,13 +194,13 @@ function AddTask({ setOpen }) {
                         </div>
                         <div>
                             <label
-                                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                class="text-sm font-medium  leading-none "
                                 for="task-name"
                             >
                                 Task Name
                             </label>
                             <input
-                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                class="flex h-10 w-full rounded-md bg-white border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                 id="task-name"
                                 placeholder="Enter task name"
                                 name="taskName"
@@ -216,7 +216,7 @@ function AddTask({ setOpen }) {
                                 Task Description
                             </label>
                             <textarea
-                                class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 h-32"
+                                class="flex min-h-[80px] w-full bg-white rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 h-32"
                                 id="task-description"
                                 placeholder="Describe the task"
                                 name="description"
@@ -228,7 +228,7 @@ function AddTask({ setOpen }) {
                         <div class="col-span-1 md:col-span-2">
                             <Autocomplete
                                 placeholder="Assign to"
-                                renderInput={(params) => <input {...params} className="flex w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm" />}
+                                renderInput={(params) => <input {...params} className="flex w-full  items-center justify-between rounded-md border border-input px-3 py-2 text-sm" />}
                                 options={selectmembers.map((lead) => lead.name)}
                                 onChange={(e, value) => handleChange('people', value)} // Ensure 'people' is passed as fieldName
                                 multiple

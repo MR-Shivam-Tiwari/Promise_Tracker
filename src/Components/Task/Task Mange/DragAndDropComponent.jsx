@@ -247,7 +247,7 @@ const Card = ({ id, text, status, card }) => {
                             sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                         >
                             <Sheet
-                                className='overflow-auto bg-white h-[70%]'
+                                className='overflow-auto bg-white h-[60%]'
                                 sx={{
                                     borderRadius: 'md',
                                     boxShadow: 'lg',
