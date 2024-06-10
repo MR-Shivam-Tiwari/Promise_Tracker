@@ -360,11 +360,11 @@ function MainHome() {
                                             </div>
                                         ))
                                 ) : (
-                                    <div className=''>
-                                        {Array.from(new Array(1)).map((_, index) => (
-                                            <div className='grid grid-cols-1 '>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+                                        {Array.from(new Array(6)).map((_, index) => (
+                                            <div key={index} style={{ width: '100%' }}>
                                                 <Box sx={{ m: 'auto' }}>
-                                                    <AspectRatio variant="plain" sx={{ width: 300 }}>
+                                                    <AspectRatio variant="plain" sx={{ width: 500}}>
                                                         <Skeleton loading={loading}>
                                                             <img
                                                                 src={
@@ -380,6 +380,7 @@ function MainHome() {
                                             </div>
                                         ))}
                                     </div>
+
                                 )}
 
 

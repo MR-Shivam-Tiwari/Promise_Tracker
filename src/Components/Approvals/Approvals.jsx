@@ -1,4 +1,4 @@
-import { IconButton, Modal, ModalClose, ModalDialog } from '@mui/joy';
+import { Box, IconButton, Modal, ModalClose, ModalDialog, Skeleton } from '@mui/joy';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import EditApprovals from './EditApprovals';
@@ -10,13 +10,15 @@ function Approvals() {
     const [open, setOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
     const [userid, setUserid] = useState("");
-
+    const [loading, setLoading] = useState(true);
     const fetchData = async () => {
         try {
             const response = await axios.get('https://ptb.insideoutprojects.in/api/tasks');
             setTasks(response.data);
+            setLoading(false);
         } catch (error) {
             console.error('Error fetching tasks:', error);
+            setLoading(false);
         }
     };
 
@@ -88,76 +90,86 @@ function Approvals() {
                                 </th>
                             </tr>
                         </thead>
-                        {filteredTasks.map(task => (
-                            <tbody key={task?._id} className="[&_tr:last-child]:border-0">
-                                <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                    <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
-                                        {task?.taskName}
-                                    </td>
-                                    <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
-                                        {task?.people.map(person => person.name).join(', ')}
-                                    </td>
-                                    <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
-                                        {task?.taskGroup}
-                                    </td>
-                                    <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
-                                        {task?.reminder}
-                                    </td>
-                                    <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0">
-                                        {task.category === 'Approved' && (
-                                            <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-100 text-green-900 dark:bg-green-900/20 dark:text-green-400">
-                                                Approved
-                                            </div>
-                                        )}
-                                        {task.category === 'Unapproved' && (
-                                            <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-red-100 text-red-900 dark:bg-red-900/20 dark:text-red-400">
-                                                Unapproved
-                                            </div>
-                                        )}
-                                        {!task.category && (
-                                            <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-gray-100 text-gray-900 dark:bg-gray-900/20 dark:text-gray-400">
-                                                Not Updated
-                                            </div>
-                                        )}
-                                    </td>
-                                    <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 text-right">
-                                        <IconButton onClick={() => handleEditClick(task)} aria-label="Edit">
-                                            <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    width="24"
-                                                    height="24"
-                                                    viewBox="0 0 24 24"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    strokeWidth="2"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    className="h-4 w-4"
-                                                >
-                                                    <path d="M4 13.5V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2h-5.5"></path>
-                                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                                    <path d="M10.42 12.61a2.1 2.1 0 1 1 2.97 2.97L7.95 21 4 22l.99-3.95 5.43-5.44Z"></path>
-                                                </svg>
-                                                <span className="sr-only">Edit</span>
-                                            </button>
-                                        </IconButton>
-                                        <Modal
-                                            aria-labelledby="modal-title"
-                                            aria-describedby="modal-desc"
-                                            open={open}
-                                            onClose={() => { setOpen(false); setSelectedTask(null); }}
-                                            sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-                                        >
-                                            <ModalDialog maxWidth={600} minWidth={300} style={{ height: "520px", overflow: "auto" }}>
-                                                <ModalClose variant="plain" />
-                                                {selectedTask && <EditApprovals task={selectedTask} taskId={selectedTask?._id} onClose={handleCloseModal} />}
-                                            </ModalDialog>
-                                        </Modal>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        ))}
+                        {loading ? (Array(10).fill().map((_, index) => (
+                            <Box className="" key={index} mb={2} display="flex" alignItems="center">
+                                <Box ml={2} flexGrow={1}>
+                                    <Skeleton variant="text" width="100%" />
+                                    <Skeleton variant="text" width="80%" />
+                                </Box>
+                            </Box>
+                        ))
+                        ) : (
+                            filteredTasks.map(task => (
+                                <tbody key={task?._id} className="[&_tr:last-child]:border-0">
+                                    <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                        <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
+                                            {task?.taskName}
+                                        </td>
+                                        <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
+                                            {task?.people.map(person => person.name).join(', ')}
+                                        </td>
+                                        <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
+                                            {task?.taskGroup}
+                                        </td>
+                                        <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
+                                            {task?.reminder}
+                                        </td>
+                                        <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0">
+                                            {task.category === 'Approved' && (
+                                                <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-100 text-green-900 dark:bg-green-900/20 dark:text-green-400">
+                                                    Approved
+                                                </div>
+                                            )}
+                                            {task.category === 'Unapproved' && (
+                                                <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-red-100 text-red-900 dark:bg-red-900/20 dark:text-red-400">
+                                                    Unapproved
+                                                </div>
+                                            )}
+                                            {!task.category && (
+                                                <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-gray-100 text-gray-900 dark:bg-gray-900/20 dark:text-gray-400">
+                                                    Not Updated
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 text-right">
+                                            <IconButton onClick={() => handleEditClick(task)} aria-label="Edit">
+                                                <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        width="24"
+                                                        height="24"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="2"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        className="h-4 w-4"
+                                                    >
+                                                        <path d="M4 13.5V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2h-5.5"></path>
+                                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                                        <path d="M10.42 12.61a2.1 2.1 0 1 1 2.97 2.97L7.95 21 4 22l.99-3.95 5.43-5.44Z"></path>
+                                                    </svg>
+                                                    <span className="sr-only">Edit</span>
+                                                </button>
+                                            </IconButton>
+                                            <Modal
+                                                aria-labelledby="modal-title"
+                                                aria-describedby="modal-desc"
+                                                open={open}
+                                                onClose={() => { setOpen(false); setSelectedTask(null); }}
+                                                sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                                            >
+                                                <ModalDialog maxWidth={600} minWidth={300} style={{ height: "520px", overflow: "auto" }}>
+                                                    <ModalClose variant="plain" />
+                                                    {selectedTask && <EditApprovals task={selectedTask} taskId={selectedTask?._id} onClose={handleCloseModal} />}
+                                                </ModalDialog>
+                                            </Modal>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            ))
+                        )}
                     </table>
                 </div>
             </div>
@@ -233,9 +245,9 @@ function Approvals() {
                                             aria-describedby="modal-desc"
                                             open={open}
                                             onClose={() => { setOpen(false); setSelectedTask(null); }}
-                                            sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor:"#f0f0f0" }}
+                                            sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: "#f0f0f0" }}
                                         >
-                                            <ModalDialog maxWidth={600} minWidth={300}  className='bg-gray-200'>
+                                            <ModalDialog maxWidth={600} minWidth={300} className='bg-gray-200'>
                                                 <ModalClose variant="plain" />
                                                 {selectedTask && <AcceptApprovals task={selectedTask} taskId={selectedTask?._id} onClose={handleCloseModal} />}
                                             </ModalDialog>

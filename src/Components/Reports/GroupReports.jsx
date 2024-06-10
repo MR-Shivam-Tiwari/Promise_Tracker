@@ -1,18 +1,21 @@
+import { Box, Skeleton } from '@mui/joy';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 // import { saveAs } from 'file-saver';
 
 function GroupReports() {
     const [groupreport, setGroupReport] = useState([]);
-
+    const [loading, setLoading] = useState(true);
     useEffect(() => {
         const fetchGroupData = async () => {
             try {
                 const response = await axios.get('https://ptb.insideoutprojects.in/api/tasksByGroup');
                 const sortedData = response.data.sort((a, b) => a._id.localeCompare(b._id));
                 setGroupReport(sortedData);
+                setLoading(false);
             } catch (error) {
                 console.log("Error Fetching Task ", error);
+                setLoading(false);
             }
         };
         fetchGroupData();
@@ -70,7 +73,16 @@ function GroupReports() {
                     </tr>
                 </thead>
                 <tbody>
-                    {groupreport.map(task => (
+                    {loading ? (
+                        Array(8).fill().map((_, index) => (
+                            <Box key={index} mb={2} display="flex" alignItems="center">
+                                <Box ml={2} flexGrow={1}>
+                                    <Skeleton variant="text" width="80%" />
+                                    <Skeleton variant="text" width="60%" />
+                                </Box>
+                            </Box>
+                        ))
+                    ) : (groupreport.map(task => (
                         <tr className="bg-white border-b" key={task._id}>
                             <td className="px-6 py-4 font-medium text-black whitespace-nowrap">
                                 {task._id}
@@ -80,7 +92,8 @@ function GroupReports() {
                             <td className="px-6 py-4">{task.completedTasks}</td>
                             <td className="px-6 py-4">{task.cancelledTasks}</td>
                         </tr>
-                    ))}
+                    ))
+                    )}
                 </tbody>
             </table>
         </div>

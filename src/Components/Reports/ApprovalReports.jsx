@@ -6,7 +6,7 @@ import Typography from '@mui/joy/Typography';
 import Sheet from '@mui/joy/Sheet';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Button } from '@mui/joy';
+import { Box, Button, Skeleton } from '@mui/joy';
 
 function Row(props) {
     const { row } = props;
@@ -179,7 +179,14 @@ function ApprovalReports() {
 
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div>{Array(8).fill().map((_, index) => (
+            <Box key={index} mb={2} display="flex" alignItems="center">
+                <Box ml={2} flexGrow={1}>
+                    <Skeleton variant="text" width="80%" />
+                    <Skeleton variant="text" width="60%" />
+                </Box>
+            </Box>
+        ))}</div>;
     }
 
     if (!userData || !Array.isArray(userData) || userData.length === 0) {

@@ -6,6 +6,7 @@ import Typography from '@mui/joy/Typography';
 import Sheet from '@mui/joy/Sheet';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { Box, Skeleton } from '@mui/joy';
 
 
 
@@ -187,7 +188,18 @@ function UserReports() {
 
 
     if (loading) {
-        return <div>Loading...</div>; // Render loading indicator while fetching data
+        return <div>
+            {
+                Array(8).fill().map((_, index) => (
+                    <Box key={index} mb={2} display="flex" alignItems="center">
+                        <Box ml={2} flexGrow={1}>
+                            <Skeleton variant="text" width="80%" />
+                            <Skeleton variant="text" width="60%" />
+                        </Box>
+                    </Box>
+                ))}
+
+        </div>; // Render loading indicator while fetching data
     }
 
     if (!userData || !Array.isArray(userData) || userData.length === 0) {

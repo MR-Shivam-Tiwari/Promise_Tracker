@@ -1,4 +1,4 @@
-import { Button, Chip, Dropdown, IconButton, Menu, MenuButton, MenuItem, Modal, Sheet, Typography } from '@mui/joy';
+import { AspectRatio, Box, Button, Chip, Dropdown, IconButton, Menu, MenuButton, MenuItem, Modal, Sheet, Skeleton, Typography } from '@mui/joy';
 import React, { useState, useEffect } from 'react';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -7,12 +7,12 @@ import { toast } from 'react-toastify';
 import ModalClose from '@mui/joy/ModalClose';
 import ViewTask from '../ViewTask';
 import EditTask from '../EditTask';
-
+import Load from './Loading.gif'
 const ItemTypes = {
     CARD: 'card',
 };
 
-const Section = ({ title, cards, moveCard }) => {
+const Section = ({ title, cards, moveCard, loading }) => {
     const [, drop] = useDrop({
         accept: ItemTypes.CARD,
         drop(item, monitor) {
@@ -29,9 +29,32 @@ const Section = ({ title, cards, moveCard }) => {
                 </div>
             </div>
             <div className="flex-1 flex flex-col gap-4 p-4  overflow-y-scroll">
-                {cards.map((card) => (
-                    <Card key={card._id} card={card} id={card._id} text={card.taskName} status={card.status} />
-                ))}
+                {
+                    loading ? (
+
+                        Array.from(new Array(6)).map((_, index) => (
+                            <div key={index} style={{ width: '100%' }}>
+                                <Box sx={{ m: 'auto', display: "flex", justifyContent: "center" }} >
+                                    <AspectRatio variant="plain" sx={{ width: 300 }}>
+                                        <Skeleton loading={loading}>
+                                            <img
+                                                src={
+                                                    loading
+                                                        ? 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
+                                                        : 'https://images.unsplash.com/photo-1686548812883-9d3777f4c137?h=400&fit=crop&auto=format&dpr=2'
+                                                }
+                                                alt=""
+                                            />
+                                        </Skeleton>
+                                    </AspectRatio>
+                                </Box>
+                            </div>
+                        ))
+
+                    ) : (
+                        cards.map((card) => (
+                            <Card key={card._id} card={card} id={card._id} text={card.taskName} status={card.status} />
+                        )))}
             </div>
         </div>
     );
@@ -299,7 +322,7 @@ const Card = ({ id, text, status, card }) => {
     );
 };
 
-const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasksInProgress }) => {
+const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksCompleted, tasksInProgress }) => {
     const [sections, setSections] = useState({
         'Todo': tasksToDo,
         'In Progress': tasksInProgress,
@@ -412,10 +435,18 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, tasksCompleted, tasks
 
     return (
         <DndProvider backend={HTML5Backend}>
-            <div className="grid grid-cols-4 gap-6 h-full" style={{ display: 'flex' }}>
-                {Object.entries(sections).map(([title, cards]) => (
-                    <Section key={title} title={title} cards={cards} moveCard={moveCard} />
-                ))}
+            <div className="grid grid-cols-4 gap-6 h-full flex items-center justify-center" style={{ display: 'flex' }}>
+                {loading ? (
+
+                    <div className='flex items-center justify-center'>
+                        <img src={Load} alt="" style={{ width: "600px" }} />
+                    </div>
+
+                ) : (
+
+                    Object.entries(sections).map(([title, cards]) => (
+                        <Section key={title} title={title} cards={cards} loading={loading} moveCard={moveCard} />
+                    )))}
             </div>
 
             {isModalOpen && (
