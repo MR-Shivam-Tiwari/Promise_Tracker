@@ -120,7 +120,7 @@ console.log("totalTask", tasks)
                                                     </td>
 
                                                     <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0 font-medium">
-                                                        {task?.taskGroup}
+                                                        {task?.taskGroup.groupName}
                                                     </td>
                                                     <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0 font-medium">
                                                         {task?.reminder}

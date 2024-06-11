@@ -220,8 +220,8 @@ function MainHome() {
 
     // Check if the current user has userRole 0, 1, or 2
     const showButton = currentUser && (currentUser.userRole === 0 || currentUser.userRole === 1 || currentUser.userRole === 2);
-    const dpthead = currentUser && (currentUser.userRole === 0 );
-    const prjtlead = currentUser && (currentUser.userRole === 0 || currentUser.userRole === 1  );
+    const dpthead = currentUser && (currentUser.userRole === 0);
+    const prjtlead = currentUser && (currentUser.userRole === 0 || currentUser.userRole === 1);
 
     useEffect(() => {
         if (userid) {
@@ -251,7 +251,10 @@ function MainHome() {
 
 
 
-
+    const handleTaskView = (groupId, groupName) => {
+        // Navigate to the /task route with the group ID and group name as parameters
+        navigate(`/task?groupId=${groupId}&groupName=${groupName}`);
+    };
 
 
 
@@ -321,7 +324,7 @@ function MainHome() {
                                                 <div class="p-2 h-[150px]">
                                                     <div class="flex items-center justify-between">
                                                         <div>
-                                                            <h3 class="text-lg text-black font-medium">{task?.taskGroup}</h3>
+                                                            <h3 class="text-lg text-black font-medium">{task?.taskGroup.groupName}</h3>
                                                         </div>
                                                         <div className="flex text-black items-center gap-2">
                                                             <span className="flex items-center gap-2">
@@ -366,7 +369,7 @@ function MainHome() {
                                         {Array.from(new Array(6)).map((_, index) => (
                                             <div key={index} style={{ width: '100%' }}>
                                                 <Box sx={{ m: 'auto' }}>
-                                                    <AspectRatio variant="plain" sx={{ width: 500}}>
+                                                    <AspectRatio variant="plain" sx={{ width: 500 }}>
                                                         <Skeleton loading={loading}>
                                                             <img
                                                                 src={
@@ -552,14 +555,21 @@ function MainHome() {
                                                         <ModalClose />
                                                         <div onSubmit={() => setEditModal(false)}>
                                                             {editedgroup && (
-                                                                <EditGroup dpthead={dpthead} prjtlead ={prjtlead} Editid={editedgroup?._id} />
+                                                                <EditGroup dpthead={dpthead} prjtlead={prjtlead} Editid={editedgroup?._id} />
                                                             )}
                                                         </div>
                                                     </ModalDialog>
                                                 </Modal>
-                                                <Button variant='outlined' color='neutral' onClick={()=> navigate("/task")} >
+                                                <Button
+                                                    variant="outlined"
+                                                    color="neutral"
+                                                    onClick={() => handleTaskView(task._id, task.groupName)}
+                                                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gray-200 text-black hover:bg-primary/90 h-10 px-4 py-2"
+                                                >
                                                     View Tasks
                                                 </Button>
+
+
                                                 {/* <Button
                                                     variant="outlined"
                                                     onClick={() => handleClickDelete(task?._id)}

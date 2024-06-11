@@ -1,31 +1,24 @@
-import { Button, Card, Checkbox, Chip, IconButton, Modal, ModalDialog, Sheet, Typography } from '@mui/joy'
+import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
-import { useDrag, useDrop, DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-
-import React, { useEffect, useRef, useState } from 'react'
 import DragAndDropComponent from './Task Mange/DragAndDropComponent';
-
-
 import Select from '@mui/joy/Select';
 import Option from '@mui/joy/Option';
-
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function Task() {
     const [tasks, setTasks] = useState([]);
-    const [selectedStatus, setSelectedStatus] = useState('To Do');
-    const [userid, setuserid] = useState("")
+    const [userid, setuserid] = useState('');
     const selectedDateRef = useRef(null);
     const [tasksToDo, setTasksToDo] = useState([]);
     const [tasksInProgress, setTasksInProgress] = useState([]);
     const [tasksCompleted, setTasksCompleted] = useState([]);
     const [tasksCancelled, setTasksCancelled] = useState([]);
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-    const buttonContainerRef = useRef(null);
     const [loading, setLoading] = useState(true);
     const [allTasks, setAllTasks] = useState([]);
     const [taskGroups, setTaskGroups] = useState([]);
-    const [selectedGroup, setSelectedGroup] = useState('group');
+    const [selectedGroup, setSelectedGroup] = useState('');
+    const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         // Retrieve userData from localStorage
@@ -37,8 +30,6 @@ function Task() {
             setuserid(userId);
         }
     }, []);
-
-   
 
     useEffect(() => {
         const fetchData = async () => {
@@ -72,7 +63,6 @@ function Task() {
                 setTasksCompleted(completedTasks);
                 setTasksCancelled(cancelledTasks);
 
-
                 // Extract unique task groups
                 const uniqueTaskGroups = [...new Set(userTasks.map(task => task.taskGroup.groupName))];
                 setTaskGroups(uniqueTaskGroups);
@@ -86,20 +76,24 @@ function Task() {
 
         // Fetch data only when the component mounts or when userid changes
         fetchData();
-
-        // Specify the dependency array to include userid to trigger the effect when userid changes
     }, [userid]);
 
-    const handleGroupChange = (selectedGroup) => {
-        setSelectedGroup(selectedGroup);
-        if (selectedGroup === 'group') {
-            // Show all tasks
-            setTasksToDo(allTasks.filter(task => !task.status || task.status === 'To Do'));
-            setTasksInProgress(allTasks.filter(task => task.status === 'In Progress'));
-            setTasksCompleted(allTasks.filter(task => task.status === 'Completed'));
-            setTasksCancelled(allTasks.filter(task => task.status === 'Cancelled'));
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search);
+        const groupId = searchParams.get('groupId');
+        const groupName = searchParams.get('groupName');
+
+        // Check if groupId and groupName exist in the URL query
+        if (groupId && groupName) {
+            setSelectedGroup(groupName); // Set the selected group based on the groupName parameter
         } else {
-            // Filter tasks based on the selected group
+            setSelectedGroup(''); // Reset selected group if no parameters are found
+        }
+    }, [location.search]);
+
+    useEffect(() => {
+        if (selectedGroup !== '') {
+            // Filter tasks based on selected group name
             const filteredTasks = allTasks.filter(task => task.taskGroup.groupName === selectedGroup);
 
             // Separate filtered tasks based on status and set them in their corresponding states
@@ -107,43 +101,39 @@ function Task() {
             setTasksInProgress(filteredTasks.filter(task => task.status === 'In Progress'));
             setTasksCompleted(filteredTasks.filter(task => task.status === 'Completed'));
             setTasksCancelled(filteredTasks.filter(task => task.status === 'Cancelled'));
+        } else {
+            // Set all tasks if no group is selected
+            setTasksToDo(allTasks.filter(task => !task.status || task.status === 'To Do'));
+            setTasksInProgress(allTasks.filter(task => task.status === 'In Progress'));
+            setTasksCompleted(allTasks.filter(task => task.status === 'Completed'));
+            setTasksCancelled(allTasks.filter(task => task.status === 'Cancelled'));
         }
-    };
-
-
-
-
-
+    }, [selectedGroup, allTasks]);
 
     return (
         <div>
             <div className="flex flex-col h-full bg-white rounded text-black ">
-               
                 <div className='flex items-center justify-between px-2'>
-                    <div className='font-bold'>
-
-                    </div>
-                    <div className='flex  items-center gap-3 text-lg font-bold' >
+                    <div className='font-bold'></div>
+                    <div className='flex items-center gap-3 text-lg font-bold'>
                         <p>Filter By Groups</p>
-
-                        <Select value={selectedGroup} className='font-bold' onChange={(event, newValue) => handleGroupChange(newValue)}>
-                            <Option value="group" className='font-bold'>All Tasks</Option>
-                            {/* Dynamically generate options from unique task groups */}
-                            {taskGroups.map((group, index) => (
-                                <Option className='font-bold text-gray-400' key={index} value={group}>
-                                    {group}
-                                </Option>
-                            ))}
-                        </Select>
+                        {taskGroups.length > 0 && (
+                            <Select value={selectedGroup} className='font-bold' onChange={(event, newValue) => setSelectedGroup(newValue)}>
+                                {/* Dynamically generate options from unique task groups */}
+                                <Option value="" className='font-bold'>All Tasks</Option>
+                                {taskGroups.map((group, index) => (
+                                    <Option className='font-bold text-gray-400' key={index} value={group}>
+                                        {group}
+                                    </Option>
+                                ))}
+                            </Select>
+                        )}
                     </div>
                 </div>
-
-
                 <DragAndDropComponent tasksToDo={tasksToDo} loading={loading} tasksCancelled={tasksCancelled} tasksCompleted={tasksCompleted} tasksInProgress={tasksInProgress} />
-
             </div>
         </div>
     )
 }
 
-export default Task
+export default Task;

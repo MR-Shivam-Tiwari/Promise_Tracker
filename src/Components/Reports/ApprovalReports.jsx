@@ -58,15 +58,31 @@ function Row(props) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {Object.keys(row.groupData).map((groupName, index) => (
-                                        <tr key={index}>
-                                            <td>{groupName}</td>
-                                            <td>{row.groupData[groupName].totalTasks}</td>
-                                            <td>{row.groupData[groupName].inProgressTasks}</td>
-                                            <td>{row.groupData[groupName].completedTasks}</td>
-                                            <td>{row.groupData[groupName].cancelledTasks}</td>
-                                        </tr>
-                                    ))}
+                                    {Object.keys(row.groupData).map((groupKey, index) => {
+                                        let groupName = '';
+                                        try {
+                                            const match = groupKey.match(/groupName:\s*'([^']+)'/);
+                                            if (match) {
+                                                groupName = match[1];
+                                            }
+                                        } catch (error) {
+                                            console.error('Error extracting group name:', error);
+                                        }
+                                        const group = row.groupData[groupKey];
+                                        return (
+                                            <tr key={index}>
+                                                <td>{groupName}</td>
+                                                <td>{group.totalTasks}</td>
+                                                <td>{group.inProgressTasks}</td>
+                                                <td>{group.completedTasks}</td>
+                                                <td>{group.cancelledTasks}</td>
+                                            </tr>
+                                        );
+                                    })}
+
+
+
+
                                 </tbody>
                             </Table>
                         </Sheet>

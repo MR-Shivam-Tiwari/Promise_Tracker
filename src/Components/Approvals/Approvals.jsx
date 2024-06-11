@@ -109,7 +109,7 @@ function Approvals() {
                                             {task?.people.map(person => person.name).join(', ')}
                                         </td>
                                         <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
-                                            {task?.taskGroup}
+                                            {task?.taskGroup.groupName}
                                         </td>
                                         <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
                                             {task?.reminder}
@@ -215,7 +215,7 @@ function Approvals() {
                                         {task?.people.map(person => person.name).join(', ')}
                                     </td>
                                     <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
-                                        {task?.taskGroup}
+                                        {task?.taskGroup.groupName}
                                     </td>
                                     <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
                                         {task?.reminder}
