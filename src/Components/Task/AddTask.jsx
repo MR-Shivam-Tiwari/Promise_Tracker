@@ -1,15 +1,25 @@
-import { Autocomplete, Button, Input, Option, Select } from '@mui/joy'
+import { Autocomplete, Button, Input, Option, Select } from '@mui/joy';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 function AddTask({ setOpen }) {
-    const [GroupData, setGrouptData] = useState("")
+    const [GroupData, setGroupData] = useState([]);
     const [departmentHeads, setDepartmentHeads] = useState([]);
-    const [userid, setuserid] = useState("")
+    const [userid, setUserid] = useState("");
     const [selectProjectLead, setProjectLead] = useState([]);
-    const [selectmembers, setMembers] = useState([]);
-    const [formData, setFormData] = useState([])
+    const [selectMembers, setMembers] = useState([]);
+    const [formData, setFormData] = useState({
+        owner: { id: '' },
+        taskGroup: { groupName: '', groupId: '' },
+        taskName: '',
+        description: '',
+        audioFile: '',
+        startDate: '',
+        endDate: '',
+        reminder: '',
+        people: [],
+    });
     const [userNamesEmail, setUserNamesEmail] = useState([]);
     const [formComplete, setFormComplete] = useState(false);
 
@@ -20,40 +30,29 @@ function AddTask({ setOpen }) {
             const userDataObj = JSON.parse(userDataString);
             const userId = userDataObj.userId;
             console.log("userid:", userId);
-            setuserid(userId);
+            setUserid(userId);
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                owner: { id: userId }
+            }));
         }
     }, []);
-
-    useEffect(() => {
-        // Function to get current date in "YYYY-MM-DD" format
-
-
-        setFormData({
-            owner: { id: userid },
-            taskGroup: '',
-            taskName: '',
-            description: '',
-            audioFile: '',
-            startDate: '',
-            endDate: '',
-            reminder: '',
-            people: [],
-            // createdAt: getCurrentDate(), // Add createdAt field with current date
-        });
-    }, [userid]); // Trigger the effect whenever userid changes
-
-
-
 
     const handleChange = (fieldName, value) => {
         if (fieldName === 'people') {
             // Map selected user names to corresponding user objects
             const selectedUsers = value.map((name) => {
-                return selectmembers.find((member) => member.name === name);
+                return selectMembers.find((member) => member.name === name);
             });
             setFormData((prevFormData) => ({
                 ...prevFormData,
                 [fieldName]: selectedUsers,
+            }));
+        } else if (fieldName === 'taskGroup') {
+            const [groupName, groupId] = value.split('||');
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                taskGroup: { groupName, groupId },
             }));
         } else {
             setFormData((prevFormData) => ({
@@ -63,18 +62,13 @@ function AddTask({ setOpen }) {
         }
     };
 
-
-
-
-
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         const { taskGroup, taskName, description, startDate, endDate } = formData;
 
         // Check if any field is empty
-        if (!taskGroup || !taskName || !description || !startDate || !endDate ) {
+        if (!taskGroup.groupId || !taskName || !description || !startDate || !endDate) {
             toast.error('Please fill in all fields.');
             return; // Exit the function
         }
@@ -85,9 +79,9 @@ function AddTask({ setOpen }) {
             resetForm();
             setOpen(false);
             toast.success("Task created successfully!");
-            setInterval(() => {
-                window.location.reload();
-            }, 1000);
+            // setInterval(() => {
+            //     window.location.reload();
+            // }, 1000);
         } catch (error) {
             console.error("Error creating group:", error);
             if (error.response && error.response.data && error.response.data.error) {
@@ -98,11 +92,10 @@ function AddTask({ setOpen }) {
         }
     };
 
-
     const resetForm = () => {
         setFormData({
-            owner: '',
-            taskGroup: '',
+            owner: { id: userid },
+            taskGroup: { groupName: '', groupId: '' },
             taskName: '',
             description: '',
             audioFile: '',
@@ -112,12 +105,13 @@ function AddTask({ setOpen }) {
             people: [],
         });
     };
+
     useEffect(() => {
         const fetchGroupData = async () => {
             try {
                 const response = await axios.get('https://ptb.insideoutprojects.in/api/groups');
-                setGrouptData(response.data);
-                console.log("groupdata", response.data)
+                setGroupData(response.data);
+                console.log("groupdata", response.data);
             } catch (error) {
                 console.log("Error fetching Task: ", error);
             }
@@ -125,6 +119,7 @@ function AddTask({ setOpen }) {
 
         fetchGroupData();
     }, []);
+
     useEffect(() => {
         const fetchRegisteredNames = async () => {
             try {
@@ -138,10 +133,10 @@ function AddTask({ setOpen }) {
                     (user) => user.userRole === 2
                 );
                 setProjectLead(filteredProjectlead);
-                const filtermember = response.data.filter(
+                const filterMember = response.data.filter(
                     (user) => user.userRole === 3
                 );
-                setMembers(filtermember);
+                setMembers(filterMember);
 
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -152,31 +147,30 @@ function AddTask({ setOpen }) {
 
         fetchRegisteredNames();
     }, []);
-    console.log("selectmembers", selectmembers)
-
+    console.log("selectmembers", selectMembers);
     return (
-        <div >
-            <div class="w-full bg-gray-200 text-black rounded-lg">
-                <div class="max-w-4xl mx-auto p-0 md:p-10">
-                    <h1 class="text-2xl font-bold mb-6">Create New Task</h1>
-                    <form class="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleSubmit}>
+        <div>
+            <div className="w-full bg-gray-200 text-black rounded-lg">
+                <div className="max-w-4xl mx-auto p-0 md:p-10">
+                    <h1 className="text-2xl font-bold mb-6">Create New Task</h1>
+                    <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleSubmit}>
                         <div>
                             <label
-                                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                for="location"
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                htmlFor="location"
                             >
                                 Group
                             </label>
 
                             <select
                                 className="flex bg-white h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                value={formData.taskGroup}
+                                value={`${formData.taskGroup.groupName || ''}||${formData.taskGroup.groupId || ''}`}
                                 onChange={(e) => handleChange('taskGroup', e.target.value)}
                             >
                                 <option value="">Select a Group</option>
                                 {Array.isArray(GroupData) && GroupData.length > 0 ? (
                                     GroupData.map((group) => (
-                                        <option key={group._id} value={group.groupName}>
+                                        <option key={group._id} value={`${group.groupName}||${group._id}`}>
                                             {group.groupName}
                                         </option>
                                     ))
@@ -184,23 +178,16 @@ function AddTask({ setOpen }) {
                                     <option value="" disabled>No groups available</option>
                                 )}
                             </select>
-
-
-
-
-
-
-
                         </div>
                         <div>
                             <label
-                                class="text-sm font-medium  leading-none "
-                                for="task-name"
+                                className="text-sm font-medium  leading-none"
+                                htmlFor="task-name"
                             >
                                 Task Name
                             </label>
                             <input
-                                class="flex h-10 w-full rounded-md bg-white border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="flex h-10 w-full rounded-md bg-white border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                 id="task-name"
                                 placeholder="Enter task name"
                                 name="taskName"
@@ -208,15 +195,15 @@ function AddTask({ setOpen }) {
                                 onChange={(e) => setFormData({ ...formData, taskName: e.target.value })}
                             />
                         </div>
-                        <div class="col-span-1 md:col-span-2">
+                        <div className="col-span-1 md:col-span-2">
                             <label
-                                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                for="task-description"
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                htmlFor="task-description"
                             >
                                 Task Description
                             </label>
                             <textarea
-                                class="flex min-h-[80px] w-full bg-white rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 h-32"
+                                className="flex min-h-[80px] w-full bg-white rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 h-32"
                                 id="task-description"
                                 placeholder="Describe the task"
                                 name="description"
@@ -225,21 +212,19 @@ function AddTask({ setOpen }) {
                             ></textarea>
                         </div>
 
-                        <div class="col-span-1 md:col-span-2">
+                        <div className="col-span-1 md:col-span-2">
                             <Autocomplete
                                 placeholder="Assign to"
                                 renderInput={(params) => <input {...params} className="flex w-full  items-center justify-between rounded-md border border-input px-3 py-2 text-sm" />}
-                                options={selectmembers.map((lead) => lead.name)}
+                                options={selectMembers.map((lead) => lead.name)}
                                 onChange={(e, value) => handleChange('people', value)} // Ensure 'people' is passed as fieldName
                                 multiple
                             />
-
-
                         </div>
                         <div>
                             <label
-                                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                for="start-date"
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                htmlFor="start-date"
                             >
                                 Start Date
                             </label>
@@ -247,34 +232,37 @@ function AddTask({ setOpen }) {
                                 name="startDate"
                                 value={formData.startDate}
                                 onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                                className='inline-flex items-center whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full justify-start text-left font-normal' type="date" />
-
+                                className="inline-flex items-center whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full justify-start text-left font-normal"
+                                type="date"
+                            />
                         </div>
                         <div>
                             <label
-                                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                for="end-date"
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                htmlFor="end-date"
                             >
                                 End Date
                             </label>
 
-                            <input className='inline-flex items-center whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full justify-start text-left font-normal'
+                            <input
+                                className="inline-flex items-center whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full justify-start text-left font-normal"
                                 type="date"
                                 name="endDate"
                                 value={formData.endDate}
                                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-
                             />
                         </div>
-                        <div class="col-span-1 md:col-span-2">
+                        <div className="col-span-1 md:col-span-2">
                             <label
-                                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                for="reminder"
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                htmlFor="reminder"
                             >
                                 Reminder
                             </label>
-                            <div class="flex items-center gap-4">
-                                <input className='inline-flex items-center whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2  justify-start text-left font-normal' type="time"
+                            <div className="flex items-center gap-4">
+                                <input
+                                    className="inline-flex items-center whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 justify-start text-left font-normal"
+                                    type="time"
                                     name="reminder"
                                     value={formData.reminder}
                                     onChange={(e) => setFormData({ ...formData, reminder: e.target.value })}
@@ -284,7 +272,7 @@ function AddTask({ setOpen }) {
                         <div className="col-span-1 md:col-span-2">
                             <button
                                 onClick={handleSubmit}
-                                className={`inline-flex bg-black text-white items-center justify-center whitespace-nowrap rounded-md text-sm font-medium hover:bg-primary/90 h-10 px-4 py-2 w-full `}
+                                className="inline-flex bg-black text-white items-center justify-center whitespace-nowrap rounded-md text-sm font-medium hover:bg-primary/90 h-10 px-4 py-2 w-full"
                             >
                                 Add Task
                             </button>
@@ -292,8 +280,8 @@ function AddTask({ setOpen }) {
                     </form>
                 </div>
             </div>
-        </div >
-    )
+        </div>
+    );
 }
 
-export default AddTask
+export default AddTask;

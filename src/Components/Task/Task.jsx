@@ -126,7 +126,7 @@ function Task() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('https://ptb.insideoutprojects.in/api/tasks');
+                const response = await axios.get('http://localhost:5000/api/tasks');
                 console.log('Response data:', response.data);
 
                 // Filter tasks based on the user's ID
@@ -157,7 +157,7 @@ function Task() {
 
 
                 // Extract unique task groups
-                const uniqueTaskGroups = [...new Set(userTasks.map(task => task.taskGroup))];
+                const uniqueTaskGroups = [...new Set(userTasks.map(task => task.taskGroup.groupName))];
                 setTaskGroups(uniqueTaskGroups);
 
                 setLoading(false);
@@ -183,7 +183,7 @@ function Task() {
             setTasksCancelled(allTasks.filter(task => task.status === 'Cancelled'));
         } else {
             // Filter tasks based on the selected group
-            const filteredTasks = allTasks.filter(task => task.taskGroup === selectedGroup);
+            const filteredTasks = allTasks.filter(task => task.taskGroup.groupName === selectedGroup);
 
             // Separate filtered tasks based on status and set them in their corresponding states
             setTasksToDo(filteredTasks.filter(task => !task.status || task.status === 'To Do'));

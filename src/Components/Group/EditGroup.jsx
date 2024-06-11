@@ -3,7 +3,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
-function EditGroup({ Editid }) {
+function EditGroup({ Editid, dpthead, prjtlead }) {
     const [departmentHeads, setDepartmentHeads] = useState([]);
     const [selectProjectLead, setProjectLead] = useState([]);
     const [selectmembers, setMembers] = useState([]);
@@ -158,62 +158,72 @@ function EditGroup({ Editid }) {
                         onChange={(e) => setFormData({ ...formData, groupName: e.target.value })}
                     />
                 </div>
-                <div>
-                    <label htmlFor="department-head" className="mb-2 block text-sm font-medium">
-                        Department Head
-                    </label>
-                    {departmentHeads && departmentHeads.length > 0 && (
-                        <Autocomplete
-                            id="department-head"
-                            className="mb-3"
-                            options={departmentHeads.filter(lead => lead && lead.name).map(lead => lead.name)}
-                            multiple
-                            getOptionLabel={(option) => option}
-                            onChange={(e, value) => handleChange(e, value, 'deptHead')}
-                            value={formData?.deptHead?.map((head) => head?.name)}
-                            renderOption={(props, option, { selected }) => (
-                                <li {...props} key={option} className='px-2' style={{ fontWeight: selected ? 700 : 400 }}>
-                                    {option}
-                                </li>
-                            )}
-                            renderInput={(params) => (
-                                <input
-                                    {...params}
-                                    className="flex w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm"
+                {
+                    dpthead && (
+
+
+                        <div>
+                            <label htmlFor="department-head" className="mb-2 block text-sm font-medium">
+                                Department Head
+                            </label>
+                            {departmentHeads && departmentHeads.length > 0 && (
+                                <Autocomplete
+                                    id="department-head"
+                                    className="mb-3"
+                                    options={departmentHeads.filter(lead => lead && lead.name).map(lead => lead.name)}
+                                    multiple
+                                    getOptionLabel={(option) => option}
+                                    onChange={(e, value) => handleChange(e, value, 'deptHead')}
+                                    value={formData?.deptHead?.map((head) => head?.name)}
+                                    renderOption={(props, option, { selected }) => (
+                                        <li {...props} key={option} className='px-2' style={{ fontWeight: selected ? 700 : 400 }}>
+                                            {option}
+                                        </li>
+                                    )}
+                                    renderInput={(params) => (
+                                        <input
+                                            {...params}
+                                            className="flex w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm"
+                                        />
+                                    )}
                                 />
                             )}
-                        />
-                    )}
 
-                </div>
-                <div>
-                    <label htmlFor="project-lead" className="mb-2 block text-sm font-medium">
-                        Project Lead
-                    </label>
-                    {selectProjectLead && selectProjectLead.length > 0 && (
-                        <Autocomplete
-                            id="project-lead"
-                            className="mb-3"
-                            options={selectProjectLead.filter(lead => lead && lead.name).map(lead => lead.name)}
-                            multiple
-                            onChange={(e, value) => handleChange(e, value, 'projectLead')}
-                            value={formData?.projectLead?.map((lead) => lead?.name)}
-                            getOptionLabel={(option) => option} // Use option itself as label
-                            renderOption={(props, option, { selected }) => (
-                                <li {...props} key={option} className='px-2' style={{ fontWeight: selected ? 700 : 400 }}>
-                                    {option}
-                                </li>
-                            )}
-                            renderInput={(params) => (
-                                <input
-                                    {...params}
-                                    className="flex w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm"
-                                />
-                            )}
-                        />
-                    )}
+                        </div>
+                    )
+                }
+                {prjtlead && (
 
-                </div>
+
+                    <div>
+                        <label htmlFor="project-lead" className="mb-2 block text-sm font-medium">
+                            Project Lead
+                        </label>
+                        {selectProjectLead && selectProjectLead.length > 0 && (
+                            <Autocomplete
+                                id="project-lead"
+                                className="mb-3"
+                                options={selectProjectLead.filter(lead => lead && lead.name).map(lead => lead.name)}
+                                multiple
+                                onChange={(e, value) => handleChange(e, value, 'projectLead')}
+                                value={formData?.projectLead?.map((lead) => lead?.name)}
+                                getOptionLabel={(option) => option} // Use option itself as label
+                                renderOption={(props, option, { selected }) => (
+                                    <li {...props} key={option} className='px-2' style={{ fontWeight: selected ? 700 : 400 }}>
+                                        {option}
+                                    </li>
+                                )}
+                                renderInput={(params) => (
+                                    <input
+                                        {...params}
+                                        className="flex w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm"
+                                    />
+                                )}
+                            />
+                        )}
+
+                    </div>
+                )}
                 <div>
                     <label htmlFor="members" className="mb-2 block text-sm font-medium">
                         Members

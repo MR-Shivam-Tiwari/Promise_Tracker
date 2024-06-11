@@ -220,6 +220,8 @@ function MainHome() {
 
     // Check if the current user has userRole 0, 1, or 2
     const showButton = currentUser && (currentUser.userRole === 0 || currentUser.userRole === 1 || currentUser.userRole === 2);
+    const dpthead = currentUser && (currentUser.userRole === 0 );
+    const prjtlead = currentUser && (currentUser.userRole === 0 || currentUser.userRole === 1  );
 
     useEffect(() => {
         if (userid) {
@@ -550,11 +552,14 @@ function MainHome() {
                                                         <ModalClose />
                                                         <div onSubmit={() => setEditModal(false)}>
                                                             {editedgroup && (
-                                                                <EditGroup Editid={editedgroup?._id} />
+                                                                <EditGroup dpthead={dpthead} prjtlead ={prjtlead} Editid={editedgroup?._id} />
                                                             )}
                                                         </div>
                                                     </ModalDialog>
                                                 </Modal>
+                                                <Button variant='outlined' color='neutral' onClick={()=> navigate("/task")} >
+                                                    View Tasks
+                                                </Button>
                                                 {/* <Button
                                                     variant="outlined"
                                                     onClick={() => handleClickDelete(task?._id)}
