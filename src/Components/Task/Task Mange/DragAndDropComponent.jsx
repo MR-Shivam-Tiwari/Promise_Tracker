@@ -28,34 +28,37 @@ const Section = ({ title, cards, moveCard, loading }) => {
                     {cards.length}
                 </div>
             </div>
-            <div className="flex-1 flex flex-col gap-4 p-4  overflow-y-scroll">
-                {
-                    loading ? (
-
-                        Array.from(new Array(6)).map((_, index) => (
-                            <div key={index} style={{ width: '100%' }}>
-                                <Box sx={{ m: 'auto', display: "flex", justifyContent: "center" }} >
-                                    <AspectRatio variant="plain" sx={{ width: 300 }}>
-                                        <Skeleton loading={loading}>
-                                            <img
-                                                src={
-                                                    loading
-                                                        ? 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
-                                                        : 'https://images.unsplash.com/photo-1686548812883-9d3777f4c137?h=400&fit=crop&auto=format&dpr=2'
-                                                }
-                                                alt=""
-                                            />
-                                        </Skeleton>
-                                    </AspectRatio>
-                                </Box>
-                            </div>
-                        ))
-
-                    ) : (
+            <div className="flex-1 flex flex-col gap-4 p-4 overflow-y-scroll">
+                {loading ? (
+                    Array.from(new Array(6)).map((_, index) => (
+                        <div key={index} style={{ width: '100%' }}>
+                            <Box sx={{ m: 'auto', display: "flex", justifyContent: "center" }} >
+                                <AspectRatio variant="plain" sx={{ width: 300 }}>
+                                    <Skeleton loading={loading}>
+                                        <img
+                                            src={
+                                                loading
+                                                    ? 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
+                                                    : 'https://images.unsplash.com/photo-1686548812883-9d3777f4c137?h=400&fit=crop&auto=format&dpr=2'
+                                            }
+                                            alt=""
+                                        />
+                                    </Skeleton>
+                                </AspectRatio>
+                            </Box>
+                        </div>
+                    ))
+                ) : (
+                    cards.length > 0 ? (
                         cards.map((card) => (
                             <Card key={card._id} card={card} id={card._id} text={card.taskName} status={card.status} />
-                        )))}
+                        ))
+                    ) : (
+                        <div className='border px-2 bg-red-400 font-bold rounded-[3px]'>No tasks available</div>
+                    )
+                )}
             </div>
+
         </div>
     );
 };

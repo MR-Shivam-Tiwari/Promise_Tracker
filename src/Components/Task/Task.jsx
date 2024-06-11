@@ -80,14 +80,11 @@ function Task() {
 
     useEffect(() => {
         const searchParams = new URLSearchParams(location.search);
-        const groupId = searchParams.get('groupId');
         const groupName = searchParams.get('groupName');
 
-        // Check if groupId and groupName exist in the URL query
-        if (groupId && groupName) {
-            setSelectedGroup(groupName); // Set the selected group based on the groupName parameter
-        } else {
-            setSelectedGroup(''); // Reset selected group if no parameters are found
+        // Set selected group based on the groupName parameter from URL
+        if (groupName) {
+            setSelectedGroup(groupName);
         }
     }, [location.search]);
 
