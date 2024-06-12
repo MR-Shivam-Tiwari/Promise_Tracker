@@ -29,7 +29,7 @@ function Task() {
             console.log("Running archiveOldTasks function at 6 AM");
 
             try {
-                const response = await fetch('http://localhost:5000/api/archiveOldTasks', {
+                const response = await fetch('https://ptb.insideoutprojects.in/api/archiveOldTasks', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -140,6 +140,9 @@ function Task() {
         }
     }, [selectedGroup, allTasks]);
 
+
+
+    
     return (
         <div>
             <div className="flex flex-col h-full bg-white rounded text-black ">

@@ -12,7 +12,6 @@ import axios from 'axios';
 const ItemTypes = {
     CARD: 'card',
 };
-
 const Section = ({ title, cards, moveCard, loading }) => {
     const [, drop] = useDrop({
         accept: ItemTypes.CARD,
@@ -59,18 +58,15 @@ const Section = ({ title, cards, moveCard, loading }) => {
                     )
                 )}
             </div>
-
         </div>
     );
 };
-
 const Card = ({ id, text, status, card }) => {
     const [showOptions, setShowOptions] = useState(false);
     const [selectedOption, setSelectedOption] = useState('');
     const navigate = useNavigate()
     const [open, setOpen] = useState(false);
     const [edit, setEdit] = useState(false);
-
     const handleClick = (option) => {
         setSelectedOption(option);
         setShowOptions(false);
@@ -90,7 +86,6 @@ const Card = ({ id, text, status, card }) => {
                 break;
         }
     };
-
     const [{ isDragging }, drag] = useDrag({
         type: ItemTypes.CARD,
         item: () => {
@@ -100,39 +95,28 @@ const Card = ({ id, text, status, card }) => {
             isDragging: monitor.isDragging(),
         }),
     });
-
     const opacity = isDragging ? 0.5 : 1;
     const isValidDate = (date) => {
         return date instanceof Date && !isNaN(date);
     };
-
-    // Helper function to format date as "DD MMM"
     const formatDate = (date) => {
         const day = date.getDate();
         const month = date.toLocaleString('default', { month: 'short' });
         return `${day} ${month}`;
     };
-
-    // Helper function to format date as "YYYY-MM-DD"
     const formatISODate = (date) => {
         return date.toISOString().split('T')[0];
     };
     const startDate = new Date(card?.startDate);
     const endDate = new Date(card?.endDate);
-
-    // Check if the dates are valid
     const isStartDateValid = isValidDate(startDate);
     const isEndDateValid = isValidDate(endDate);
-
-    // Format dates for display
     const formattedDefaultDate = isStartDateValid && isEndDateValid
         ? `${formatDate(startDate)} - ${formatDate(endDate)}`
         : null;
-
     const monthNames = ["January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ];
-
     const formatDatee = (dateString) => {
         if (!dateString) return ''; // Agar date nahi milti toh empty string return karo
         try {
@@ -152,21 +136,17 @@ const Card = ({ id, text, status, card }) => {
     };
     const formatStartDate = formatDatee(card?.startDate);
     const formatEndDate = formatDatee(card?.endDate);
-
     let formattedFallbackDate = '';
     if (formatStartDate) {
         formattedFallbackDate = formatEndDate ? `${formatStartDate} | ${formatEndDate}` : formatStartDate;
     }
     const calculateDueMessage = (endDate) => {
         if (!endDate) return '';
-
         const end = new Date(endDate);
         const today = new Date();
         const differenceInTime = end.getTime() - today.getTime(); // Calculate the difference in milliseconds
         const differenceInDays = Math.ceil(differenceInTime / (1000 * 60 * 60 * 24));
-
         console.log('Difference in days:', differenceInDays);
-
         if (differenceInDays < 0) {
             console.log('Overdue');
             return 'Overdue';
@@ -184,33 +164,26 @@ const Card = ({ id, text, status, card }) => {
             return '';
         }
     };
-
     const formatDate2 = (dateString) => {
         if (!dateString) return ''; // Return empty string if no date string provided
-
         const date = new Date(dateString);
         if (isNaN(date.getTime())) {
             console.error('Invalid date:', dateString);
             return ''; // Return empty string if the date string is invalid
         }
-
         return date.toISOString().split('T')[0]; // Extracts the date part and returns in "YYYY-MM-DD" format
     };
-
-
     const endDateFormatted = formatDate2(card?.endDate);
     const dueMessage = calculateDueMessage(endDateFormatted);
-
     const archiveTask = async () => {
         try {
-            const response = await axios.put(`http://localhost:5000/api/tasks/${id}/status`, {
+            const response = await axios.put(`https://ptb.insideoutprojects.in/api/tasks/${id}/status`, {
                 status: 'Archive',
             }, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
-
             if (response.status === 200) {
                 // Handle successful update
                 console.log('Task archived successfully', response.data);
@@ -220,15 +193,14 @@ const Card = ({ id, text, status, card }) => {
                 console.error('Failed to archive task', response.data);
             }
             toast.success("Task archived successfully")
-            // setInterval(() => {
-            //     window.location.reload();
-            // }, 1000);
+            setInterval(() => {
+                window.location.reload();
+            }, 1000);
 
         } catch (error) {
             console.error('Error archiving task:', error);
         }
     };
-
     return (
         <div ref={drag} style={{ opacity }}>
             <div className="flex-1 shadow-md flex flex-col gap-4  border bg-blue-50 p-4 rounded">
@@ -270,7 +242,6 @@ const Card = ({ id, text, status, card }) => {
                                 <EditTask data={card} />
                             </Sheet>
                         </Modal>
-
                         <Modal
                             aria-labelledby="modal-title"
                             aria-describedby="modal-desc"
@@ -325,8 +296,6 @@ const Card = ({ id, text, status, card }) => {
                         </svg>
                         {card?.taskGroup.groupName}
                     </div>
-
-
                     {card.status === 'Cancelled' && (
                         <div className='text-xs border p-1 px-2 rounded-md font-bold bg-red-400 '>
                             {card?.status === 'Cancelled' ? 'Postponed' : 'Postponed'}
@@ -353,10 +322,8 @@ const Card = ({ id, text, status, card }) => {
                 </div>
             </div>
         </div>
-
     );
 };
-
 const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksCompleted, tasksInProgress }) => {
     const [sections, setSections] = useState({
         'Todo': tasksToDo,
@@ -364,12 +331,10 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
         'Completed': tasksCompleted,
         'Postponed': tasksCancelled,
     });
-
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentCard, setCurrentCard] = useState(null);
     const [remarks, setRemarks] = useState('');
     const [selectedDate, setSelectedDate] = useState(new Date());
-
     useEffect(() => {
         setSections({
             'Todo': tasksToDo,
@@ -378,7 +343,6 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
             'Postponed': tasksCancelled,
         });
     }, [tasksToDo, tasksInProgress, tasksCompleted, tasksCancelled]);
-
     const updateTaskStatus = async (id, status, remark) => {
         const response = await fetch(`https://ptb.insideoutprojects.in/api/tasks/${id}/status`, {
             method: 'PUT',
@@ -394,11 +358,9 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
 
         return response.json();
     };
-
     const moveCard = async (id, toSection) => {
         const newSections = { ...sections };
         const fromSection = Object.keys(newSections).find(section => newSections[section].find(card => card._id === id));
-
         if (fromSection !== toSection) {
             if (toSection === 'Postponed') {
                 const cardToMove = newSections[fromSection].find((card) => card._id === id);
@@ -419,7 +381,6 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
             }
         }
     };
-
     const handleCancelModalSubmit = async () => {
         if (!remarks || !selectedDate) {
             console.error('Remark text and date are required');
@@ -460,14 +421,12 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
             }
         }
     };
-
     const handleCancelModalClose = () => {
         setIsModalOpen(false);
         setCurrentCard(null);
         setRemarks('');
         setSelectedDate(new Date()); // Reset selectedDate as a Date object
     };
-
     return (
         <DndProvider backend={HTML5Backend}>
             <div className="grid grid-cols-4 gap-6 h-full flex items-center justify-center" style={{ display: 'flex' }}>
@@ -476,14 +435,11 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                     <div className='flex items-center justify-center'>
                         <img src={Load} alt="" style={{ width: "600px" }} />
                     </div>
-
                 ) : (
-
                     Object.entries(sections).map(([title, cards]) => (
                         <Section key={title} title={title} cards={cards} loading={loading} moveCard={moveCard} />
                     )))}
             </div>
-
             {isModalOpen && (
                 <Modal
                     aria-labelledby="modal-title"
@@ -519,9 +475,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                             textColor="inherit"
                             fontWeight="lg"
                             mb={1}
-                        >
-                            Reason to Cancel
-                        </Typography>
+                        >                         Reason to Cancel                       </Typography>
                         <div className="grid gap-4">
                             <div className="gap-2 grid">
                                 <label>Remarks</label>
@@ -537,9 +491,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                                     value={selectedDate.toISOString().split('T')[0]} // Convert date to string
                                     onChange={(e) => setSelectedDate(new Date(e.target.value))} // Set selectedDate as Date object
                                 />
-                            </div>
-                        </div>
-
+                            </div></div>
                         <div className="flex justify-end gap-2 mt-4">
                             <Button onClick={handleCancelModalClose} variant="plain">Cancel</Button>
                             <Button onClick={handleCancelModalSubmit}>Submit</Button>
@@ -550,11 +502,4 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
         </DndProvider>
     );
 };
-
-
-
-
-
-
-
 export default DragAndDropComponent;
