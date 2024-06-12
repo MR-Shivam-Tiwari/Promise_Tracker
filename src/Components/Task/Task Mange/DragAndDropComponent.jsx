@@ -8,6 +8,7 @@ import ModalClose from '@mui/joy/ModalClose';
 import ViewTask from '../ViewTask';
 import EditTask from '../EditTask';
 import Load from './Loading.gif'
+import axios from 'axios';
 const ItemTypes = {
     CARD: 'card',
 };
@@ -200,6 +201,33 @@ const Card = ({ id, text, status, card }) => {
     const endDateFormatted = formatDate2(card?.endDate);
     const dueMessage = calculateDueMessage(endDateFormatted);
 
+    const archiveTask = async () => {
+        try {
+            const response = await axios.put(`http://localhost:5000/api/tasks/${id}/status`, {
+                status: 'Archive',
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.status === 200) {
+                // Handle successful update
+                console.log('Task archived successfully', response.data);
+                // Optionally, update the card state or show a notification
+            } else {
+                // Handle error response
+                console.error('Failed to archive task', response.data);
+            }
+            toast.success("Task archived successfully")
+            // setInterval(() => {
+            //     window.location.reload();
+            // }, 1000);
+
+        } catch (error) {
+            console.error('Error archiving task:', error);
+        }
+    };
 
     return (
         <div ref={drag} style={{ opacity }}>
@@ -219,7 +247,9 @@ const Card = ({ id, text, status, card }) => {
                             </MenuButton>
 
                             <Menu className=''>
+
                                 <MenuItem onClick={() => setOpen(true)}>View</MenuItem>
+                                <MenuItem onClick={archiveTask} >Archive</MenuItem>
                             </Menu>
                         </Dropdown>
                         <Modal

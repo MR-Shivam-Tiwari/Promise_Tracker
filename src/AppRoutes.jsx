@@ -24,6 +24,7 @@ import Reports from './Components/Reports/Reports';
 import { toast } from 'react-toastify';
 import Role from './Components/Role/Role';
 import Notification from './Components/Notification/Notification';
+import Archive from './Components/ArchivedTasks/Archive';
 function AppRoutes() {
     const [currentRouteName, setCurrentRouteName] = useState('');
     const location = useLocation();
@@ -335,6 +336,7 @@ function AppRoutes() {
                                 <Route path="/task" element={<Task />} />
                                 <Route path="/reports" element={<Reports />} />
                                 <Route path="/roles" element={<Role />} />
+                                <Route path="/archive-task" element={<Archive />} />
                             </Routes>
                         </div>
 
