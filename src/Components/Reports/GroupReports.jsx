@@ -1,31 +1,42 @@
 import { Box, Skeleton } from '@mui/joy';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-// import { saveAs } from 'file-saver';
 
 function GroupReports() {
     const [groupreport, setGroupReport] = useState([]);
     const [loading, setLoading] = useState(true);
-
     useEffect(() => {
         const fetchGroupData = async () => {
             try {
                 const response = await axios.get('https://ptb.insideoutprojects.in/api/tasksByGroup');
-                const sortedData = response.data.sort((a, b) => {
-                    // Assuming _id.groupName is the string you want to compare
-                    const nameA = a._id.groupName || ""; 
-                    const nameB = b._id.groupName || ""; 
-                    return nameA.localeCompare(nameB);
-                });
-                setGroupReport(sortedData);
-                setLoading(false);
+                const responseData = response.data;
+                console.log("API Response:", responseData); // Log the response for debugging
+    
+                // Filter out objects with _id set to null
+                const filteredData = responseData.filter(item => item._id !== null);
+    
+                if (Array.isArray(filteredData)) {
+                    const sortedData = filteredData.sort((a, b) => {
+                        // Assuming _id.groupName is the string you want to compare
+                        const nameA = a._id.groupName || ""; 
+                        const nameB = b._id.groupName || ""; 
+                        return nameA.localeCompare(nameB);
+                    });
+                    setGroupReport(sortedData);
+                    setLoading(false);
+                } else {
+                    console.error("Invalid API response format:", responseData);
+                    setLoading(false);
+                }
             } catch (error) {
                 console.log("Error Fetching Task ", error);
                 setLoading(false);
             }
         };
+    
         fetchGroupData();
     }, []);
+    
 
     const convertToCSV = () => {
         const csvContent = "data:text/csv;charset=utf-8," +
@@ -42,12 +53,15 @@ function GroupReports() {
         link.click();
     };
 
+console.log("groupreport", groupreport)
+
     return (
         <div className="relative overflow-x-auto shadow-md text-black bg-white sm:rounded-lg">
             <div className='flex justify-end p-2'>
                 <button
-                    className="inline-flex gap-2 text-gray-800 items-center justify-center bg-blue-200 text-black whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 rounded-md"
+                    className={`inline-flex gap-2 text-gray-800 items-center justify-center bg-blue-200 text-black whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${loading ? 'pointer-events-none opacity-50' : ''} border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 rounded-md`}
                     onClick={convertToCSV}
+                    disabled={loading}
                 >
                     Download File 
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" className="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16">
@@ -72,23 +86,27 @@ function GroupReports() {
                             <div className="flex items-center">Completed Task</div>
                         </th>
                         <th scope="col" className="px-6 py-3">
-                            <div className="flex items-center">Cancelled Task</div>
+                            <div className="flex items-center">POSTPONED Task</div>
                         </th>
                     </tr>
                 </thead>
                 <tbody>
                     {loading ? (
                         Array(8).fill().map((_, index) => (
-                            <Box key={index} mb={2} display="flex" alignItems="center">
-                                <Box ml={2} flexGrow={1}>
-                                    <Skeleton variant="text" width="80%" />
-                                    <Skeleton variant="text" width="60%" />
-                                </Box>
-                            </Box>
+                            <tr key={index}>
+                                <td colSpan="5">
+                                    <Box mb={2} display="flex" alignItems="center">
+                                        <Box ml={2} flexGrow={1}>
+                                            <Skeleton variant="text" width="80%" />
+                                            <Skeleton variant="text" width="60%" />
+                                        </Box>
+                                    </Box>
+                                </td>
+                            </tr>
                         ))
                     ) : (
                         groupreport.map(task => (
-                            <tr className="bg-white border-b" key={task._id.groupName}>
+                            <tr className="bg-white border-b" key={task?._id?.groupName}>
                                 <td className="px-6 py-4 font-medium text-black whitespace-nowrap">
                                     {task._id.groupName}
                                 </td>

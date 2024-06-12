@@ -79,9 +79,9 @@ function AddTask({ setOpen }) {
             resetForm();
             setOpen(false);
             toast.success("Task created successfully!");
-            setInterval(() => {
-                window.location.reload();
-            }, 1000);
+            // setInterval(() => {
+            //     window.location.reload();
+            // }, 1000);
         } catch (error) {
             console.error("Error creating group:", error);
             if (error.response && error.response.data && error.response.data.error) {

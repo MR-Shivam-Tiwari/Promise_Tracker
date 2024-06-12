@@ -4,6 +4,8 @@ import DragAndDropComponent from './Task Mange/DragAndDropComponent';
 import Select from '@mui/joy/Select';
 import Option from '@mui/joy/Option';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Button } from '@mui/joy';
+import schedule from 'node-schedule';
 
 function Task() {
     const [tasks, setTasks] = useState([]);
@@ -19,6 +21,37 @@ function Task() {
     const [selectedGroup, setSelectedGroup] = useState('');
     const navigate = useNavigate();
     const location = useLocation();
+
+
+    useEffect(() => {
+        // Schedule the task to run every day at 6 AM
+        const job = schedule.scheduleJob('0 6 * * *', async () => {
+            console.log("Running archiveOldTasks function at 6 AM");
+
+            try {
+                const response = await fetch('http://localhost:5000/api/archiveOldTasks', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+                console.log('Tasks archived successfully:', data);
+                alert(`Archived ${data.updatedTasks.length} tasks`);
+            } catch (error) {
+                console.error('Error archiving tasks:', error);
+                alert('Failed to archive tasks');
+            }
+        });
+
+        // No cleanup function to cancel the job
+
+    }, []);
 
     useEffect(() => {
         // Retrieve userData from localStorage
@@ -64,7 +97,7 @@ function Task() {
                 setTasksCancelled(cancelledTasks);
 
                 // Extract unique task groups
-                const uniqueTaskGroups = [...new Set(userTasks.map(task => task.taskGroup.groupName))];
+                const uniqueTaskGroups = [...new Set(userTasks.map(task => task?.taskGroup?.groupName))];
                 setTaskGroups(uniqueTaskGroups);
 
                 setLoading(false);
@@ -91,7 +124,7 @@ function Task() {
     useEffect(() => {
         if (selectedGroup !== '') {
             // Filter tasks based on selected group name
-            const filteredTasks = allTasks.filter(task => task.taskGroup.groupName === selectedGroup);
+            const filteredTasks = allTasks.filter(task => task?.taskGroup?.groupName === selectedGroup);
 
             // Separate filtered tasks based on status and set them in their corresponding states
             setTasksToDo(filteredTasks.filter(task => !task.status || task.status === 'To Do'));
@@ -111,7 +144,10 @@ function Task() {
         <div>
             <div className="flex flex-col h-full bg-white rounded text-black ">
                 <div className='flex items-center justify-between px-2'>
-                    <div className='font-bold'></div>
+                    <div className='font-bold'>
+                        <Button onClick={() => navigate('/archive-task')} variant='outlined' className='font-bold text-black bh-white border-gray-400 border-2'>Archive Tasks</Button>
+
+                    </div>
                     <div className='flex items-center gap-3 text-lg font-bold'>
                         <p>Filter By Groups</p>
                         {taskGroups.length > 0 && (
