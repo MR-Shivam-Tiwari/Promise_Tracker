@@ -1,7 +1,12 @@
-import { Autocomplete, Button, Input, Option, Select } from '@mui/joy';
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { toast } from 'react-toastify';
+import 'react-quill/dist/quill.snow.css'; // Import Quill styles
+import ReactQuill from 'react-quill'; // Import Quill
+import { EditorProvider } from 'react-simple-wysiwyg';
+import { Autocomplete } from '@mui/joy';
+
+
 
 function AddTask({ setOpen }) {
     const [GroupData, setGroupData] = useState([]);
@@ -20,8 +25,7 @@ function AddTask({ setOpen }) {
         reminder: '',
         people: [],
     });
-    const [userNamesEmail, setUserNamesEmail] = useState([]);
-    const [formComplete, setFormComplete] = useState(false);
+
 
     useEffect(() => {
         // Retrieve userData from localStorage
@@ -124,7 +128,6 @@ function AddTask({ setOpen }) {
         const fetchRegisteredNames = async () => {
             try {
                 const response = await axios.get("https://ptb.insideoutprojects.in/api/userData");
-                setUserNamesEmail(response.data);
                 const filteredDepartmentHeads = response.data.filter(
                     (user) => user.userRole === 1
                 );
@@ -147,7 +150,6 @@ function AddTask({ setOpen }) {
 
         fetchRegisteredNames();
     }, []);
-    console.log("selectmembers", selectMembers);
     return (
         <div>
             <div className="w-full bg-gray-200 text-black rounded-lg">
@@ -195,21 +197,29 @@ function AddTask({ setOpen }) {
                                 onChange={(e) => setFormData({ ...formData, taskName: e.target.value })}
                             />
                         </div>
-                        <div className="col-span-1 md:col-span-2">
+                        <div className="col-span-1 md:col-span-2 mb-5">
                             <label
                                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                 htmlFor="task-description"
                             >
                                 Task Description
                             </label>
-                            <textarea
-                                className="flex min-h-[80px] w-full bg-white rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 h-32"
-                                id="task-description"
-                                placeholder="Describe the task"
-                                name="description"
+                            <ReactQuill
                                 value={formData.description}
-                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            ></textarea>
+                                onChange={(value) => handleChange('description', value)}
+                                className='rounded bg-white h-[100px] mb-5'
+                                modules={{
+                                    toolbar: [
+                                        [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+                                        [{ size: [] }],
+                                        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                                        [{ 'list': 'ordered' }, { 'list': 'bullet' },
+                                        { 'indent': '-1' }, { 'indent': '+1' }],
+                                        ['link', 'image', 'video'],
+                                        ['clean']
+                                    ],
+                                }}
+                            />
                         </div>
 
                         <div className="col-span-1 md:col-span-2">

@@ -19,12 +19,12 @@ import Add from '@mui/icons-material/Add';
 import ColorSchemeToggle from './Components/ColorToggle/ColorSchemeToggle';
 import AddTask from './Components/Task/AddTask';
 import axios from 'axios';
-import MainTask from './Components/Task/MainTask';
 import Reports from './Components/Reports/Reports';
 import { toast } from 'react-toastify';
 import Role from './Components/Role/Role';
 import Notification from './Components/Notification/Notification';
 import Archive from './Components/ArchivedTasks/Archive';
+
 function AppRoutes() {
     const [currentRouteName, setCurrentRouteName] = useState('');
     const location = useLocation();
@@ -39,7 +39,6 @@ function AppRoutes() {
     const [profilePic, setProfilePic] = useState(null);
     const [allNotifications, setAllNotifications] = useState([]);
     const [newNotifications, setNewNotifications] = useState([]);
-
     useEffect(() => {
         const fetchNotifications = async () => {
             try {
@@ -235,7 +234,9 @@ function AppRoutes() {
                                         <ModalDialog className="bg-gray-200" maxWidth={1000} minWidth={1000} style={{ height: "800px", overflow: "auto" }} >
                                             <ModalClose />
                                             <form onSubmit={() => setOpen(false)}>
-                                                <AddTask setOpen={setOpen} />
+                                              
+                                                    <AddTask setOpen={setOpen} />
+                                                
                                             </form>
                                         </ModalDialog>
                                     </Modal>
@@ -267,7 +268,7 @@ function AppRoutes() {
                                                 </svg>
                                                 <div>
 
-                                                    {newNotifications > 0 && <span className="bg-red-500 text-white rounded-full px-2 py-1  " style={{fontSize:"9px", marginTop:"-4px"}} >{newNotifications}</span>}
+                                                    {newNotifications > 0 && <span className="bg-red-500 text-white rounded-full px-2 py-1  " style={{ fontSize: "9px", marginTop: "-4px" }} >{newNotifications}</span>}
                                                 </div>
                                             </IconButton>
 

@@ -9,6 +9,36 @@ function ViewTask({ data, status }) {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return date.toLocaleDateString(undefined, options);
     };
+    const contentStyle = {
+        padding: '1rem',
+        backgroundColor: '#f3f4f6',
+        borderRadius: '0.5rem',
+    };
+
+    const pStyle = {
+        margin: '0 0 1em',
+    };
+
+    const listStyle = {
+        margin: '0 0 1em 1.5em',
+        padding: '0',
+    };
+
+    const listItemStyle = {
+        margin: '0.5em 0',
+    };
+
+    const italicStyle = {
+        fontStyle: 'italic',
+    };
+    const setInlineStyles = (html) => {
+        return html.replace(/<p>/g, `<p style="margin: 0 0 1em;">`)
+            .replace(/<ol>/g, `<ol style="margin: 0 0 1em 1.5em; padding: 0;">`)
+            .replace(/<ul>/g, `<ul style="margin: 0 0 1em 1.5em; padding: 0;">`)
+            .replace(/<li>/g, `<li style="margin: 0.5em 0;">`)
+            .replace(/<i>/g, `<i style="font-style: italic;">`)
+            .replace(/<em>/g, `<em style="font-style: italic;">`);
+    };
     return (
         <div>
             <div class="container mx-auto   p-0 ">
@@ -23,15 +53,15 @@ function ViewTask({ data, status }) {
                             <p class="  ">
                                 {data?.taskName}
                             </p>
+
                         </div>
                         <div>
-                            <h2 class="text-lg font-medium  text-gray-900 dark:text-gray-700 mb-2">Task Description</h2>
+                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Task Description</h2>
                             <div
-                                className=" bg-gray-100 p-4 rounded"
+                                className="bg-gray-100 p-4 rounded"
+                                style={contentStyle}
                                 dangerouslySetInnerHTML={{ __html: data?.description }}
-
-                            ></div>
-
+                            />
                         </div>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">

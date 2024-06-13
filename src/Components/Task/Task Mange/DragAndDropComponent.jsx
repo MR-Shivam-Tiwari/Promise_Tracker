@@ -325,16 +325,26 @@ const Card = ({ id, text, status, card }) => {
     );
 };
 const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksCompleted, tasksInProgress }) => {
+
     const [sections, setSections] = useState({
         'Todo': tasksToDo,
         'In Progress': tasksInProgress,
         'Completed': tasksCompleted,
         'Postponed': tasksCancelled,
     });
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
     const [currentCard, setCurrentCard] = useState(null);
     const [remarks, setRemarks] = useState('');
     const [selectedDate, setSelectedDate] = useState(new Date());
+
+    const handleSubmit = () => {
+        if (!proofText) {
+            toast.error('Proof of Work (Text) is required');
+            return;
+        }
+        handleCompleteModalSubmit(); // Call the submit handler if validation passes
+    };
     useEffect(() => {
         setSections({
             'Todo': tasksToDo,
@@ -343,13 +353,14 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
             'Postponed': tasksCancelled,
         });
     }, [tasksToDo, tasksInProgress, tasksCompleted, tasksCancelled]);
-    const updateTaskStatus = async (id, status, remark) => {
+
+    const updateTaskStatus = async (id, status, body) => {
         const response = await fetch(`https://ptb.insideoutprojects.in/api/tasks/${id}/status`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ status, remark }), // Include remark as an object
+            body: JSON.stringify({ status, ...body }), // Include additional data in the body
         });
         toast.success("Task Status Updated");
         if (!response.ok) {
@@ -358,6 +369,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
 
         return response.json();
     };
+
     const moveCard = async (id, toSection) => {
         const newSections = { ...sections };
         const fromSection = Object.keys(newSections).find(section => newSections[section].find(card => card._id === id));
@@ -365,7 +377,12 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
             if (toSection === 'Postponed') {
                 const cardToMove = newSections[fromSection].find((card) => card._id === id);
                 setCurrentCard({ ...cardToMove, fromSection });
-                setIsModalOpen(true);
+                setIsCancelModalOpen(true);
+                return;
+            } else if (toSection === 'Completed') {
+                const cardToMove = newSections[fromSection].find((card) => card._id === id);
+                setCurrentCard({ ...cardToMove, fromSection });
+                setIsCompleteModalOpen(true);
                 return;
             }
             try {
@@ -381,6 +398,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
             }
         }
     };
+
     const handleCancelModalSubmit = async () => {
         if (!remarks || !selectedDate) {
             console.error('Remark text and date are required');
@@ -397,7 +415,6 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                     body: JSON.stringify({
                         remark: { text: remarks, date: selectedDate.toISOString().split('T')[0] },
                     }),
-
                 });
 
                 if (!response.ok) {
@@ -411,7 +428,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                 newSections[currentCard.fromSection] = newSections[currentCard.fromSection].filter((card) => card._id !== currentCard._id);
                 newSections['Postponed'] = [...newSections['Postponed'], { ...currentCard, status: 'Postponed' }];
                 setSections(newSections);
-                setIsModalOpen(false);
+                setIsCancelModalOpen(false);
                 setCurrentCard(null);
                 setRemarks('');
                 setSelectedDate(new Date());
@@ -421,17 +438,89 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
             }
         }
     };
+
     const handleCancelModalClose = () => {
-        setIsModalOpen(false);
+        setIsCancelModalOpen(false);
         setCurrentCard(null);
         setRemarks('');
         setSelectedDate(new Date()); // Reset selectedDate as a Date object
     };
+    const [proofText, setProofText] = useState('');
+    const [proofFile, setProofFile] = useState(null);
+
+    const handleCompleteModalSubmit = async () => {
+        if (!proofText) {
+            console.error('Proof text is required');
+            toast.error('Proof text is required');
+            return;
+        }
+
+        let fileBase64 = null;
+        if (proofFile) {
+            fileBase64 = await convertFileToBase64(proofFile);
+        }
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/tasks/${currentCard._id}/complete`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: proofText,
+                    file: fileBase64, // Sending base64 encoded file as a string
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update task status');
+            }
+
+            const updatedTask = await response.json(); // Updated task object from API response
+
+            // Update frontend state to reflect the completed task
+            const updatedSections = { ...sections };
+            updatedSections[currentCard.fromSection] = updatedSections[currentCard.fromSection].filter(card => card._id !== currentCard._id);
+            updatedSections['Completed'] = [...updatedSections['Completed'], { ...currentCard, status: 'Completed' }];
+            setSections(updatedSections);
+
+            toast.success('Task Status Updated');
+            handleCompleteModalClose();
+            setProofText('');
+            setProofFile(null);
+
+        } catch (error) {
+            console.error('Error updating task status:', error);
+            toast.error('Failed to update task status');
+        }
+    };
+
+    const convertFileToBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]); // Extract base64 string without data URL prefix
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
+        });
+    };
+
+
+
+
+
+
+
+    const handleCompleteModalClose = () => {
+        setIsCompleteModalOpen(false);
+        setCurrentCard(null);
+        setProofText('');
+        setProofFile(null);
+    };
+
     return (
         <DndProvider backend={HTML5Backend}>
             <div className="grid grid-cols-4 gap-6 h-full flex items-center justify-center" style={{ display: 'flex' }}>
                 {loading ? (
-
                     <div className='flex items-center justify-center'>
                         <img src={Load} alt="" style={{ width: "600px" }} />
                     </div>
@@ -440,11 +529,11 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                         <Section key={title} title={title} cards={cards} loading={loading} moveCard={moveCard} />
                     )))}
             </div>
-            {isModalOpen && (
+            {isCancelModalOpen && (
                 <Modal
                     aria-labelledby="modal-title"
                     aria-describedby="modal-desc"
-                    open={isModalOpen}
+                    open={isCancelModalOpen}
                     onClose={handleCancelModalClose}
                     sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                 >
@@ -475,14 +564,23 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                             textColor="inherit"
                             fontWeight="lg"
                             mb={1}
-                        >                         Reason to Cancel                       </Typography>
+                        >
+                            Reason to Cancel
+                        </Typography>
                         <div className="grid gap-4">
                             <div className="gap-2 grid">
                                 <label>Remarks</label>
-                                <input type="text" name="remarks" className='flex h-10 w-full bg-gray-300 text-black rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2' id="remarks" value={remarks} onChange={(e) => setRemarks(e.target.value)} />
+                                <input
+                                    type="text"
+                                    name="remarks"
+                                    className='flex h-10 w-full bg-gray-300 text-black rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                                    id="remarks"
+                                    value={remarks}
+                                    onChange={(e) => setRemarks(e.target.value)}
+                                />
                             </div>
                             <div className="gap-2 grid">
-                                <label>Select New Deadline  Date</label>
+                                <label>Select New Deadline Date</label>
                                 <input
                                     type="date"
                                     className='flex h-10 w-full bg-gray-300 text-black rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
@@ -491,7 +589,8 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                                     value={selectedDate.toISOString().split('T')[0]} // Convert date to string
                                     onChange={(e) => setSelectedDate(new Date(e.target.value))} // Set selectedDate as Date object
                                 />
-                            </div></div>
+                            </div>
+                        </div>
                         <div className="flex justify-end gap-2 mt-4">
                             <Button onClick={handleCancelModalClose} variant="plain">Cancel</Button>
                             <Button onClick={handleCancelModalSubmit}>Submit</Button>
@@ -499,6 +598,64 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                     </Sheet>
                 </Modal>
             )}
+            {isCompleteModalOpen && (
+                <Modal
+                    aria-labelledby="complete-modal-title"
+                    aria-describedby="complete-modal-desc"
+                    open={isCompleteModalOpen}
+                    onClose={handleCompleteModalClose}
+                    sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                >
+                    <Sheet
+                        variant="outlined"
+                        sx={{
+                            maxWidth: 1000,
+                            borderRadius: 'md',
+                            p: 3,
+                            boxShadow: 'lg',
+                            width: 400
+                        }}
+                    >
+                        <Typography
+                            component="h2"
+                            id="complete-modal-title"
+                            level="h4"
+                            textColor="inherit"
+                            fontWeight="lg"
+                            mb={1}
+                        >
+                            Complete Task
+                        </Typography>
+                        <div className="grid gap-4">
+                            <div className="gap-2 grid">
+                                <label>Proof of Work (Text)</label>
+                                <textarea
+                                    name="proofText"
+                                    className='flex h-20 w-full bg-gray-300 text-black rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                                    id="proofText"
+                                    value={proofText}
+                                    onChange={(e) => setProofText(e.target.value)}
+                                />
+                            </div>
+                            <div className="gap-2 grid">
+                                <label>Proof of Work (File)</label>
+                                <input
+                                    type="file"
+                                    name="proofFile"
+                                    className='flex h-10 w-full bg-gray-300 text-black rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                                    id="proofFile"
+                                    onChange={(e) => setProofFile(e.target.files[0])}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex justify-end gap-2 mt-4">
+                            <Button onClick={handleCompleteModalClose} variant="plain">Cancel</Button>
+                            <Button onClick={handleCompleteModalSubmit} disabled={!proofText}>Submit</Button> {/* Disable if proofText is empty */}
+                        </div>
+                    </Sheet>
+                </Modal>
+            )}
+
         </DndProvider>
     );
 };

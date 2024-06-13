@@ -1,15 +1,23 @@
 import axios from 'axios';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
 
 
 function EditApprovals({ taskId, task, onClose }) {
     const [status, setStatus] = useState('');
-    // const [toast, setToast] = useState('');
-    console.log("Task ID :", taskId);
     const [remark, setRemark] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    // Function to convert base64 to Blob
+    const base64ToBlob = (base64String, contentType) => {
+        const byteCharacters = atob(base64String);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        return new Blob([byteArray], { type: contentType });
+    };
     const handleApprove = async () => {
         setIsLoading(true);
         try {
@@ -69,6 +77,26 @@ function EditApprovals({ taskId, task, onClose }) {
             setIsLoading(false);
         }
     };
+    console.log("task", task)
+    // Function to handle image download
+
+
+    const handleDownloadImage = () => {
+        // Assuming task.pow.file contains the base64 encoded image data
+        const contentType = 'image/png'; // Adjust accordingly if your image type is different
+        const blob = base64ToBlob(task.pow.file, contentType);
+        const url = URL.createObjectURL(blob);
+
+        // Create a temporary link element to trigger the download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'image.png'; // File name as you want it to appear when downloaded
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <div>
             <div>
@@ -96,6 +124,41 @@ function EditApprovals({ taskId, task, onClose }) {
                             <div>
                                 <h4 class="text-sm font-medium">End Date</h4>
                                 <p class="text-gray-500 dark:text-gray-400">{task?.endDate}</p>
+                            </div>
+                        </div>
+                        <div className='' >
+
+                            <h4 className='text-md font-bold  px-2 '>Proof Of work</h4>
+                            <div className='grid grid-cols-2 gap-4'>
+                                <div>
+                                    <h6 className='text-sm font-medium mb-2'>Text</h6>
+                                    <div className='border rounded bg-gray-300 p-2'>
+                                        {task?.pow?.text || 'No text provided'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <h6 className='text-sm font-medium mb-2'>Screenshot</h6>
+                                    <div className='flex items-end justify-between'>
+
+                                        {task?.pow?.file && (
+                                            <div className="mt-4">
+                                                <img
+                                                    src={`data:image/png;base64,${task.pow.file}`}
+                                                    alt="Preview"
+                                                    className="max-w-full h-[200px] rounded-lg"
+                                                />
+                                            </div>
+                                        )}
+                                        <button
+                                            className="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-blue-500 text-white hover:bg-blue-600"
+                                            onClick={handleDownloadImage}
+                                            disabled={isLoading || !task?.pow?.file}
+                                        >
+                                            Download
+                                        </button>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                         <div>
@@ -127,7 +190,7 @@ function EditApprovals({ taskId, task, onClose }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 

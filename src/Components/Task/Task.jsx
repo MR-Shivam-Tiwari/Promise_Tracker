@@ -6,6 +6,7 @@ import Option from '@mui/joy/Option';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@mui/joy';
 import schedule from 'node-schedule';
+import { toast } from 'react-toastify';
 
 function Task() {
     const [tasks, setTasks] = useState([]);
@@ -23,35 +24,6 @@ function Task() {
     const location = useLocation();
 
 
-    useEffect(() => {
-        // Schedule the task to run every day at 6 AM
-        const job = schedule.scheduleJob('0 6 * * *', async () => {
-            console.log("Running archiveOldTasks function at 6 AM");
-
-            try {
-                const response = await fetch('https://ptb.insideoutprojects.in/api/archiveOldTasks', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-
-                const data = await response.json();
-                console.log('Tasks archived successfully:', data);
-                alert(`Archived ${data.updatedTasks.length} tasks`);
-            } catch (error) {
-                console.error('Error archiving tasks:', error);
-                alert('Failed to archive tasks');
-            }
-        });
-
-        // No cleanup function to cancel the job
-
-    }, []);
 
     useEffect(() => {
         // Retrieve userData from localStorage
@@ -65,8 +37,9 @@ function Task() {
     }, []);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchDataAndArchiveOldTasks = async () => {
             try {
+                // Fetch data
                 const response = await axios.get('https://ptb.insideoutprojects.in/api/tasks');
                 console.log('Response data:', response.data);
 
@@ -101,6 +74,28 @@ function Task() {
                 setTaskGroups(uniqueTaskGroups);
 
                 setLoading(false);
+
+                // Archive old tasks
+                try {
+                    const archiveResponse = await fetch('https://ptb.insideoutprojects.in/api/archiveOldTasks', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    if (!archiveResponse.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+
+                    const archiveData = await archiveResponse.json();
+                    console.log('Tasks archived successfully:', archiveData);
+                    // toast.success(`Archived ${archiveData.updatedTasks.length} tasks`);
+                } catch (archiveError) {
+                    console.error('Error archiving tasks:', archiveError);
+                    alert('Failed to archive tasks');
+                }
+
             } catch (error) {
                 console.error('Error fetching tasks:', error);
                 setLoading(false);
@@ -108,7 +103,9 @@ function Task() {
         };
 
         // Fetch data only when the component mounts or when userid changes
-        fetchData();
+        if (userid) {
+            fetchDataAndArchiveOldTasks();
+        }
     }, [userid]);
 
     useEffect(() => {
@@ -142,12 +139,13 @@ function Task() {
 
 
 
-    
+
     return (
         <div>
             <div className="flex flex-col h-full bg-white rounded text-black ">
                 <div className='flex items-center justify-between px-2'>
-                    <div className='font-bold'>
+                    <div className='font-bold flex gap-3'>
+                        <Button onClick={() => navigate('/archive-task')} variant='outlined' className='font-bold text-black bh-white border-gray-400 border-2'>Add Task</Button>
                         <Button onClick={() => navigate('/archive-task')} variant='outlined' className='font-bold text-black bh-white border-gray-400 border-2'>Archive Tasks</Button>
 
                     </div>
