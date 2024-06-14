@@ -220,8 +220,8 @@ function AppRoutes() {
                         <div className='grid col border rounded-lg p-2 gap-3'>
                             <div className="flex  lg:flex-row items-center lg:items-end  justify-between">
 
-                                <div className="flex gap-2  items-center">
-                                    <Button
+                                <div className="flex gap-2 mb-[5px] ml-[5px]  items-center">
+                                    {/* <Button
                                         variant="outlined"
                                         color="neutral"
                                         className='text-xs'
@@ -239,31 +239,35 @@ function AppRoutes() {
                                                 
                                             </form>
                                         </ModalDialog>
-                                    </Modal>
-                                    <ColorSchemeToggle />
+                                    </Modal> */}
+                                    {/* <ColorSchemeToggle /> */}
                                 </div>
-                                <div className="cursor-pointer  border gap-2 px-2 rounded-lg shadow-sm bg-gray-100  " style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                                    <div onClick={() => navigate("/profile")} >
+                                <div className="cursor-pointer  gap-2 px-2 rounded-lg   " style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                    <div className="cursor-pointer  border gap-2 px-2 rounded-lg shadow-sm bg-gray-100  " style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                        <div onClick={() => navigate("/profile")} >
 
-                                        <Avatar
-                                            variant="outlined"
-                                            size="sm"
-                                            src={profilePic}
-                                        />
-                                    </div>
-                                    <div onClick={() => navigate("/profile")}>
+                                            <Avatar
+                                                variant="outlined"
+                                                size="sm"
+                                                src={profilePic}
+                                            />
+                                        </div>
+                                        <div onClick={() => navigate("/profile")}>
 
-                                        <Box className='' sx={{ minWidth: 0, color: "" }}>
-                                            <Typography className="text-gray-700" level="body-sm">Hello!</Typography>
-                                            <Typography className='text-black' level="title-sm" >{userData?.name}</Typography>
+                                            <Box className='' sx={{ minWidth: 0, color: "" }}>
+                                                <Typography className="text-gray-700" level="body-sm">Hello!</Typography>
+                                                <Typography className='text-black' level="title-sm" >{userData?.name}</Typography>
 
-                                        </Box>
+                                            </Box>
+                                        </div>
+
+
                                     </div>
                                     <div>
 
-                                        <div>
-                                            <IconButton size="sm" variant="plain" color="neutral" onClick={handleOpen}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="black" className="bi bi-bell-fill" viewBox="0 0 16 16">
+                                        <div className="cursor-pointer  border gap-2  rounded-lg shadow-sm bg-gray-100  ">
+                                            <IconButton size="sm" variant="plain" className='p-2' color="neutral" onClick={handleOpen}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="black" className="bi bi-bell-fill" viewBox="0 0 16 16">
                                                     <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901" />
                                                 </svg>
                                                 <div>
