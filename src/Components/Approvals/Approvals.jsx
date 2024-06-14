@@ -13,7 +13,7 @@ function Approvals() {
     const [loading, setLoading] = useState(true);
     const fetchData = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/tasks');
+            const response = await axios.get('https://ptb.insideoutprojects.in/api/tasks');
             setTasks(response.data);
             setLoading(false);
         } catch (error) {
@@ -22,7 +22,7 @@ function Approvals() {
         }
     };
 
-    console.log("6669423368af8aedd6ff220e", tasks )
+    console.log("6669423368af8aedd6ff220e", tasks)
     useEffect(() => {
         fetchData();
     }, []);
@@ -116,7 +116,7 @@ function Approvals() {
                                                 {task?.people.map(person => person.name).join(', ')}
                                             </td>
                                             <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
-                                                {task?.taskGroup.groupName}
+                                                {/* {task?.taskGroup.groupName} */}
                                             </td>
                                             <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
                                                 {task?.reminder}
@@ -318,7 +318,7 @@ function Approvals() {
                                                 Archive
                                             </div>
                                         )}
-                                        
+
                                     </td>
                                     {/* <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 text-right">
                                         <IconButton onClick={() => handleEditClick(task)} aria-label="Edit">
@@ -374,7 +374,7 @@ function Approvals() {
             {selectedStatus !== 'Archive Task' && selectedStatus !== 'New Task Approval' && renderTable()}
         </div>
     );
-    
+
 }
 
 export default Approvals;

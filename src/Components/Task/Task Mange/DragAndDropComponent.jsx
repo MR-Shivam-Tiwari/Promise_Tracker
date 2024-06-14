@@ -461,7 +461,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
         }
 
         try {
-            const response = await fetch(`http://localhost:5000/api/tasks/${currentCard._id}/complete`, {
+            const response = await fetch(`https://ptb.insideoutprojects.in/api/tasks/${currentCard._id}/complete`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
