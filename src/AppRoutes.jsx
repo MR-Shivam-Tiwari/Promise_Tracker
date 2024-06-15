@@ -24,6 +24,7 @@ import { toast } from 'react-toastify';
 import Role from './Components/Role/Role';
 import Notification from './Components/Notification/Notification';
 import Archive from './Components/ArchivedTasks/Archive';
+import UnApprovedTask from './Components/Task/UnApprovedTask';
 
 function AppRoutes() {
     const [currentRouteName, setCurrentRouteName] = useState('');
@@ -342,6 +343,7 @@ function AppRoutes() {
                                 <Route path="/reports" element={<Reports />} />
                                 <Route path="/roles" element={<Role />} />
                                 <Route path="/archive-task" element={<Archive />} />
+                                <Route path="/unapproved-task" element={<UnApprovedTask />} />
                             </Routes>
                         </div>
 

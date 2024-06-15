@@ -105,6 +105,28 @@ function MainHome() {
     const [selectedGroup, setSelectedGroup] = useState(null); // State to store selected group data
     const [editedgroup, setEditedgroup] = useState(null); // State to store selected group data
 
+    const calculateCompletionPercentage = () => {
+        if (taskData.length === 0) return 0;
+
+        const completedTasks = taskData.filter(task => task.status === 'Completed');
+        const completionPercentage = (completedTasks.length / taskData.length) * 100;
+
+        return completionPercentage;
+    };
+
+    // Function to get the appropriate message based on the completion percentage
+    const getCompletionMessage = (percentage) => {
+        if (percentage === 100) return "All tasks done! Great job!";
+        if (percentage >= 76) return "Almost there! Just a few more tasks.";
+        if (percentage >= 51) return "Over halfway! Keep going!";
+        if (percentage >= 26) return "Good progress! Keep it up.";
+        if (percentage >= 11) return "Nice start! You're getting there.";
+        return "Let's get started!";
+    };
+
+    const completionPercentage = calculateCompletionPercentage();
+    const completionMessage = getCompletionMessage(completionPercentage);
+
     const handleCloseModal = () => {
         setOpenModal(false);
         setSelectedGroup(null); // Reset selected group data when modal is closed
@@ -207,30 +229,39 @@ function MainHome() {
             fetchpinnedGroup();
         }
     }, [userid]); // useEffect dependency on userid
+    useEffect(() => {
+        const fetchGroupData = async () => {
+            try {
+                const response = await axios.get(`https://ptb.insideoutprojects.in/api/groups`);
+
+                // Filter groups based on userId mismatch in pinnedBy array
+                const filteredGroups = response.data.filter(group => {
+                    // Check if userid does not exist in any pinnedBy userId
+                    return group.pinnedBy.every(pinned => pinned.userId !== userid);
+                });
+
+                // Update state with filtered groups
+                setGroupData(filteredGroups);
+
+            } catch (error) {
+                console.log("Error fetching Group Data: ", error);
+            }
+        };
+
+        // Check if userid is truthy before calling fetchGroupData
+        if (userid) {
+            fetchGroupData();
+        }
+    }, [userid]);
+
+
+
 
     // Log pinnedGroup to check its value
     console.log("pinnedGroup", pinnedGroup);
 
 
-    const calculateCompletionPercentage = () => {
-        if (taskData.length === 0) return 0;
 
-        const completedTasks = taskData.filter(task => task.status === 'Completed');
-        const completionPercentage = (completedTasks.length / taskData.length) * 100;
-
-        return completionPercentage;
-    };
-
-    const completionPercentage = calculateCompletionPercentage();
-
-    const fetchGroupData = async () => {
-        try {
-            const response = await axios.get(`https://ptb.insideoutprojects.in/api/groups`);
-            setGroupData(response.data);
-        } catch (error) {
-            console.log("Error fetching Group Data: ", error);
-        }
-    };
 
 
     const fetchUserData = async () => {
@@ -255,11 +286,7 @@ function MainHome() {
     const dpthead = currentUser && (currentUser.userRole === 0);
     const prjtlead = currentUser && (currentUser.userRole === 0 || currentUser.userRole === 1);
 
-    useEffect(() => {
-        if (userid) {
-            fetchGroupData();
-        }
-    }, [userid]);
+
 
 
 
@@ -340,23 +367,24 @@ function MainHome() {
                 <main className="flex-1 p-2 md:p-8 grid gap-4 md:gap-4">
                     <div className=" gap-4 md:gap-4">
                         <div className="rounded-lg border bg-card    shadow-sm" style={{ background: "#0A91D0" }} >
-                            <div className="flex gap-9 items-center justify-between lg:justify-center  p-8">
-                                <div className="">
-                                    <div className='flex items-center justify-center'>
-
+                            <div className="flex gap-9 items-center justify-between lg:justify-center p-8">
+                                <div>
+                                    <div className="flex items-center justify-center">
                                         <h3 className="text-1xl lg:text-5xl font-semibold text-white text-center lg:text-start">
-                                            Your today’s task is almost done!
+                                            {completionMessage}
                                         </h3>
-
                                     </div>
-                                    <div className='flex items-center lg:m-3  justify-center'>
-
-                                        <button onClick={() => navigate("/task")} className=" mt-5 w-full lg:w-[50%] h-full lg:h-14   text-black lg:text-lg   rounded-md text-sm font-medium  px-2 py-2" style={{ background: "#EA791D" }}>
+                                    <div className="flex items-center lg:m-3 justify-center">
+                                        <button
+                                            onClick={() => navigate("/task")}
+                                            className="mt-5 w-full lg:w-[50%] h-full lg:h-14 text-black lg:text-lg rounded-md text-sm font-medium px-2 py-2"
+                                            style={{ background: "#EA791D" }}
+                                        >
                                             View tasks
                                         </button>
                                     </div>
                                 </div>
-                                <div className='flex items-center  justify-center p-3'>
+                                <div className="flex items-center justify-center p-3">
                                     <CircularProgress
                                         thickness={isSmallScreen ? 10 : 24}
                                         className="bg-gray-700"
@@ -702,7 +730,7 @@ function MainHome() {
                                         ))}  </div>
                                     <div className='flex itmes-start'>
 
-                                        <h3 className='border px-2 mb-2 rounded-[5px] font-bold text-black bg-gray-400 text-sm '>All Groups</h3>
+                                        <h3 className='border px-2 mb-2 rounded-[5px] font-bold text-black bg-gray-400 text-sm '>Groups</h3>
                                     </div>
                                     {Array.isArray(groupData) && groupData.map((task, index) => (
 

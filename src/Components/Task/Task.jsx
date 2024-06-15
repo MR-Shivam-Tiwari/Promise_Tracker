@@ -137,7 +137,7 @@ function Task() {
             setDepartmentHeads(filteredDepartmentHeads);
             const filteredProjectlead = response.data.filter(user => user.userRole === 2);
             setProjectLead(filteredProjectlead);
-            const filterMember = response.data.filter(user => user.userRole === 3);
+            const filterMember = response.data.filter(user => user.userRole === 3 || user.userRole === 2 || user.userRole === 1);
             setMembers(filterMember);
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -218,7 +218,8 @@ function Task() {
                         <Button onClick={toggleModal} startDecorator={<Add />} variant='outlined' className='font-bold bg-blue-400 text-black  border-blue-400 border-2'>Add Tasks</Button>
                     </div>
                     <div className='flex items-center gap-3 text-lg font-bold'>
-                        <Button onClick={() => navigate('/archive-task')} variant='outlined' className='font-bold text-black bh-white border-gray-400 border-2'> Archive Task</Button>
+                        <Button onClick={() => navigate('/unapproved-task')} variant='outlined' className='font-bold bg-yellow-400 text-black bh-white border-yellow-400 border-2'> Unapproved Task</Button>
+                        <Button onClick={() => navigate('/archive-task')} variant='outlined' className='font-bold bg-red-400 text-black bh-white border-red-400 border-2'> Archive Task</Button>
 
                         <p>Filter By Groups</p>
                         {taskGroups.length > 0 && (

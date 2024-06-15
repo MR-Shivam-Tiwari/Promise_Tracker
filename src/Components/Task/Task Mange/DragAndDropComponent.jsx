@@ -565,7 +565,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                             fontWeight="lg"
                             mb={1}
                         >
-                            Reason to Cancel
+                            Reason to Postponed
                         </Typography>
                         <div className="grid gap-4">
                             <div className="gap-2 grid">
