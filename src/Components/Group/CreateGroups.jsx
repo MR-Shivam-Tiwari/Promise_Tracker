@@ -107,7 +107,7 @@ function CreateGroups() {
                 setError("Internal Server Error");
                 setLoading(false);
             }
-        };
+        }; 
 
         fetchRegisteredNames();
     }, []);
@@ -118,7 +118,7 @@ function CreateGroups() {
         <div>
             <form className="space-y-6" onSubmit={handleSubmit}>
                 <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white" htmlFor="profile-pic">
+                    <label className="mb-2 block text-sm font-medium text-gray-900 " htmlFor="profile-pic">
                         Profile Pic
                     </label>
                     <input
@@ -129,12 +129,12 @@ function CreateGroups() {
                     />
                 </div>
                 <div>
-                    <label htmlFor="group-name" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                    <label htmlFor="group-name" className="mb-2 block text-sm font-medium text-gray-900 ">
                         Group Name
                     </label>
                     <input
                         id="group-name"
-                        className="block w-full rounded-lg border border-gray-300 bg-white p-2.5 text-gray-900 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                        className="block w-full rounded-lg border border-gray-300 bg-white p-2.5 text-gray-900 "
                         placeholder="Enter group name"
                         required
                         type="text"
@@ -144,7 +144,7 @@ function CreateGroups() {
                     />
                 </div>
                 <div>
-                    <label htmlFor="department-head" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                    <label htmlFor="department-head" className="mb-2 block text-sm font-medium text-gray-900 ">
                         Department Head
                     </label>
                     <Autocomplete
@@ -157,7 +157,7 @@ function CreateGroups() {
                     />
                 </div>
                 <div>
-                    <label htmlFor="project-lead" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                    <label htmlFor="project-lead" className="mb-2 block text-sm font-medium text-gray-900 ">
                         Project Lead
                     </label>
                     <Autocomplete
@@ -170,7 +170,7 @@ function CreateGroups() {
                     />
                 </div>
                 <div>
-                    <label htmlFor="members" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                    <label htmlFor="members" className="mb-2 block text-sm font-medium text-gray-900 ">
                         Members
                     </label>
                     <Autocomplete

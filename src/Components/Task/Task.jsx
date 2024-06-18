@@ -234,7 +234,7 @@ function Task() {
                         )}
                     </div>
                     {modal && (
-                        <div>
+                        <div> 
                             <div
                                 id="default-modal"
                                 tabIndex="-1"
@@ -242,11 +242,11 @@ function Task() {
                                 className="fixed inset-0 flex items-center justify-center z-50 w-full p-4 overflow-x-hidden overflow-y-auto max-h-full"
                             >
                                 <div className="relative w-full max-w-4xl max-h-full">
-                                    <div className="relative bg-white rounded-lg shadow dark:bg-white-700">
+                                    <div className="relative bg-white rounded-lg shadow ">
                                         <button
                                             type="button"
                                             onClick={toggleModal}
-                                            className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
+                                            className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center  "
                                             data-modal-hide="default-modal"
                                         >
                                             <svg

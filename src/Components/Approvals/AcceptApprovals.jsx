@@ -39,15 +39,15 @@ function AcceptApprovals({ taskId, task, onClose }) {
                 </div>
                 <div class="space-y-6 px-6 py-2 text-gray-800">
                     <div class="grid grid-cols-2 gap-4">
-                        <div>
+                        <div> 
                             <h4 class="text-sm font-medium">Task Member</h4>
-                            <p class="text-gray-500 dark:text-gray-400">{task?.people.map(person => person?.name).join(', ')}</p>
+                            <p class="text-gray-500 ">{task?.people.map(person => person?.name).join(', ')}</p>
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <h4 className="text-sm font-medium">Remark</h4>
-                            <p className="text-gray-500 dark:text-gray-400">
+                            <p className="text-gray-500 ">
                                 {task.remark && task.remark.length > 0 ? task.remark[0].text : 'No remarks available'}
                             </p>
                         </div>
@@ -55,7 +55,7 @@ function AcceptApprovals({ taskId, task, onClose }) {
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <h4 className="text-sm font-medium">New Date</h4>
-                            <p className="text-gray-500 dark:text-gray-400">
+                            <p className="text-gray-500 ">
                                 {task.remark && task.remark.length > 0 ? task.remark[0].date : 'No date available'}
                             </p>
                         </div>

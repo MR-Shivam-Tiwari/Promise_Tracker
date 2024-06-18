@@ -120,20 +120,20 @@ function Approvals() {
                                             </td>
                                             <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
                                                 {task?.reminder}
-                                            </td>
+                                            </td> 
                                             <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0">
                                                 {task.category === 'Approved' && (
-                                                    <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-100 text-green-900 dark:bg-green-900/20 dark:text-green-400">
+                                                    <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-100 text-green-900  ">
                                                         Approved
                                                     </div>
                                                 )}
                                                 {task.category === 'Unapproved' && (
-                                                    <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-red-100 text-red-900 dark:bg-red-900/20 dark:text-red-400">
+                                                    <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-red-100 text-red-900 ">
                                                         Unapproved
                                                     </div>
                                                 )}
                                                 {!task.category && (
-                                                    <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-gray-100 text-gray-900 dark:bg-gray-900/20 dark:text-gray-400">
+                                                    <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-gray-100 text-gray-900 ">
                                                         Not Updated
                                                     </div>
                                                 )}
@@ -231,12 +231,12 @@ function Approvals() {
                                     <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0">
 
                                         {task.status === 'Cancelled' && (
-                                            <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-red-100 text-red-900 dark:bg-red-900/20 dark:text-red-400">
+                                            <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-red-100 text-red-90 ">
                                                 Unapproved
                                             </div>
                                         )}
                                         {!task.status && (
-                                            <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-gray-100 text-gray-900 dark:bg-gray-900/20 dark:text-gray-400">
+                                            <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-gray-100 text-gray-900  ">
                                                 Not Updated
                                             </div>
                                         )}

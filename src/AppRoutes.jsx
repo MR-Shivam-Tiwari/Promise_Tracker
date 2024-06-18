@@ -15,12 +15,9 @@ import Approvals from './Components/Approvals/Approvals';
 import Task from './Components/Task/Task';
 import MainHome from './Components/Home/MainHome';
 import { Avatar, Button, IconButton, Modal, ModalClose, ModalDialog } from '@mui/joy';
-import Add from '@mui/icons-material/Add';
-import ColorSchemeToggle from './Components/ColorToggle/ColorSchemeToggle';
-import AddTask from './Components/Task/AddTask';
+
 import axios from 'axios';
 import Reports from './Components/Reports/Reports';
-import { toast } from 'react-toastify';
 import Role from './Components/Role/Role';
 import Notification from './Components/Notification/Notification';
 import Archive from './Components/ArchivedTasks/Archive';

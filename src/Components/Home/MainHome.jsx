@@ -505,9 +505,9 @@ function MainHome() {
                                 )}
                             </div>
                             <Modal className="mt-14" open={open} onClose={() => setOpen(false)}>
-                                <ModalDialog className=" px-5 max-w-md rounded-lg bg-white shadow-lg dark:bg-gray-900" minWidth={500} style={{ height: "580px", overflow: "auto" }} >
+                                <ModalDialog className=" px-5 max-w-md rounded-lg bg-white shadow-lg " minWidth={500} style={{ height: "580px", overflow: "auto" }} >
 
-                                    <div onSubmit={() => setOpen(false)}>
+                                    <div onSubmit={() => setOpen(false)}> 
 
 
                                         <ModalClose />

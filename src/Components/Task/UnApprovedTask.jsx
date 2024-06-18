@@ -41,7 +41,7 @@ function UnApprovedTask() {
             const userId = userDataObj.userId;
             setUserid(userId);
         }
-    }, []);
+    }, []); 
 
     console.log("TaskUnapproved", tasks);
     const toggleModal = () => {
@@ -101,17 +101,17 @@ function UnApprovedTask() {
                                         </td>
                                         <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0">
                                             {task.category === 'Approved' && (
-                                                <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-100 text-green-900 dark:bg-green-900/20 dark:text-green-400">
+                                                <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-100 text-green-900 ">
                                                     Approved
                                                 </div>
                                             )}
                                             {task.category === 'Unapproved' && (
-                                                <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-red-100 text-red-900 dark:bg-red-900/20 dark:text-red-400">
+                                                <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-red-100 text-red-900 ">
                                                     Unapproved
                                                 </div>
                                             )}
                                             {!task.category && (
-                                                <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-gray-100 text-gray-900 dark:bg-gray-900/20 dark:text-gray-400">
+                                                <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-gray-100 text-gray-900 ">
                                                     Not Updated
                                                 </div>
                                             )}
@@ -139,11 +139,11 @@ function UnApprovedTask() {
                         className="fixed inset-0 flex items-center justify-center z-50 w-full p-4 overflow-x-hidden overflow-y-auto max-h-full"
                     >
                         <div className="relative w-full max-w-2xl max-h-full">
-                            <div className="relative bg-white rounded-lg shadow dark:bg-white-700">
+                            <div className="relative bg-white rounded-lg shadow ">
                                 <button
                                     type="button"
                                     onClick={toggleModal}
-                                    className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
+                                    className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center "
                                     data-modal-hide="default-modal"
                                 >
                                     <svg

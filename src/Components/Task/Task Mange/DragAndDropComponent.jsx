@@ -218,7 +218,7 @@ const Card = ({ id, text, status, card }) => {
                                 </svg>
                             </MenuButton>
 
-                            <Menu className=''>
+                            <Menu className=''> 
 
                                 <MenuItem onClick={() => setOpen(true)}>View</MenuItem>
                                 <MenuItem onClick={archiveTask} >Archive</MenuItem>

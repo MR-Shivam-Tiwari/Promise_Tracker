@@ -29,7 +29,7 @@ function ViewTask({ data, status }) {
     };
 
     const italicStyle = {
-        fontStyle: 'italic',
+        fontStyle: 'italic', 
     };
     const setInlineStyles = (html) => {
         return html.replace(/<p>/g, `<p style="margin: 0 0 1em;">`)
@@ -44,19 +44,19 @@ function ViewTask({ data, status }) {
             <div class="container mx-auto   p-0 ">
                 <div class=" rounded-lg  p-2 py-6 lg:px-8">
                     <div class="flex items-center justify-between mb-6">
-                        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-700">{data?.taskGroup.groupName}</h1>
+                        <h1 class="text-2xl font-bold text-gray-900 ">{data?.taskGroup.groupName}</h1>
 
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Task Name</h2>
+                            <h2 class="text-lg font-medium text-gray-900  mb-2">Task Name</h2>
                             <p class="  ">
                                 {data?.taskName}
                             </p>
 
                         </div>
                         <div>
-                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Task Description</h2>
+                            <h2 className="text-lg font-medium text-gray-900  mb-2">Task Description</h2>
                             <div
                                 className="bg-gray-100 p-4 rounded"
                                 style={contentStyle}
@@ -66,7 +66,7 @@ function ViewTask({ data, status }) {
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Audio Player</h2>
+                            <h2 className="text-lg font-medium text-gray-900  mb-2">Audio Player</h2>
                             <audio controls>
                                 <source src={data?.audioFile} type="audio/mp4" />
                                 Your browser does not support the audio element.
@@ -75,7 +75,7 @@ function ViewTask({ data, status }) {
 
 
                         <div>
-                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">PDF Viewer</h2>
+                            <h2 className="text-lg font-medium text-gray-900  mb-2">PDF Viewer</h2>
                             {data && data.pdfFile && (
                                 <a
                                     href={data.pdfFile}
@@ -95,14 +95,14 @@ function ViewTask({ data, status }) {
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Assigned By</h2>
+                            <h2 className="text-lg font-medium text-gray-900  mb-2">Assigned By</h2>
                             <p className="text-gray-700 mb-2 gap-2 flex  ">
                                 <p class="font-bold  bg-yellow-500 px-2 rounded-sm text-black"> {data?.owner?.name}</p>
                             </p>
 
                         </div>
                         <div>
-                            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Assigned To</h2>
+                            <h2 class="text-lg font-medium text-gray-900  mb-2">Assigned To</h2>
                             <div className='flex '>
 
                                 <p class="font-bold  bg-green-500 text-black  px-2 rounded-sm"> {data?.people.map(person => person.name).join(', ')}</p>
@@ -112,35 +112,35 @@ function ViewTask({ data, status }) {
 
                     </div>
                     {/* <div class="mb-6">
-                        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Comments</h2>
+                        <h2 class="text-lg font-medium text-gray-900  mb-2">Comments</h2>
                         <div class="bg-gray-100  rounded-lg p-4">
                             <textarea
-                                class="w-full bg-transparent text-gray-700 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-gray-400"
+                                class="w-full bg-transparent text-gray-700  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 "
                                 rows="3"
                                 placeholder="Add a comment..."
                             ></textarea>
                             <div class="flex justify-end mt-2">
-                                <button class="px-4 py-2 rounded-md text-sm font-medium text-white  bg-black-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-gray-400">
+                                <button class="px-4 py-2 rounded-md text-sm font-medium text-white  bg-black-200  hover:bg-gray-300  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 ">
                                     Add Comment
                                 </button>
                             </div>
                         </div>
                     </div>
                     <div class="bg-gray-100  rounded-lg p-6 mb-6">
-                        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-700 mb-4">Comment History</h2>
+                        <h2 class="text-lg font-medium text-gray-900  mb-4">Comment History</h2>
                         <div class="space-y-4">
                             <div class="flex items-start space-x-4">
                                 <div class="flex-shrink-0">
                                     <Avatar src="/placeholder.svg" alt="User Avatar" class="w-10 h-10 rounded-full" />
                                 </div>
                                 <div class="flex-1">
-                                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-700">John Doe</h3>
-                                    <p class="text-gray-700 dark:text-gray-400">
+                                    <h3 class="text-lg font-medium text-gray-900 ">John Doe</h3>
+                                    <p class="text-gray-700 ">
                                         Great work on the website redesign! I love the new layout and color scheme.
                                     </p>
                                     <div class="flex items-center space-x-2 mt-2">
-                                        <span class="text-xs text-gray-500 dark:text-gray-400">2 days ago</span>
-                                        <button class="px-2 py-1 rounded-md text-xs font-medium text-white  bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-gray-400">
+                                        <span class="text-xs text-gray-500 ">2 days ago</span>
+                                        <button class="px-2 py-1 rounded-md text-xs font-medium text-white  bg-gray-200  hover:bg-gray-300  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 ">
                                             Reply
                                         </button>
                                     </div>
@@ -151,13 +151,13 @@ function ViewTask({ data, status }) {
                                     <Avatar src="/placeholder.svg" alt="User Avatar" class="w-10 h-10 rounded-full" />
                                 </div>
                                 <div class="flex-1">
-                                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-700">Jane Smith</h3>
-                                    <p class="text-gray-700 dark:text-gray-400">
+                                    <h3 class="text-lg font-medium text-gray-900 ">Jane Smith</h3>
+                                    <p class="text-gray-700 ">
                                         I have a few suggestions for the homepage layout. Can we schedule a meeting to discuss?
                                     </p>
                                     <div class="flex items-center space-x-2 mt-2">
-                                        <span class="text-xs text-gray-500 dark:text-gray-400">1 week ago</span>
-                                        <button class="px-2 py-1 rounded-md text-xs font-medium text-white  bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-gray-400">
+                                        <span class="text-xs text-gray-500 ">1 week ago</span>
+                                        <button class="px-2 py-1 rounded-md text-xs font-medium text-white  bg-gray-200  hover:bg-gray-300  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 ">
                                             Reply
                                         </button>
                                     </div>
@@ -167,7 +167,7 @@ function ViewTask({ data, status }) {
                     </div> */}
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Reminder</h2>
+                            <h2 class="text-lg font-medium text-gray-900  mb-2">Reminder</h2>
                             <div class="flex items-center space-x-2">
                                 <div className="flex items-center gap-2">
                                     <span className="text-black-900 flex text-black items-center gap-2 "><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-alarm" viewBox="0 0 16 16">
@@ -178,7 +178,7 @@ function ViewTask({ data, status }) {
 
                             </div>
                         </div><div>
-                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-700 mb-2">Dates</h2>
+                            <h2 className="text-lg font-medium text-gray-900  mb-2">Dates</h2>
                             <p className="text-gray-700 mb-2 gap-2 flex  ">
                                 Start:<p className='border px-2 font-bold  rounded bg-gray-200'>
                                     {data?.startDate ? formatDate(data.startDate) : 'N/A'}
