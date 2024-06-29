@@ -74,7 +74,7 @@ function Role() {
             <div className="container text-black mx-auto">
                 <div className='flex items-center justify-between'>
                     <div>
-                        <h1 className="text-2xl font-bold mb-6 text-gray-900">User Roles</h1>
+                        <h1 className="text-[20px] font-bold mb-6 text-gray-900">User Roles</h1>
                     </div>
                     <div> 
                         <div className="max-w-md flex gap-3 mx-auto">

@@ -308,6 +308,7 @@ function AppRoutes() {
                                         color="neutral"
                                         href="#some-link"
                                         aria-label="Home"
+                                        fontSize={17}
                                     >
                                         <HomeRoundedIcon />
                                     </Link>
@@ -320,12 +321,12 @@ function AppRoutes() {
                                     >
                                         Dashboard
                                     </Link> */}
-                                    <Typography color="primary" fontWeight={500} fontSize={12}>
+                                    <Typography color="primary" fontWeight={500} fontSize={17}>
                                         {currentRouteName}
                                     </Typography>
                                 </Breadcrumbs>
                             </Box>
-                            <Typography level="h2" component="h1">
+                            <Typography level="h2" component="h1" fontSize={20}>
                                 {currentRouteName}
                             </Typography>
 

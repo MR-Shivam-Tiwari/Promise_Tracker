@@ -356,7 +356,7 @@ function MainHome() {
 
         }
     };
-
+    const progressColor = "warning"; 
 
     return (
         <div>
@@ -387,7 +387,8 @@ function MainHome() {
                                 <div className="flex items-center justify-center p-3">
                                     <CircularProgress
                                         thickness={isSmallScreen ? 10 : 24}
-                                        className="bg-gray-700"
+                                        className="bg-gray-700 "
+                                        color= {progressColor}
                                         size="lg"
                                         sx={{
                                             color: "",
@@ -395,9 +396,10 @@ function MainHome() {
                                             '--LinearProgress-thickness': progressWidth,
                                         }}
                                         determinate
+                                        
                                         value={completionPercentage.toFixed(2)}
                                     >
-                                        <Typography className="text-white text-lg">{completionPercentage.toFixed(2)}%</Typography>
+                                        <Typography  className="text-white text-lg">{completionPercentage.toFixed(2)}%</Typography>
                                     </CircularProgress>
                                 </div>
                             </div>
@@ -544,10 +546,8 @@ function MainHome() {
                                                     </div>
                                                 </div>
                                                 <div className='gap-4 flex  items-center '>
-                                                    <div>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" style={{ color: 'gold' }} class="bi bi-star-fill" viewBox="0 0 16 16">
-                                                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                        </svg>
+                                                    <div className=''>
+                                                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAD1UlEQVR4nNWaa4hVVRTHfz6qQREaZ3wSKvRwIhXziT3ATw4ODBFJEUj0cFDGd1nOBKIownwqJkgZ9GNMHyIIoigtKjKZcZrRxvGOMio+0JGsmNLUxvTKgv+FxeWOd+49j3vvHw6cu8/Za6//OXuv9d/rXCgOjADeBfqB34HNlCg+AJJpxzZKDC/I8RtANbAS+F9tjZQIJgFX5PQ61/6KI/M+RQ5bF1/J2W/02+N14I6uN1DEeEdO2uKePMQ9bzgy71GEmAXcBO4CtVnufVNk7N71FBHKgG495Y+H2ectR2YtRYK9IpEAxuTQr05E7KinwFguRwaBhXn0r3Nk1lAEoXZLADsbZcPIrKaAofYnYFRAe5tky9bNa0SAqcBsYD7wFFCh9rc18J/AIyGNtUU2LXG+FMZ0qVdC+yuDXkpqOv2n8xWEi62yeyZfA9OBFudg6jAyXcCPQBtwwV3bT/h4VrbP59pxJLABuO4c/FmLbsYQfSqBJSGsCzJImAH5sJscE9lnjsAhYBHxYxLwhfOjFXggFwOpqDOoqJEu8uLACuCq/BjQW8kZv8jAKWAC8WK8nnzqLRwEpuVrzJz/TYZ676NYw0Y1cNFtvrZqrQZCOfBrTGTGAM3K4DbeYeCJMAcwMh2OzBTCxzNAn8a4qbcQdtSLlEwZ0OQ2UzaV5xIxTH4c1YDHgYkB7dk07XWRcXuuYTUomS4N3hOQTI2TNPMoAB4GjoQwzSzRmY1LFBC7XIzvkVP5oF82LG/EjhotTpPTpwOS6VT/mcSMR518b5BAPKbfJ/Ig06a+C4gRY12m/9xpLx/NciXTrX5PEiNaXTVkXNq18S6hDZeMPYh/1Cc2LbdZA/4NVKVdMx20wyW14ZJ5zIXfWLAUuC0N9GKGUPyl20tvd9MlkYWMFbGT6h85LEdcHmJXViVn7dofwLIMQvOkChSZkJI8VlWMFA+5qPJtmoh7Gbima50Ztr2VLjAkMqjm551Mr4iayD4Ndk6OITJNTmp/cp8yqBea/s3YmmpXe3PUJOrcE3tabRZZvnciz3+oGQo+NKfeTKPbuk6NkoQVGG5psFRVb75KMEnJiufyFJpnFTjsfBURYqLbZn6kNvvG96/aOvLcO3uhacenURYzRgM/uNKPZfI9bnA7fzCAfUua36nEFMROVnzops4CV0W5FfU0CBOvukXc6HKHTbPFlAjmuJJoQmSSilBx17PyRrkTe/5oiXP/HBQjXVk06fJGJB9SosTONBJ9+mhTUqhNk91fa5qVFB533xnuSjsFrq0WAu1O62T7F0JR44DIhFogjhv3APByS5e0g7UeAAAAAElFTkSuQmCC" style={{width:"25px"}} />
                                                     </div>
                                                     <Button
                                                         onClick={() => handleGroupClick(task)}

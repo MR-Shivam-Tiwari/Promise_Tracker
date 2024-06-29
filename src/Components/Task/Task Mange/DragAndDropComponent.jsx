@@ -297,18 +297,18 @@ const Card = ({ id, text, status, card }) => {
                         {card?.taskGroup.groupName}
                     </div>
                     {card.status === 'Cancelled' && (
-                        <div className='text-xs border p-1 px-2 rounded-md font-bold bg-red-400 '>
+                        <div className='text-xs border p-1 px-2 rounded font-bold bg-red-400 '>
                             {card?.status === 'Cancelled' ? 'Postponed' : 'Postponed'}
                         </div>
                     )}
                     {card.status === 'Completed' && (
                         <Chip
-                            className='text-xs border'
+                            className='text-xs border p-1 px-2 rounded font-bold text-black  '
                             variant="soft"
                             color={
                                 card.category === 'Approved' ? 'success' :
-                                    card.category === 'Unapproved' ? 'danger' :
-                                        'warning'
+                                    card.category === 'Unapproved' ? '#3c3c3c' :
+                                        'gray'
                             }
                         >
                             {card?.category || "Awaiting approval"}
