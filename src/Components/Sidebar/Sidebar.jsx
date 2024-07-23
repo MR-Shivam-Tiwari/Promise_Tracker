@@ -40,7 +40,9 @@ export default function Sidebar({ onSidebarItemClick }) {
     const location = useLocation();
     const [userData, setUserData] = useState("")
     const navigate = useNavigate();
-    const [selectedItem, setSelectedItem] = useState('home');
+    const routeName = location.pathname.split('/').pop().replace(/-/g, ' ');
+
+    const [selectedItem, setSelectedItem] = useState(routeName);
     useEffect(() => {
         const routeName = location.pathname.split('/').pop().replace(/-/g, ' ');
         setCurrentRouteName(routeName.charAt(0).toUpperCase() + routeName.slice(1));

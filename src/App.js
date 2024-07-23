@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import Login from './Components/Auth/Login';
@@ -8,44 +8,35 @@ import Home from './Components/Home';
 import AppRoutes from './AppRoutes';
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const userDataString = localStorage.getItem('userData');
+  const userDataObj = userDataString ? JSON.parse(userDataString) : null;
+  const [isLoggedIn, setIsLoggedIn] = useState(userDataObj?.token || false);
 
   useEffect(() => {
-    // Retrieve userData from localStorage
     const userDataString = localStorage.getItem('userData');
     const userDataObj = userDataString ? JSON.parse(userDataString) : null;
-    // Update isLoggedIn state based on the presence of userId in userData
     setIsLoggedIn(userDataObj && userDataObj.userId);
-  }, []);  
+  }, []);
 
   return (
     <div>
       <ToastContainer />
       <Router>
-        {isLoggedIn ? <AppRoutes /> : <NonAuthContent />}
+        <Routes>
+          <Route path="/*" element={isLoggedIn ? <AppRoutes /> : <NonAuthContent />} />
+        </Routes>
       </Router>
     </div>
   );
 }
 
 function NonAuthContent() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const userDataString = localStorage.getItem('userData');
-    const userDataObj = userDataString ? JSON.parse(userDataString) : null;
-    if (userDataObj && userDataObj.userId) {
-      // Redirect to /home if userData exists
-      navigate('/home');
-    }
-  }, [navigate]);
-
   return (
     <Routes>
-      
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/" element={<Home />} />
+      <Route path="/*" element={<Navigate to="/login" />} />
     </Routes>
   );
 }
