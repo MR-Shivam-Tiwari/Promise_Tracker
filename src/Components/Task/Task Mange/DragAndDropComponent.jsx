@@ -146,21 +146,21 @@ const Card = ({ id, text, status, card }) => {
         const today = new Date();
         const differenceInTime = end.getTime() - today.getTime(); // Calculate the difference in milliseconds
         const differenceInDays = Math.ceil(differenceInTime / (1000 * 60 * 60 * 24));
-        console.log('Difference in days:', differenceInDays);
+        // console.log('Difference in days:', differenceInDays);
         if (differenceInDays < 0) {
-            console.log('Overdue');
+            // console.log('Overdue');
             return 'Overdue';
         } else if (differenceInDays === 0) {
-            console.log('Due today');
+            // console.log('Due today');
             return 'Due today';
         } else if (differenceInDays === 1) {
-            console.log('Due tomorrow');
+            // console.log('Due tomorrow');
             return 'Due tomorrow';
         } else if (differenceInDays === 2) {
-            console.log('Due in 2 days');
+            // console.log('Due in 2 days');
             return 'Due in 2 days';
         } else {
-            console.log('No due message');
+            // console.log('No due message');
             return '';
         }
     };
@@ -177,7 +177,7 @@ const Card = ({ id, text, status, card }) => {
     const dueMessage = calculateDueMessage(endDateFormatted);
     const archiveTask = async () => {
         try {
-            const response = await axios.put(`https://ptb.insideoutprojects.in/api/tasks/${id}/status`, {
+            const response = await axios.put(`http://localhost:5000/api/tasks/${id}/status`, {
                 status: 'Archive',
             }, {
                 headers: {
@@ -186,7 +186,7 @@ const Card = ({ id, text, status, card }) => {
             });
             if (response.status === 200) {
                 // Handle successful update
-                console.log('Task archived successfully', response.data);
+                // console.log('Task archived successfully', response.data);
                 // Optionally, update the card state or show a notification
             } else {
                 // Handle error response
@@ -355,14 +355,16 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
     }, [tasksToDo, tasksInProgress, tasksCompleted, tasksCancelled]);
 
     const updateTaskStatus = async (id, status, body) => {
-        const response = await fetch(`https://ptb.insideoutprojects.in/api/tasks/${id}/status`, {
+        const response = await fetch(`http://localhost:5000/api/tasks/${id}/status`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ status, ...body }), // Include additional data in the body
         });
+        toast.dismiss()
         toast.success("Task Status Updated");
+
         if (!response.ok) {
             throw new Error('Failed to update task status');
         }
@@ -407,7 +409,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
 
         if (currentCard) {
             try {
-                const response = await fetch(`https://ptb.insideoutprojects.in/api/tasks/${currentCard._id}/cancel`, {
+                const response = await fetch(`http://localhost:5000/api/tasks/${currentCard._id}/cancel`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -461,7 +463,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
         }
 
         try {
-            const response = await fetch(`https://ptb.insideoutprojects.in/api/tasks/${currentCard._id}/complete`, {
+            const response = await fetch(`http://localhost:5000/api/tasks/${currentCard._id}/complete`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

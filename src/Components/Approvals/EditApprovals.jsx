@@ -21,7 +21,7 @@ function EditApprovals({ taskId, task, onClose }) {
     const handleApprove = async () => {
         setIsLoading(true);
         try {
-            const response = await fetch(`https://ptb.insideoutprojects.in/api/categoryedit/${taskId}`, {
+            const response = await fetch(`http://localhost:5000/api/categoryedit/${taskId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ function EditApprovals({ taskId, task, onClose }) {
     const handleUnapprove = async () => {
         setIsLoading(true);
         try {
-            const response = await fetch(`https://ptb.insideoutprojects.in/api/categoryedit/${taskId}`, {
+            const response = await fetch(`http://localhost:5000/api/categoryedit/${taskId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

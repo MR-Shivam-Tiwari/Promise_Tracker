@@ -78,7 +78,7 @@ function AddTask({ setOpen }) {
         }
 
         try {
-            const response = await axios.post("https://ptb.insideoutprojects.in/api/tasksadd", formData);
+            const response = await axios.post("http://localhost:5000/api/tasksadd", formData);
             console.log(response.data);
             resetForm();
             setOpen(false);
@@ -113,7 +113,7 @@ function AddTask({ setOpen }) {
     useEffect(() => {
         const fetchGroupData = async () => {
             try {
-                const response = await axios.get('https://ptb.insideoutprojects.in/api/groups');
+                const response = await axios.get('http://localhost:5000/api/groups');
                 setGroupData(response.data);
                 console.log("groupdata", response.data);
             } catch (error) {
@@ -127,7 +127,7 @@ function AddTask({ setOpen }) {
     useEffect(() => {
         const fetchRegisteredNames = async () => {
             try {
-                const response = await axios.get("https://ptb.insideoutprojects.in/api/userData");
+                const response = await axios.get("http://localhost:5000/api/userData");
                 const filteredDepartmentHeads = response.data.filter(
                     (user) => user.userRole === 1
                 );

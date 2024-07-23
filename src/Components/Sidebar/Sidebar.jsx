@@ -70,7 +70,7 @@ export default function Sidebar({ onSidebarItemClick }) {
 
     const fetchUserData = async () => {
         try {
-            const response = await axios.get('https://ptb.insideoutprojects.in/api/userData');
+            const response = await axios.get('http://localhost:5000/api/userData');
             setUserData(Array.isArray(response.data) ? response.data : []);
             console.log(response.data);
         } catch (error) {
@@ -297,6 +297,28 @@ export default function Sidebar({ onSidebarItemClick }) {
 
 
             </Box>
+            <div className=''>
+
+                <ListItem nested onClick={() => { navigate('/settings'); handleItemClick('settings'); }} >
+                    <Toggler
+                        renderToggle={({ open, setOpen }) => (
+                            <ListItemButton selected={selectedItem === 'settings'} className='flex p-2 px-4 rounded-md bg-gray-100  items-center ' onClick={() => setOpen(!open)}>
+                                <ListItemContent>
+
+                                    <Typography style={{ fontSize: "20px", fontWeight: "bold" }}>Settings</Typography>
+                                </ListItemContent>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z" />
+                                </svg>
+
+
+                            </ListItemButton>
+                        )}
+                    >
+
+                    </Toggler>
+                </ListItem>
+            </div>
             <div className=''>
 
                 <ListItem nested onClick={() => { navigate('/profile'); handleItemClick('profile'); }} >

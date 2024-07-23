@@ -4,7 +4,7 @@ import { Dropdown, IconButton, Menu, MenuButton, MenuItem } from '@mui/joy';
 import { toast } from 'react-toastify';
 
 const updateTaskStatus = async (id, status, body) => {
-    const response = await fetch(`https://ptb.insideoutprojects.in/api/tasks/${id}/status`, {
+    const response = await fetch(`http://localhost:5000/api/tasks/${id}/status`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ function Archive() {
 
     const fetchTasks = async (userId) => {
         try {
-            const response = await axios.get('https://ptb.insideoutprojects.in/api/tasks');
+            const response = await axios.get('http://localhost:5000/api/tasks');
             console.log('Response data:', response.data);
 
             const userTasks = response.data.filter(task => {

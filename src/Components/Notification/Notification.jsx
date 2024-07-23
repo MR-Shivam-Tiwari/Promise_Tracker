@@ -22,7 +22,7 @@ function Notification({ handleClose }) {
     useEffect(() => {
         const fetchNotifications = async () => {
             try {
-                const response = await axios.get(`https://ptb.insideoutprojects.in/api/notifications`);
+                const response = await axios.get(`http://localhost:5000/api/notifications`);
                 const allNotifications = response.data;
                 const filteredNotifications = allNotifications.filter(notification => notification.userId === userid);
                 const sortedNotifications = filteredNotifications.sort((a, b) => new Date(b.created) - new Date(a.created));
@@ -50,7 +50,7 @@ function Notification({ handleClose }) {
     const markAllNotificationsAsRead = async () => {
         try {
             const notificationIds = allNotifications.map(notification => notification._id);
-            await axios.put(`https://ptb.insideoutprojects.in/api/notifications/mark-read`, { notificationIds });
+            await axios.put(`http://localhost:5000/api/notifications/mark-read`, { notificationIds });
             console.log("All notifications marked as read successfully");
             setInterval(() => {
                 window.location.reload();

@@ -8,7 +8,7 @@ function Role() {
     const [searchTerm, setSearchTerm] = useState("");
     const fetchUserData = async () => {
         try {
-            const response = await axios.get('https://ptb.insideoutprojects.in/api/userData');
+            const response = await axios.get('http://localhost:5000/api/userData');
             setUserData(Array.isArray(response.data) ? response.data : []);
             console.log(response.data);
         } catch (error) {
@@ -18,7 +18,7 @@ function Role() {
 
     const updateUserRole = async (userId, newRole) => {
         try {
-            const response = await axios.put(`https://ptb.insideoutprojects.in/api/updateUserRole/${userId}`, {
+            const response = await axios.put(`http://localhost:5000/api/updateUserRole/${userId}`, {
                 userRole: newRole
             });
             setUserData(userData.map(user => user.userId === userId ? { ...user, userRole: newRole } : user));

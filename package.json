@@ -30,6 +30,7 @@
     "react-scripts": "5.0.1",
     "react-simple-wysiwyg": "^3.0.2",
     "react-toastify": "^10.0.5",
+    "socket.io-client": "^4.7.5",
     "typescript": "latest",
     "web-vitals": "^2.1.4",
     "yup": "^1.4.0"

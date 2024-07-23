@@ -12,7 +12,7 @@ function UnApprovedTask() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('https://ptb.insideoutprojects.in/api/tasks');
+                const response = await axios.get('http://localhost:5000/api/tasks');
                 const userTasks = response.data.filter(task => {
                     // Check if the task's category is "Unapproved"
                     const inUnapproved = task.category === "Unapproved";

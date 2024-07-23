@@ -59,7 +59,7 @@ function EditGroup({ Editid, dpthead, prjtlead }) {
         console.log("Form Data: ", JSON.stringify(formData, null, 2));
 
         try {
-            const response = await axios.put(`https://ptb.insideoutprojects.in/api/group/${Editid}`, formData);
+            const response = await axios.put(`http://localhost:5000/api/group/${Editid}`, formData);
             console.log("Response data:", response.data);
             toast.success("Successfully updated Group");
             setInterval(() => {
@@ -78,7 +78,7 @@ function EditGroup({ Editid, dpthead, prjtlead }) {
 
         const fetchRegisteredNames = async () => {
             try {
-                const response = await axios.get("https://ptb.insideoutprojects.in/api/userData");
+                const response = await axios.get("http://localhost:5000/api/userData");
                 setUserNamesEmail(response.data);
                 const filteredDepartmentHeads = response.data.filter(
                     (user) => user.userRole === 1
@@ -103,7 +103,7 @@ function EditGroup({ Editid, dpthead, prjtlead }) {
         const fetchGroupData = async () => {
             try {
                 console.log("Fetching group data...");
-                const response = await axios.get(`https://ptb.insideoutprojects.in/api/groups/${Editid}`);
+                const response = await axios.get(`http://localhost:5000/api/groups/${Editid}`);
                 const groupData = response.data;
                 console.log("Group data:", groupData);
 

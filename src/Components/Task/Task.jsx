@@ -5,14 +5,20 @@ import Select from '@mui/joy/Select';
 import Option from '@mui/joy/Option';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@mui/joy';
+import debounce from 'lodash.debounce';
+
 import ReactQuill from 'react-quill';
 import { toast } from 'react-toastify';
 import { Autocomplete } from '@mui/joy';
 import Add from '@mui/icons-material/Add';
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:5000');
 
 function Task() {
+    const userDataString = localStorage.getItem('userData');
     const [tasks, setTasks] = useState([]);
-    const [userid, setUserid] = useState('');
+    const [userid, setUserid] = useState(JSON.parse(userDataString)?.userId ||'');
     const selectedDateRef = useRef(null);
     const [tasksToDo, setTasksToDo] = useState([]);
     const [tasksInProgress, setTasksInProgress] = useState([]);
@@ -95,11 +101,11 @@ function Task() {
         }
 
         try {
-            const response = await axios.post("https://ptb.insideoutprojects.in/api/tasksadd", formData);
-            console.log(response.data);
+            const response = await axios.post("http://localhost:5000/api/tasksadd", formData);
+            // console.log(response.data);
             resetForm();
             setModal(false);
-            toast.success("Task created successfully!");
+            // toast.success("Task created successfully!");
             await fetchTasks(); // Refetch tasks after creating a new one
         } catch (error) {
             console.error("Error creating group:", error);
@@ -122,17 +128,17 @@ function Task() {
 
     const fetchGroupData = async () => {
         try {
-            const response = await axios.get('https://ptb.insideoutprojects.in/api/groups');
+            const response = await axios.get('http://localhost:5000/api/groups');
             setGroupData(response.data);
-            console.log("groupData", response.data);
+            // console.log("groupData", response.data);
         } catch (error) {
-            console.log("Error fetching Task: ", error);
+            // console.log("Error fetching Task: ", error);
         }
     };
 
     const fetchRegisteredNames = async () => {
         try {
-            const response = await axios.get("https://ptb.insideoutprojects.in/api/userData");
+            const response = await axios.get("http://localhost:5000/api/userData");
             const filteredDepartmentHeads = response.data.filter(user => user.userRole === 1);
             setDepartmentHeads(filteredDepartmentHeads);
             const filteredProjectlead = response.data.filter(user => user.userRole === 2);
@@ -144,38 +150,86 @@ function Task() {
         }
     };
 
-    const fetchTasks = async () => {
-        try {
-            const response = await axios.get('https://ptb.insideoutprojects.in/api/tasks');
-            const userTasks = response.data.filter(task => {
-                const isOwner = task.owner.id === userid;
-                const isPerson = task.people.some(person => person.userId === userid);
-                return isOwner || isPerson;
+    const fetchTasks = () => {
+        axios.get('http://localhost:5000/api/tasks')
+            .then(response => {
+                console.log('Response data:', response.data); // Log the response data
+    
+                const filteredTasks = response.data.filter(task => {
+                    const isOwner = task.owner.id === userid;
+                    const isPerson = task.people.some(person => person.userId === userid);
+                    return isOwner || isPerson;
+                });
+    
+                console.log('Filtered tasks:', filteredTasks); // Log the filtered tasks
+    
+                const todoTasks =  filteredTasks?.filter(task => !task.status || task.status === 'To Do');
+                const inProgressTasks =  filteredTasks?.filter(task => task.status === 'In Progress');
+                const completedTasks =  filteredTasks?.filter(task => task.status === 'Completed');
+                const cancelledTasks =  filteredTasks?.filter(task => task.status === 'Cancelled');
+    
+                const uniqueTaskGroups = [...new Set(filteredTasks.map(task => task?.taskGroup?.groupName))];
+    
+                // console.log('Todo tasks:', todoTasks);
+                // console.log('In progress tasks:', inProgressTasks);
+                // console.log('Completed tasks:', completedTasks);
+                // console.log('Cancelled tasks:', cancelledTasks);
+                // console.log('Unique task groups:', uniqueTaskGroups);
+    
+                setTasks(filteredTasks);
+                setAllTasks(filteredTasks);
+                setTasksToDo(todoTasks);
+                setTasksInProgress(inProgressTasks);
+                setTasksCompleted(completedTasks);
+                setTasksCancelled(cancelledTasks);
+                setTaskGroups(uniqueTaskGroups);
+                setLoading(false);
+    
+                return axios.put('http://localhost:5000/api/archiveOldTasks');
+            })
+            .then(() => {
+                // Optionally, handle the response from the PUT request
+            })
+            .catch(error => {
+                console.error('Error fetching tasks:', error);
+                setLoading(false);
             });
-            setTasks(userTasks);
-            setAllTasks(userTasks);
-            const todoTasks = userTasks.filter(task => !task.status || task.status === 'To Do');
-            const inProgressTasks = userTasks.filter(task => task.status === 'In Progress');
-            const completedTasks = userTasks.filter(task => task.status === 'Completed');
-            const cancelledTasks = userTasks.filter(task => task.status === 'Cancelled');
-            setTasksToDo(todoTasks);
-            setTasksInProgress(inProgressTasks);
-            setTasksCompleted(completedTasks);
-            setTasksCancelled(cancelledTasks);
-            const uniqueTaskGroups = [...new Set(userTasks.map(task => task?.taskGroup?.groupName))];
-            setTaskGroups(uniqueTaskGroups);
-            setLoading(false);
-            await axios.put('https://ptb.insideoutprojects.in/api/archiveOldTasks');
-        } catch (error) {
-            console.error('Error fetching tasks:', error);
-            setLoading(false);
-        }
     };
+    
+    
+    
+
+
+    // Inside your component
+    
+    useEffect(() => {
+        // const debouncedFetchTasks = debounce(fetchTasks, 300); // 300ms debounce
+    
+        socket.on('newTask', (data)=>{
+            fetchTasks()
+        }); 
+        socket.on('taskStatusUpdate', (data)=>{
+            fetchTasks()
+        });
+        socket.on('taskCompleted', (data)=>{
+            fetchTasks()
+        });
+        // socket.on('taskStatusUpdate', debouncedFetchTasks);
+        // socket.on('taskCompleted', debouncedFetchTasks);
+    
+        return () => {
+            socket.off('newTask');
+            socket.off('taskStatusUpdate');
+            socket.off('taskCompleted');
+        };
+    }, []);
 
     useEffect(() => {
         fetchGroupData();
         fetchRegisteredNames();
     }, []);
+
+
 
     useEffect(() => {
         if (userid) {
@@ -193,16 +247,16 @@ function Task() {
 
     useEffect(() => {
         if (selectedGroup !== '') {
-            const filteredTasks = allTasks.filter(task => task?.taskGroup?.groupName === selectedGroup);
-            setTasksToDo(filteredTasks.filter(task => !task.status || task.status === 'To Do'));
-            setTasksInProgress(filteredTasks.filter(task => task.status === 'In Progress'));
-            setTasksCompleted(filteredTasks.filter(task => task.status === 'Completed'));
-            setTasksCancelled(filteredTasks.filter(task => task.status === 'Cancelled'));
+            const filteredTasks = allTasks?.filter(task => task?.taskGroup?.groupName === selectedGroup);
+            setTasksToDo(filteredTasks?.filter(task => !task.status || task.status === 'To Do'));
+            setTasksInProgress(filteredTasks?.filter(task => task.status === 'In Progress'));
+            setTasksCompleted(filteredTasks?.filter(task => task.status === 'Completed'));
+            setTasksCancelled(filteredTasks?.filter(task => task.status === 'Cancelled'));
         } else {
-            setTasksToDo(allTasks.filter(task => !task.status || task.status === 'To Do'));
-            setTasksInProgress(allTasks.filter(task => task.status === 'In Progress'));
-            setTasksCompleted(allTasks.filter(task => task.status === 'Completed'));
-            setTasksCancelled(allTasks.filter(task => task.status === 'Cancelled'));
+            setTasksToDo(allTasks?.filter(task => !task.status || task.status === 'To Do'));
+            setTasksInProgress(allTasks?.filter(task => task.status === 'In Progress'));
+            setTasksCompleted(allTasks?.filter(task => task.status === 'Completed'));
+            setTasksCancelled(allTasks?.filter(task => task.status === 'Cancelled'));
         }
     }, [selectedGroup, allTasks]);
 

@@ -22,6 +22,7 @@ import Role from './Components/Role/Role';
 import Notification from './Components/Notification/Notification';
 import Archive from './Components/ArchivedTasks/Archive';
 import UnApprovedTask from './Components/Task/UnApprovedTask';
+import ChangePassword from './Components/Profile/ChangePassword';
 
 function AppRoutes() {
     const [currentRouteName, setCurrentRouteName] = useState('');
@@ -40,7 +41,7 @@ function AppRoutes() {
     useEffect(() => {
         const fetchNotifications = async () => {
             try {
-                const response = await axios.get(`https://ptb.insideoutprojects.in/api/notifications`);
+                const response = await axios.get(`http://localhost:5000/api/notifications`);
                 const allNotifications = response.data;
                 // Filter notifications based on userId
                 const filteredNotifications = allNotifications.filter(notification => notification.userId === userid);
@@ -69,7 +70,7 @@ function AppRoutes() {
             // Extract notification IDs from allNotifications
             const notificationIds = allNotifications.map(notification => notification._id);
             // Call the API to mark all notifications as read using the extracted IDs
-            await axios.put(`https://ptb.insideoutprojects.in/api/notifications/mark-read`, { notificationIds });
+            await axios.put(`http://localhost:5000/api/notifications/mark-read`, { notificationIds });
             console.log("All notifications marked as read successfully");
             setInterval(() => {
                 window.location.reload();
@@ -124,7 +125,7 @@ function AppRoutes() {
     // Function to fetch user data
     const fetchUserData = async (userId) => {
         try {
-            const response = await axios.get(`https://ptb.insideoutprojects.in/api/user/${userid}`);
+            const response = await axios.get(`http://localhost:5000/api/user/${userid}`);
             const userData = response.data;
             setUserData(userData);
             setFormData({
@@ -335,6 +336,7 @@ function AppRoutes() {
                         <div style={{ height: "1000px", overflow: "auto" }}>
                             <Routes onChange={handleRouteChange}>
                                 <Route path="/profile" element={<MyProfile />} />
+                                <Route path="/settings" element={<ChangePassword />} />
                                 <Route path="/home" element={<MainHome />} />
                                 <Route path="/approvals" element={<Approvals />} />
                                 <Route path="/task" element={<Task />} />

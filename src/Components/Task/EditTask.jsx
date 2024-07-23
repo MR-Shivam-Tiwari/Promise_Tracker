@@ -49,7 +49,7 @@ function EditTask({ setedit, Taskid }) {
         const fetchTaskData = async () => {
             if (Taskid) {
                 try {
-                    const response = await axios.get(`https://ptb.insideoutprojects.in/api/tasks/${Taskid}`);
+                    const response = await axios.get(`http://localhost:5000/api/tasks/${Taskid}`);
                     setFormData(response.data);
                     console.log(response.data)
                 } catch (error) {
@@ -82,7 +82,7 @@ function EditTask({ setedit, Taskid }) {
         e.preventDefault();
 
         try {
-            const response = await axios.put(`https://ptb.insideoutprojects.in/api/tasksedit/${Taskid}`, formData);
+            const response = await axios.put(`http://localhost:5000/api/tasksedit/${Taskid}`, formData);
             console.log(response.data);
             setedit(false);
             toast.success("Task updated successfully!");
@@ -104,7 +104,7 @@ function EditTask({ setedit, Taskid }) {
     useEffect(() => {
         const fetchGroupData = async () => {
             try {
-                const response = await axios.get('https://ptb.insideoutprojects.in/api/groups');
+                const response = await axios.get('http://localhost:5000/api/groups');
                 setGrouptData(response.data);
             } catch (error) {
                 console.log("Error fetching group data: ", error);
@@ -117,7 +117,7 @@ function EditTask({ setedit, Taskid }) {
     useEffect(() => {
         const fetchRegisteredNames = async () => {
             try {
-                const response = await axios.get("https://ptb.insideoutprojects.in/api/userData");
+                const response = await axios.get("http://localhost:5000/api/userData");
                 setUserNamesEmail(response.data);
                 const filteredDepartmentHeads = response.data.filter((user) => user.userRole === 1);
                 setDepartmentHeads(filteredDepartmentHeads);

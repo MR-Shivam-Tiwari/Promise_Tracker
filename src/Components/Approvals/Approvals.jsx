@@ -13,7 +13,7 @@ function Approvals() {
     const [loading, setLoading] = useState(true);
     const fetchData = async () => {
         try {
-            const response = await axios.get('https://ptb.insideoutprojects.in/api/tasks');
+            const response = await axios.get('http://localhost:5000/api/tasks');
             setTasks(response.data);
             setLoading(false);
         } catch (error) {
