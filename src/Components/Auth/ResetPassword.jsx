@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 // material-ui
 import {
@@ -11,10 +11,13 @@ import { useTheme } from '@mui/material/styles';
 import { Box, Typography } from '@mui/joy';
 import { toast } from 'react-toastify';
 import { UserContext } from '../../global/UserContext';
+import { Password } from '@mui/icons-material';
 
-function ForgotPassword() {
+function ResetPassword() {
     const navigate = useNavigate();
-    const [email, setEmail] = useState('');
+    const {userId} = useParams();
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState(null);
     const [loader, setLoader] = useState(false)
     const theme = useTheme();
@@ -25,11 +28,18 @@ function ForgotPassword() {
         e.preventDefault();
         setLoader(true)
 
-        axios.post('http://localhost:5000/api/reset-link', { email: email })
+        if (newPassword !== confirmPassword) {
+            setError('Passwords do not match');
+            setLoader(false)
+            return;
+        }
+
+        axios.post('http://localhost:5000/api/set-password', { userId, password: newPassword })
         .then((res)=>{
             toast.dismiss()
             toast.success(res.data.message);
             setLoader(false)
+            navigate('/login')
         }).catch((err)=>{  
             toast.dismiss()
             toast.error(err.response.data.message);
@@ -83,23 +93,32 @@ function ForgotPassword() {
                         >
                             <div class="min-h-screen  flex items-center justify-center p-6">
                                 <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-8">
-                                    <h1 class="text-4xl font-bold text-center mb-1">Forgot Password</h1>
-                                    <p class="text-center text-gray-500 mb-6">Enter Email to get reset link</p>
+                                    <h1 class="text-4xl font-bold text-center mb-1">Reset Your Password</h1>
+                                    <p class="text-center text-gray-500 mb-6">Now you can reset your password</p>
 
                                     <form onSubmit={handleSubmit} class="space-y-6 mb-6">
                                         <div>
                                             <input
                                                 class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full"
-                                                placeholder="Email Address"
-                                                type="email"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
+                                                placeholder="New Password"
+                                                type="password"
+                                                value={newPassword}
+                                                onChange={(e) => setNewPassword(e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <input
+                                                class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full"
+                                                placeholder="Confirm Password"
+                                                type="password"
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
                                             />
                                         </div>
 
 
                                         <button type='submit' disabled={loader} class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 w-full bg-[#ff8c00] hover:bg-[#ff7b00] text-white py-3">
-                                            Send Reset Link
+                                            {loader ? 'Please wait...' : 'Submit'}
                                         </button>
                                     </form>
                                     {error && <p>{error}</p>}
@@ -123,4 +142,4 @@ function ForgotPassword() {
     )
 }
 
-export default ForgotPassword
+export default ResetPassword
