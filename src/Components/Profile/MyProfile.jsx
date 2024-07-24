@@ -1,26 +1,28 @@
-import * as React from 'react';
-import { useState, useEffect } from 'react';
+import * as React from "react";
+import { useState, useEffect } from "react";
 
-import IconButton from '@mui/joy/IconButton';
+import IconButton from "@mui/joy/IconButton";
 
-import { toast } from 'react-toastify';
-import axios from 'axios';
+import { toast } from "react-toastify";
+import axios from "axios";
 
-import { BrowserRouter as Router, useLocation } from 'react-router-dom';
-import { UserContext } from '../../global/UserContext';
+import { BrowserRouter as Router, useLocation } from "react-router-dom";
+import { UserContext } from "../../global/UserContext";
 
 export default function MyProfile() {
   const { userData, setUserData } = React.useContext(UserContext);
 
-  const userDataString = localStorage.getItem('userData');
-  const [userId, setUserId] = useState(JSON.parse(userDataString)?.userId || '');
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const userDataString = localStorage.getItem("userData");
+  const [userId, setUserId] = useState(
+    JSON.parse(userDataString)?.userId || ""
+  );
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const [selectedImage, setSelectedImage] = useState(null);
   const location = useLocation();
-  const [role, setRole] = useState('');
+  const [role, setRole] = useState("");
 
   // Function to handle file selection
   const handleFileSelect = (event) => {
@@ -30,22 +32,25 @@ export default function MyProfile() {
 
   // Function to handle upload button click
   const handleUploadClick = () => {
-    document.getElementById('image-upload').click();
+    document.getElementById("image-upload").click();
   };
 
   const handleChangePassword = () => {
     if (newPassword === confirmPassword) {
       const data = {
-        newPassword, oldPassword, userId
+        newPassword,
+        oldPassword,
+        userId,
       };
-      axios.post('http://localhost:5000/api/change-password', data)
+      axios
+        .post("http://localhost:5000/api/change-password", data)
         .then((res) => {
           toast.dismiss();
-          toast.success('Password changed successfully');
+          toast.success("Password changed successfully");
         });
     } else {
       toast.dismiss();
-      toast.error('New Password and Confirm Password should be the same');
+      toast.error("New Password and Confirm Password should be the same");
     }
   };
 
@@ -58,13 +63,16 @@ export default function MyProfile() {
       mobilenumber,
       department,
       active,
-      profilePic: selectedImage ? URL.createObjectURL(selectedImage) : userData.profilePic
+      profilePic: selectedImage
+        ? URL.createObjectURL(selectedImage)
+        : userData.profilePic,
     };
 
-    axios.put(`http://localhost:5000/api/users/${userData?.userId}`, updatedData)
+    axios
+      .put(`http://localhost:5000/api/users/${userData?.userId}`, updatedData)
       .then((res) => {
         toast.dismiss();
-        toast.success('Profile updated successfully');
+        toast.success("Profile updated successfully");
         console.log("Response data:", res.data);
         setUserData({
           ...userData,
@@ -74,15 +82,14 @@ export default function MyProfile() {
           mobilenumber: res.data.mobilenumber,
           department: res.data.department,
           active: res.data.active,
-          designation: res.data.designation
+          designation: res.data.designation,
         });
       })
       .catch((error) => {
         toast.dismiss();
-        toast.error('Failed to update profile');
+        toast.error("Failed to update profile");
         console.error("Error updating profile:", error);
       });
-
   };
 
   const getRole = (role) => {
@@ -104,7 +111,7 @@ export default function MyProfile() {
     setRole(getRole(Number(userData?.userRole)));
   }, [userData]);
 
-  const [section, setSection] = useState('about');
+  const [section, setSection] = useState("about");
 
   const [name, setName] = useState(userData?.name);
   const [designation, setDesignation] = useState(userData?.designation);
@@ -119,14 +126,18 @@ export default function MyProfile() {
 
   return (
     <>
-      <div className="p-6 bg-gray-50 min-h-screen">
-        <div className=" flex flex-col sm:flex-row items-center p-4 bg-white shadow-b-lg gap-10 px-10 rounded-t-lg">
-          <div onClick={handleUploadClick} className="relative cursor-pointer group">
-            <div className='w-[120px] h-[120px]'>
+      <div className="lg:p-6  bg-gray-50 min-h-screen">
+      <div className=" bg-white shadow-b-lg ">
+        <div className=" flex flex-col sm:flex-row items-center lg:p-4 p-2  gap-10 lg:px-10 px-0  rounded-t-lg">
+          <div
+            onClick={handleUploadClick}
+            className="relative cursor-pointer group"
+          >
+            <div className="w-[190px] h-[190px]">
               <img
                 src={userData?.profilePic}
                 alt="Profile"
-                className="w-full h-full rounded-full shadow-lg mr-6"
+                className="w-full h-full rounded-md shadow-lg mr-6"
               />
             </div>
             <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
@@ -134,7 +145,7 @@ export default function MyProfile() {
                 accept="image/*"
                 id="image-upload"
                 type="file"
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
                 onChange={handleFileSelect}
               />
               <IconButton
@@ -163,180 +174,253 @@ export default function MyProfile() {
               </IconButton>
             </div>
           </div>
-          <div className="flex-1 mt-3 ">
+          <div className="flex flex-col justify-between items-start ">
             <div className="flex items-center justify-between">
               <div>
-                <div className=''>
-                  <span className=" text-2xl sm:text-4xl capitalize font-bold">{userData?.name} </span>
-                  <span className="text-blue-500 capitalize text-md sm:text-xl font-bold mb-3">({role})</span>
+                <div className=" flex items-center gap-3">
+                  <span className=" text-2xl  capitalize font-bold">
+                    {userData?.name}{" "}
+                  </span>
+                  <span className="text-white rounded-[3px] capitalize text-sm border px-2 font-bold bg-gray-600">
+                    ({role})
+                  </span>
                 </div>
                 <div>
-                  <p className="text-md text-xl text-gray-500">{userData?.email}</p>
-                  <p className="text-md text-xl text-gray-500">{userData?.mobilenumber}</p>
+                  <p className="text-md text-xl text-gray-500 border rounded bg-gray-100 px-3 text-start mt-2">
+                   Email :  {userData?.email}
+                  </p>
+                  <p className="text-md text-xl text-gray-500 border rounded bg-gray-100 px-3 text-start mt-2">
+                   Phone : {userData?.mobilenumber}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="   mt-[60px] rounded-b-md     bg-white">
+              <div className="mx-auto  ">
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={() => setSection("about")}
+                    className={`flex items-center  font-bold text-xl  border-b-2 ${
+                      section === "about"
+                        ? "border-blue-500 text-blue-500"
+                        : "border-transparent text-gray-500 hover:text-gray-900"
+                    }`}
+                  >
+                    About
+                  </button>
+                  <button
+                    onClick={() => setSection("setting")}
+                    className={`flex items-center font-bold text-xl  border-b-2 ${
+                      section === "setting"
+                        ? "border-blue-500 text-blue-500"
+                        : "border-transparent text-gray-500 hover:text-gray-900"
+                    }`}
+                  >
+                    Settings
+                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
+        <div className="border-[2px]">
 
-
-        <div className=' p-2 py-3 rounded-b-md shadow-lg  mb-11  bg-white'>
-          <div className="mx-auto px-5 ">
-            <div className="flex items-center space-x-4">
-              <button onClick={() => setSection('about')} className={`flex items-center  font-bold text-xl  border-b-2 ${section === 'about' ? 'border-blue-500 text-blue-500' : 'border-transparent text-gray-500 hover:text-gray-900'}`}>
-                About
-              </button>
-              <button onClick={() => setSection('setting')} className={`flex items-center font-bold text-xl  border-b-2 ${section === 'setting' ? 'border-blue-500 text-blue-500' : 'border-transparent text-gray-500 hover:text-gray-900'}`}>
-                Settings
-              </button>
-            </div>
-          </div>
         </div>
+        {section === "about" && (
 
-        {section === 'about' && <div className="py-[32px] rounded-md shadow-lg p-4  bg-white">
-          <div className="flex flex-col p-6 space-y-1">
-            <h3 className="whitespace-nowrap text-2xl font-semibold leading-none tracking-tight">About</h3>
-            <p className='text-sm text-muted-foreground'>View and manage your profile information, including contact details, role, and other personal information</p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-4 p-6 ">
-            <div className=''>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-              <input
-                type="text"
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full mb-2 px-3 py-2 border rounded"
-                placeholder="Name"
-              />
-            </div>
-            <div className=''>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Designation</label>
-              <input
-                type="text"
-                disabled
-                value={designation}
-                onChange={(e) => setDesignation(e.target.value)}
-                className="w-full mb-2 px-3 py-2 border rounded"
-                placeholder="Designation"
-              />
-            </div>
-            <div className=''>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-              <input
-                disabled
-                type="text"
-                value={role}
-                // onChange={(e) => setMobilenumber(e.target.value)}
-                className="w-full mb-2 px-3 py-2 border rounded"
-                placeholder="Mobile Number"
-              />
-            </div>
-            <div className=''>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Department</label>
-              <input
-                type="text"
-                disabled
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                className="w-full mb-2 px-3 py-2 border rounded"
-                placeholder="Department"
-              />
-            </div>
-            <div className=''>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input
-                type="email"
-                disabled
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full mb-2 px-3 py-2 border rounded"
-                placeholder="Email"
-              />
-            </div>
-            <div className=''>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
-              <input
-                type="text"
-                value={mobilenumber}
-                onChange={(e) => setMobilenumber(e.target.value)}
-                className="w-full mb-2 px-3 py-2 border rounded"
-                placeholder="Mobile Number"
-              />
-            </div>
 
+          <div className="py-[32px] rounded-md shadow-lg lg:p-4 p-0  bg-white">
+            <div className="flex flex-col lg:p-6 p-2 space-y-1">
+              <h3 className="whitespace-nowrap text-2xl font-semibold leading-none tracking-tight">
+                About
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                View and manage your profile information, including contact
+                details, role, and other personal information
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4 lg:p-6 p-2">
+              <div className="">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full mb-2 px-3 py-2 border rounded"
+                  placeholder="Name"
+                />
+              </div>
+              <div className="">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Designation
+                </label>
+                <input
+                  type="text"
+                  
+                  value={designation}
+                  onChange={(e) => setDesignation(e.target.value)}
+                  className="w-full mb-2 px-3 py-2 border rounded"
+                  placeholder="Designation"
+                />
+              </div>
+              <div className="">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Role
+                </label>
+                <input
+                  disabled
+                  type="text"
+                  value={role}
+                  // onChange={(e) => setMobilenumber(e.target.value)}
+                  className="w-full mb-2 px-3 py-2 border rounded"
+                  placeholder="Mobile Number"
+                />
+              </div>
+              <div className="">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Department
+                </label>
+                <input
+                  type="text"
+                  disabled
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  className="w-full mb-2 px-3 py-2 border rounded"
+                  placeholder="Department"
+                />
+              </div>
+              <div className="">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Email
+                </label>
+                <input
+                  type="email"
+                  disabled
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full mb-2 px-3 py-2 border rounded"
+                  placeholder="Email"
+                />
+              </div>
+              <div className="">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Mobile Number
+                </label>
+                <input
+                  type="text"
+                  value={mobilenumber}
+                  onChange={(e) => setMobilenumber(e.target.value)}
+                  className="w-full mb-2 px-3 py-2 border rounded"
+                  placeholder="Mobile Number"
+                />
+              </div>
+            </div>
+            <div className="px-6 flex justify-end">
+              <button
+                onClick={handleSave}
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-700 text-white text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 "
+              >
+                Save Changes
+              </button>
+            </div>
           </div>
-          <div className='px-6'>
-            <button
-              onClick={handleSave}
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-700 text-white text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 "
-            >
-              Save Changes
-            </button>
-          </div>
-        </div>}
+        )}
 
-        {section === 'setting' && <div className="py-[32px] rounded-md shadow-lg p-4  bg-white">
-          <div className="flex flex-col p-6 space-y-1">
-            <h3 className="whitespace-nowrap text-2xl font-semibold leading-none tracking-tight">Change Password</h3>
-            <p className="text-sm text-muted-foreground">
-              Enter your current password and the new password you would like to change to
-            </p>
+        {section === "setting" && (
+          <div className="py-[32px] rounded-md shadow-lg lg:p-4 p-2  bg-white">
+            <div className="flex flex-col lg:p-6 p-2 space-y-1">
+              <h3 className="whitespace-nowrap text-2xl font-semibold leading-none tracking-tight">
+                Change Password
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Enter your current password and the new password you would like
+                to change to
+              </p>
+            </div>
+            <div className="lg:p-6 p-2 space-y-4">
+              <div className="space-y-2">
+                <label
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block"
+                  htmlFor="password"
+                >
+                  Current Password
+                </label>
+                <input
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  id="password"
+                  required
+                  type="password"
+                />
+              </div>
+              <div className="space-y-2">
+                <label
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block"
+                  htmlFor="new-password"
+                >
+                  New Password
+                </label>
+                <input
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  id="new-password"
+                  required
+                  type="password"
+                />
+              </div>
+              <div className="space-y-2">
+                <label
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block"
+                  htmlFor="confirm-password"
+                >
+                  Confirm New Password
+                </label>
+                <input
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  id="confirm-password"
+                  required
+                  type="password"
+                />
+              </div>
+              <div className="flex justify-end">  
+
+              <button
+                onClick={handleChangePassword}
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-700 text-white text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 "
+                >
+                Change Password
+              </button>
+                </div>
+            </div>
           </div>
-          <div className="p-6 space-y-4">
-            <div className="space-y-2">
-              <label
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block"
-                htmlFor="password"
-              >
-                Current Password
-              </label>
-              <input
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                id="password"
-                required
-                type="password"
-              />
-            </div>
-            <div className="space-y-2">
-              <label
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block"
-                htmlFor="new-password"
-              >
-                New Password
-              </label>
-              <input
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                id="new-password"
-                required
-                type="password"
-              />
-            </div>
-            <div className="space-y-2">
-              <label
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block"
-                htmlFor="confirm-password"
-              >
-                Confirm New Password
-              </label>
-              <input
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                id="confirm-password"
-                required
-                type="password"
-              />
-            </div>
-            <button onClick={handleChangePassword} className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-700 text-white text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 ">
-              Change Password
-            </button>
-          </div>
-        </div>}
+        )}
+
+      </div>
       </div>
     </>
   );
