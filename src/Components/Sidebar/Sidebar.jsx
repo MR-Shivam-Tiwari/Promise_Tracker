@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import GlobalStyles from '@mui/joy/GlobalStyles';
 import Box from '@mui/joy/Box';
 import IconButton from '@mui/joy/IconButton';
@@ -13,6 +13,7 @@ import { closeSidebar } from './utils';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { UserContext } from '../../global/UserContext';
 
 function Toggler({ defaultExpanded = false, renderToggle, children }) {
     const [open, setOpen] = useState(defaultExpanded);
@@ -36,9 +37,10 @@ function Toggler({ defaultExpanded = false, renderToggle, children }) {
 }
 
 export default function Sidebar({ onSidebarItemClick }) {
+    const {userData, setUserData} = useContext(UserContext)
     const [currentRouteName, setCurrentRouteName] = useState('');
     const location = useLocation();
-    const [userData, setUserData] = useState("")
+    // const [userData, setUserData] = useState("")
     const navigate = useNavigate();
     const routeName = location.pathname.split('/').pop().replace(/-/g, ' ');
 
@@ -47,24 +49,25 @@ export default function Sidebar({ onSidebarItemClick }) {
         const routeName = location.pathname.split('/').pop().replace(/-/g, ' ');
         setCurrentRouteName(routeName.charAt(0).toUpperCase() + routeName.slice(1));
     }, [location.pathname]);
-    const [userid, setuserid] = useState("")
+    const [userid, setuserid] = useState(userData?.userId)
     const handleLogout = () => {
-        localStorage.removeItem('userData');
+        setUserData({});
+        toast.dismiss()
         toast.error("Logout Successfully");
         navigate('/login');
-        setInterval(() => {
-            window.location.reload();
-        }, 1000);
+        // setInterval(() => {
+        //     window.location.reload();
+        // }, 1000);
     };
-    useEffect(() => {
-        // Retrieve userData from localStorage
-        const userDataString = localStorage.getItem('userData');
-        if (userDataString) {
-            const userDataObj = JSON.parse(userDataString);
-            const userId = userDataObj.userId;
-            setuserid(userId);
-        }
-    }, []);
+    // useEffect(() => {
+    //     // Retrieve userData from localStorage
+    //     const userDataString = localStorage.getItem('userData');
+    //     if (userDataString) {
+    //         const userDataObj = JSON.parse(userDataString);
+    //         const userId = userDataObj.userId;
+    //         setuserid(userId);
+    //     }
+    // }, []);
 
     const handleItemClick = (itemName) => {
         setSelectedItem(itemName);
@@ -73,7 +76,7 @@ export default function Sidebar({ onSidebarItemClick }) {
     const fetchUserData = async () => {
         try {
             const response = await axios.get('http://localhost:5000/api/userData');
-            setUserData(Array.isArray(response.data) ? response.data : []);
+            // setUserData(Array.isArray(response.data) ? response.data : []);
             console.log(response.data);
         } catch (error) {
             console.log("Error fetching Group Data: ", error);
@@ -81,14 +84,15 @@ export default function Sidebar({ onSidebarItemClick }) {
     };
 
     useEffect(() => {
-        fetchUserData();
+        // fetchUserData();
     }, []);
 
     // Find the current user based on the frontendUserId
-    const currentUser = Array.isArray(userData) && userData.find(user => user.userId === userid);
+    // const currentUser = Array.isArray(userData) && userData.find(user => user.userId === userid);
 
     // Check if the current user has userRole 0, 1, or 2
-    const showButton = currentUser && (currentUser.userRole === 0 || currentUser.userRole === 1);
+    // const showButton = userData?.userRole && (userData?.userRole === 0 || userData?.userRole === 1);
+    const showButton = [0, 1].includes(userData?.userRole);
 
 
     return (

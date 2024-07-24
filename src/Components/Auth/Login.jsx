@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 // material-ui
@@ -10,8 +10,10 @@ import {
 import { useTheme } from '@mui/material/styles';
 import { Box, Typography } from '@mui/joy';
 import { toast } from 'react-toastify';
+import { UserContext } from '../../global/UserContext';
 
 function Login() {
+    const {userData, setUserData} = useContext(UserContext);
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -24,12 +26,12 @@ function Login() {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:5000/api/signin', { email, password });
-            localStorage.setItem('userData', JSON.stringify(response.data));
+            setUserData(response.data);
             navigate('/home');
             toast.success("Login Successfully");
-            setTimeout(() => {
-                window.location.reload();
-            }, 500);
+            // setTimeout(() => {
+            //     window.location.reload();
+            // }, 500);
         } catch (error) {
             const errorMessage = error.response?.data.message || error.message || "An unexpected error occurred.";
             setError(errorMessage);

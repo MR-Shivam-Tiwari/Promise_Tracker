@@ -1,320 +1,343 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import Box from '@mui/joy/Box';
-import Button from '@mui/joy/Button';
-import Divider from '@mui/joy/Divider';
-import FormControl from '@mui/joy/FormControl';
-import FormLabel from '@mui/joy/FormLabel';
-import Input from '@mui/joy/Input';
+
 import IconButton from '@mui/joy/IconButton';
-import Stack from '@mui/joy/Stack';
-import Typography from '@mui/joy/Typography';
-import CardActions from '@mui/joy/CardActions';
+
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import { Avatar, Card } from '@mui/joy';
-import { useNavigate } from 'react-router-dom';
+
 import { BrowserRouter as Router, useLocation } from 'react-router-dom';
-
-
+import { UserContext } from '../../global/UserContext';
 
 export default function MyProfile() {
-    const [userData, setUserData] = useState({});
-    const [userid, setuserid] = useState("")
-    const navigate = useNavigate();
-    const [selectedImage, setSelectedImage] = useState(null);
-    const location = useLocation();
-    const [profilePic, setProfilePic] = useState(null);
-    const [refreshKey, setRefreshKey] = useState(0);
-    const [formData, setFormData] = useState({
-        name: '',
-        department: '',
-        designation: '',
-        mobilenumber: '',
-        profilePic: ''
-    });
-    // Function to handle file selection
-    const handleFileSelect = (event) => {
-        const file = event.target.files[0];
-        setSelectedImage(file);
+  const { userData, setUserData } = React.useContext(UserContext);
+
+  const userDataString = localStorage.getItem('userData');
+  const [userId, setUserId] = useState(JSON.parse(userDataString)?.userId || '');
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [selectedImage, setSelectedImage] = useState(null);
+  const location = useLocation();
+  const [role, setRole] = useState('');
+
+  // Function to handle file selection
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    setSelectedImage(file);
+  };
+
+  // Function to handle upload button click
+  const handleUploadClick = () => {
+    document.getElementById('image-upload').click();
+  };
+
+  const handleChangePassword = () => {
+    if (newPassword === confirmPassword) {
+      const data = {
+        newPassword, oldPassword, userId
+      };
+      axios.post('http://localhost:5000/api/change-password', data)
+        .then((res) => {
+          toast.dismiss();
+          toast.success('Password changed successfully');
+        });
+    } else {
+      toast.dismiss();
+      toast.error('New Password and Confirm Password should be the same');
+    }
+  };
+
+  const handleUpdate = () => {
+    const updatedData = {
+      userId: userData?.userId,
+      name,
+      designation,
+      email,
+      mobilenumber,
+      department,
+      active,
+      profilePic: selectedImage ? URL.createObjectURL(selectedImage) : userData.profilePic
     };
 
-    // Function to handle upload button click
-    const handleUploadClick = () => {
-        document.getElementById('image-upload').click();
-    };
+    axios.put(`http://localhost:5000/api/users/${userData?.userId}`, updatedData)
+      .then((res) => {
+        toast.dismiss();
+        toast.success('Profile updated successfully');
+        console.log("Response data:", res.data);
+        setUserData({
+          ...userData,
+          name: res.data.name,
+          profilePic: res.data.profilePic,
+          email: res.data.email,
+          mobilenumber: res.data.mobilenumber,
+          department: res.data.department,
+          active: res.data.active,
+          designation: res.data.designation
+        });
+      })
+      .catch((error) => {
+        toast.dismiss();
+        toast.error('Failed to update profile');
+        console.error("Error updating profile:", error);
+      });
 
+  };
 
-    useEffect(() => {
-        // Retrieve userData from localStorage
-        const userDataString = localStorage.getItem('userData');
-        if (userDataString) {
-            const userDataObj = JSON.parse(userDataString);
-            const userId = userDataObj.userId;
-            // Fetch user data using the retrieved userId
-            setuserid(userId);
-        }
-    }, []);
+  const getRole = (role) => {
+    switch (role) {
+      case 1:
+        return "Dept Head";
+      case 2:
+        return "Project Head";
+      case 3:
+        return "Member";
+      case 0:
+        return "Super Admin";
+      default:
+        return "No Role";
+    }
+  };
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await axios.get(`http://localhost:5000/api/user/${userid}`);
-                const userData = response.data;
-                setUserData(userData);
-                setFormData({
-                    name: userData.name,
-                    department: userData.department,
-                    designation: userData.designation,
-                    mobilenumber: userData.mobilenumber,
-                    profilePic: userData.profilePic,
-                });
+  useEffect(() => {
+    setRole(getRole(Number(userData?.userRole)));
+  }, [userData]);
 
-                // Convert base64 image URL to file
-                const base64Image = userData.profilePic;
-                const byteNumbers = atob(base64Image.split(','));
-                const byteArray = [];
-                for (let i = 0; i < byteNumbers.length; i++) {
-                    byteArray.push(byteNumbers.charCodeAt(i));
-                }
-                const byteNumbersTypedArray = new Uint8Array(byteArray);
-                const blob = new Blob([byteNumbersTypedArray], { type: 'image/jpeg' });
-                setProfilePic(URL.createObjectURL(blob));
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
-        };
+  const [section, setSection] = useState('about');
 
-        if (userid) {
-            fetchUserData();
-        }
-    }, [userid]);
+  const [name, setName] = useState(userData?.name);
+  const [designation, setDesignation] = useState(userData?.designation);
+  const [email, setEmail] = useState(userData?.email);
+  const [mobilenumber, setMobilenumber] = useState(userData?.mobilenumber);
+  const [department, setDepartment] = useState(userData?.department);
+  const [active, setActive] = useState(userData?.active);
 
+  const handleSave = () => {
+    handleUpdate();
+  };
 
-
-
-    const refreshDiv = () => {
-        setRefreshKey(prevKey => prevKey + 1);
-    };
-    // Function to handle form input changes
-    const handleSubmit = async () => {
-        try {
-            const formDataWithOtherData = {
-                name: formData.name,
-                department: formData.department,
-                designation: formData.designation,
-                mobilenumber: formData.mobilenumber,
-                profilePic: formData.profilePic,
-            };
-
-            // Update text data
-            const response = await axios.put(`http://localhost:5000/api/users/${userid}`, formDataWithOtherData);
-            console.log('Text data updated successfully:', response.data);
-            toast.success("User Details Updated");
-
-            // Update user data state
-            const updatedUserData = { ...response.data, profilePic: formData.profilePic };
-            setUserData(updatedUserData);
-
-            // Update profile picture if a new image is selected
-            if (selectedImage) {
-                const reader = new FileReader();
-                reader.onload = async () => {
-                    const base64Image = reader.result.split(',')[1];
-                    const formDataWithImage = {
-                        profilePic: base64Image,
-                    };
-
-                    try {
-                        // Save the image to the database
-                        const imageResponse = await axios.put(`http://localhost:5000/api/users/${userid}`, formDataWithImage);
-                        console.log('User image saved successfully to database:', imageResponse.data);
-
-                        // Update user data state with the new profile picture
-                        const updatedUserDataWithImage = { ...updatedUserData, profilePic: imageResponse.data.profilePic };
-                        setUserData(updatedUserDataWithImage);
-                        toast.success("User image updated successfully");
-                    } catch (error) {
-                        console.error('Error saving user image to database:', error);
-                    }
-                };
-                reader.readAsDataURL(selectedImage);
-            }
-
-            setRefreshKey(prevKey => prevKey + 1);
-        } catch (error) {
-            console.error('Error updating user data:', error);
-        }
-    };
-
-    console.log(userData?.profilePic, "ksjdkkj")
-
-
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    useEffect(() => {
-        handleSubmit(); // Call handleSubmit function when component mounts
-    }, []);
-
-
-
-
-    const handleSaveClick = (event) => {
-        event.preventDefault(); // Prevent default form submission behavior
-        handleSubmit();
-
-    };
-
-    // Render loading spinner or placeholder text if userData is empty
-    // if (!userData.userId) {
-    //     return <div>Loading...</div>;
-    // }
-    return (
-        <div key={refreshKey}>
-
-
-            <Box sx={{ flex: 1, width: '100%' }}>
-
-                <Stack
-                    spacing={4}
-                    sx={{
-                        display: 'flex',
-                        maxWidth: '800px',
-                        mx: 'auto',
-                        px: { xs: 2, md: 6 },
-                        py: { xs: 2, md: 3 },
-                    }}
+  return (
+    <>
+      <div className="p-6 bg-gray-50 min-h-screen">
+        <div className=" flex flex-col sm:flex-row items-center p-4 bg-white shadow-b-lg gap-10 px-10 rounded-t-lg">
+          <div onClick={handleUploadClick} className="relative cursor-pointer group">
+            <div className='w-[120px] h-[120px]'>
+              <img
+                src={userData?.profilePic}
+                alt="Profile"
+                className="w-full h-full rounded-full shadow-lg mr-6"
+              />
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+              <input
+                accept="image/*"
+                id="image-upload"
+                type="file"
+                style={{ display: 'none' }}
+                onChange={handleFileSelect}
+              />
+              <IconButton
+                aria-label="upload new picture"
+                size="large"
+                component="span"
+                variant="outlined"
+                color="neutral"
+                onClick={handleUploadClick}
+                className="text-white"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="currentColor"
+                  className="bi bi-pencil-square"
+                  viewBox="0 0 16 16"
                 >
-                    <Stack
-                        spacing={4}
-                        sx={{
-                            display: 'flex',
-                            maxWidth: '800px',
-                            mx: 'auto',
-                            px: { xs: 2, md: 6 },
-                            py: { xs: 2, md: 3 },
-                        }}
-                    >
-                        <div>
-                            <Box sx={{ mb: 1 }}>
-                                <Typography level="title-md">Personal info</Typography>
-
-                            </Box>
-                            <Divider />
-                            <div className='flex items-center justify-center p-3'>
-
-                                <Stack direction="column" spacing={1} alignItems="center">
-                                    <input
-                                        accept="image/*"
-                                        id="image-upload"
-                                        type="file"
-                                        style={{ display: 'none' }}
-                                        onChange={handleFileSelect}
-                                    />
-                                    <div >
-
-                                        <Avatar
-                                            key={refreshKey}
-                                            alt="Selected Image"
-                                            src={profilePic}
-                                            sx={{ width: 120, height: 120 }}
-                                        />
-                                    </div>
-                                    <IconButton
-                                        aria-label="upload new picture"
-                                        size="sm"
-                                        component="span"
-                                        variant="outlined"
-                                        color="neutral"
-                                        onClick={handleUploadClick}
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
-                                        </svg>
-                                    </IconButton>
-                                </Stack>
-                            </div>
-                            <Card>
-                                <div className='lg:flex items-center justify-between'>
-                                    <div>
-                                        <div><p className='text-gray font-bold'>Name</p>
-
-                                            {userData.name}</div>
-                                        <div><p className='text-gray font-bold'>Department</p>  {userData?.department}</div>
-                                    </div>
-                                    <div>
-                                        <div> <p className='text-gray font-bold'>Designation</p>  {userData?.designation}</div>
-                                        <div> <p className='text-gray font-bold'>Phone number</p>  {userData?.mobilenumber}</div>
-                                    </div>
-                                </div>
-                                        <div> <p className='text-gray font-bold'>Email</p>  {userData?.email}</div>
-                            </Card>
-                            <Stack
-                                direction="row"
-                                spacing={3}
-                                sx={{ display: { md: 'flex' }, my: 1 }}
-                            >
-                                <Stack spacing={2} sx={{ flexGrow: 1 }}>
-                                    <Stack spacing={1}>
-                                        <FormLabel>Name</FormLabel>
-                                        <FormControl
-                                            sx={{ display: { sm: 'flex-column', md: 'flex-row' }, gap: 2 }}
-                                        >
-                                            <Input size="sm" placeholder="Enter Your Name" name="name" value={formData.name} onChange={handleChange} />
-                                        </FormControl>
-                                    </Stack>
-                                    <Stack>
-                                        <FormControl>
-                                            <FormLabel>Department</FormLabel>
-                                            <Input size="sm" placeholder='Enter Your Department' name="department" value={formData.department} onChange={handleChange} />
-                                        </FormControl>
-                                    </Stack>
-                                    <div>
-                                        <FormControl sx={{ flexGrow: 1 }}>
-                                            <FormLabel>Designation</FormLabel>
-                                            <Input
-                                                size="sm"
-                                                placeholder="Enter Your Designation "
-                                                name="designation"
-                                                value={formData.designation}
-                                                onChange={handleChange}
-                                                sx={{ flexGrow: 1 }}
-                                            />
-                                        </FormControl>
-                                    </div>
-                                    <div>
-                                        <FormControl sx={{ display: { sm: 'contents' } }}>
-                                            <FormLabel>Phone Number</FormLabel>
-                                            <Input
-                                                size="sm"
-                                                placeholder="Enter Your Phone Number"
-                                                name="mobilenumber"
-                                                value={formData.mobilenumber}  // Bind input value to form data
-                                                onChange={handleChange}       // Handle input changes
-                                                sx={{ flexGrow: 1 }}
-                                            />
-                                        </FormControl>
-                                    </div>
-                                </Stack>
-                            </Stack>
-
-                            <CardActions className="flex items-center justify-end gap-4 mt-3">
-                                <Button size="sm" variant="outlined" color="neutral">
-                                    Cancel
-                                </Button>
-                                <Button size="sm" variant="solid" onClick={handleSaveClick}>
-                                    Save
-                                </Button>
-                            </CardActions>
-                        </div>
-
-                    </Stack>
-                </Stack>
-            </Box>
+                  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                  <path
+                    fillRule="evenodd"
+                    d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
+                  />
+                </svg>
+              </IconButton>
+            </div>
+          </div>
+          <div className="flex-1 mt-3 ">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className=''>
+                  <span className=" text-2xl sm:text-4xl capitalize font-bold">{userData?.name} </span>
+                  <span className="text-blue-500 capitalize text-md sm:text-xl font-bold mb-3">({role})</span>
+                </div>
+                <div>
+                  <p className="text-md text-xl text-gray-500">{userData?.email}</p>
+                  <p className="text-md text-xl text-gray-500">{userData?.mobilenumber}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-    );
+
+
+        <div className=' p-2 py-3 rounded-b-md shadow-lg  mb-11  bg-white'>
+          <div className="mx-auto px-5 ">
+            <div className="flex items-center space-x-4">
+              <button onClick={() => setSection('about')} className={`flex items-center  font-bold text-xl  border-b-2 ${section === 'about' ? 'border-blue-500 text-blue-500' : 'border-transparent text-gray-500 hover:text-gray-900'}`}>
+                About
+              </button>
+              <button onClick={() => setSection('setting')} className={`flex items-center font-bold text-xl  border-b-2 ${section === 'setting' ? 'border-blue-500 text-blue-500' : 'border-transparent text-gray-500 hover:text-gray-900'}`}>
+                Settings
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {section === 'about' && <div className="py-[32px] rounded-md shadow-lg p-4  bg-white">
+          <div className="flex flex-col p-6 space-y-1">
+            <h3 className="whitespace-nowrap text-2xl font-semibold leading-none tracking-tight">About</h3>
+            <p className='text-sm text-muted-foreground'>View and manage your profile information, including contact details, role, and other personal information</p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4 p-6 ">
+            <div className=''>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <input
+                type="text"
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full mb-2 px-3 py-2 border rounded"
+                placeholder="Name"
+              />
+            </div>
+            <div className=''>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Designation</label>
+              <input
+                type="text"
+                disabled
+                value={designation}
+                onChange={(e) => setDesignation(e.target.value)}
+                className="w-full mb-2 px-3 py-2 border rounded"
+                placeholder="Designation"
+              />
+            </div>
+            <div className=''>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+              <input
+                disabled
+                type="text"
+                value={role}
+                // onChange={(e) => setMobilenumber(e.target.value)}
+                className="w-full mb-2 px-3 py-2 border rounded"
+                placeholder="Mobile Number"
+              />
+            </div>
+            <div className=''>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+              <input
+                type="text"
+                disabled
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
+                className="w-full mb-2 px-3 py-2 border rounded"
+                placeholder="Department"
+              />
+            </div>
+            <div className=''>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                disabled
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full mb-2 px-3 py-2 border rounded"
+                placeholder="Email"
+              />
+            </div>
+            <div className=''>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
+              <input
+                type="text"
+                value={mobilenumber}
+                onChange={(e) => setMobilenumber(e.target.value)}
+                className="w-full mb-2 px-3 py-2 border rounded"
+                placeholder="Mobile Number"
+              />
+            </div>
+
+          </div>
+          <div className='px-6'>
+            <button
+              onClick={handleSave}
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-700 text-white text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 "
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>}
+
+        {section === 'setting' && <div className="py-[32px] rounded-md shadow-lg p-4  bg-white">
+          <div className="flex flex-col p-6 space-y-1">
+            <h3 className="whitespace-nowrap text-2xl font-semibold leading-none tracking-tight">Change Password</h3>
+            <p className="text-sm text-muted-foreground">
+              Enter your current password and the new password you would like to change to
+            </p>
+          </div>
+          <div className="p-6 space-y-4">
+            <div className="space-y-2">
+              <label
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block"
+                htmlFor="password"
+              >
+                Current Password
+              </label>
+              <input
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                id="password"
+                required
+                type="password"
+              />
+            </div>
+            <div className="space-y-2">
+              <label
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block"
+                htmlFor="new-password"
+              >
+                New Password
+              </label>
+              <input
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                id="new-password"
+                required
+                type="password"
+              />
+            </div>
+            <div className="space-y-2">
+              <label
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block"
+                htmlFor="confirm-password"
+              >
+                Confirm New Password
+              </label>
+              <input
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                id="confirm-password"
+                required
+                type="password"
+              />
+            </div>
+            <button onClick={handleChangePassword} className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-700 text-white text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 ">
+              Change Password
+            </button>
+          </div>
+        </div>}
+      </div>
+    </>
+  );
 }

@@ -7,22 +7,23 @@ const top100Films = [
     // Your top100Films array here...
 ];
 
-function EditTask({ setedit, Taskid }) {
+function EditTask({data, setEdit }) {
+    const Taskid = data?._id
     const [GroupData, setGrouptData] = useState([]);
     const [departmentHeads, setDepartmentHeads] = useState([]);
     const [userid, setuserid] = useState("");
     const [selectProjectLead, setProjectLead] = useState([]);
     const [selectmembers, setMembers] = useState([]);
     const [formData, setFormData] = useState({
-        owner: { id: "" },
-        taskGroup: '',
-        taskName: '',
-        description: '',
-        audioFile: '',
-        startDate: '',
-        endDate: '',
-        reminder: '',
-        people: [],
+        owner: data?.owner,
+        taskGroup: data?.taskGroup?.groupName,
+        taskName: data?.taskName,
+        description: data?.description,
+        audioFile: data?.audioFile,
+        startDate:data?.startDate,
+        endDate: data?.endDate,
+        reminder: data?.reminder,
+        people: data?.people,
     });
     const [userNamesEmail, setUserNamesEmail] = useState([]);
     console.log("taskID", Taskid)
@@ -84,7 +85,7 @@ function EditTask({ setedit, Taskid }) {
         try {
             const response = await axios.put(`http://localhost:5000/api/tasksedit/${Taskid}`, formData);
             console.log(response.data);
-            setedit(false);
+            setEdit(false)
             toast.success("Task updated successfully!");
             setInterval(
                 () => {
@@ -144,7 +145,7 @@ function EditTask({ setedit, Taskid }) {
                             </label>
                             <select
                                 className="flex bg-white h-10 w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                                value={formData.taskGroup}
+                                value={formData.taskGroup?.groupName}
                                 onChange={(e) => handleChange('taskGroup', e.target.value)}
                             >
                                 <option value="">Select a Group</option>

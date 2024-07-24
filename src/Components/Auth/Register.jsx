@@ -13,6 +13,7 @@ import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/joy';
 import { toast } from 'react-toastify';
 function Register() {
+    const [loader, setLoader] = useState(false)
     const [formData, setFormData] = useState({
         name: '',
         mobilenumber: '',
@@ -33,13 +34,18 @@ function Register() {
         }
 
         try {
+            setLoader(true)
             const response = await axios.post('http://localhost:5000/api/registration', formData);
+            setLoader(false)
             console.log(response.data);
+            toast.dismiss()
             toast.success("Registered Successfully");
             navigate('/login');
         } catch (error) {
+            setLoader(false)
+            toast.dismiss()
             console.error(error.response.data);
-            toast.error("Registration failed. Please try again later.");
+            toast.error(error.response.data.message);
         }
     };
 
@@ -145,9 +151,14 @@ function Register() {
                                                 />
                                             </div>
 
-                                            <button type="submit" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-10 px-4 w-full bg-[#ff8c00] hover:bg-[#ff7b00] text-white py-3">
+                                            <button
+                                                type="submit"
+                                                disabled={loader}
+                                                class={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-10 px-4 w-full ${loader ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#ff8c00] hover:bg-[#ff7b00]'} text-white py-3`}
+                                            >
                                                 SIGN UP
                                             </button>
+
                                         </form>
 
                                         <div class="flex items-center justify-center">

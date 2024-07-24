@@ -218,12 +218,15 @@ const Card = ({ id, text, status, card }) => {
                                 </svg>
                             </MenuButton>
 
-                            <Menu className=''> 
+                            <Menu className=''>
 
                                 <MenuItem onClick={() => setOpen(true)}>View</MenuItem>
+                                <MenuItem onClick={() => setEdit(true)} >Edit</MenuItem>
                                 <MenuItem onClick={archiveTask} >Archive</MenuItem>
                             </Menu>
                         </Dropdown>
+                        
+                        
                         <Modal
                             aria-labelledby="modal-title"
                             aria-describedby="modal-desc"
@@ -239,7 +242,7 @@ const Card = ({ id, text, status, card }) => {
                                 }}
                             >
                                 <ModalClose variant="plain" sx={{ m: 1 }} onClick={() => setEdit(false)} />
-                                <EditTask data={card} />
+                                <EditTask data={card} setEdit={setEdit}/>
                             </Sheet>
                         </Modal>
                         <Modal
@@ -321,6 +324,7 @@ const Card = ({ id, text, status, card }) => {
                     )}
                 </div>
             </div>
+            
         </div>
     );
 };

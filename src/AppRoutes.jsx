@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { CssVarsProvider } from '@mui/joy/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
 import Box from '@mui/joy/Box';
@@ -23,21 +23,23 @@ import Archive from './Components/ArchivedTasks/Archive';
 import UnApprovedTask from './Components/Task/UnApprovedTask';
 import ChangePassword from './Components/Profile/ChangePassword';
 import PrivateRoute from './Components/PrivateRoute'; // Import PrivateRoute
+import { UserContext } from './global/UserContext';
 
 function AppRoutes() {
-  const userDataString = localStorage.getItem('userData');
+    const { userData, login, logout } = useContext(UserContext);
+//   const userDataString = localStorage.getItem('userData');
   const [currentRouteName, setCurrentRouteName] = useState('');
+  const [role, setRole] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
   const [opennoti, setOpennoti] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const handleClose = () => setOpennoti(false);
-  const [userData, setUserData] = useState({});
-  const [userid, setuserid] = useState(JSON.parse(userDataString)?.userId || '');
+//   const [userData, setUserData] = useState({});
+  const [userid, setuserid] = useState(userData?.userId || '');
   const [profilePic, setProfilePic] = useState(null);
   const [allNotifications, setAllNotifications] = useState([]);
   const [newNotifications, setNewNotifications] = useState(0);
-
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
@@ -68,7 +70,7 @@ function AppRoutes() {
     if (userDataString) {
       const userDataObj = JSON.parse(userDataString);
       setuserid(userDataObj.userId);
-      fetchUserData(userDataObj.userId);
+    //   fetchUserData(userDataObj.userId);
     }
   }, []);
 
@@ -76,7 +78,7 @@ function AppRoutes() {
     try {
       const response = await axios.get(`http://localhost:5000/api/user/${userId}`);
       const userData = response.data;
-      setUserData(userData);
+    //   setUserData(userData);
       setProfilePic(userData.profilePic);
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -91,6 +93,25 @@ function AppRoutes() {
   useEffect(() => {
     handleRouteChange();
   }, [location.pathname]);
+
+
+  const getRole = (role) => {
+    switch (role) {
+        case 1:
+            return "Dept Head";
+        case 2:
+            return "Project Head";
+        case 3:
+            return "Member";
+        case 0:
+            return "Super Admin";
+        default:
+            return "No Role";
+    }
+};
+useEffect(() => {
+    setRole(getRole(Number(userData?.userRole)));
+}, [userData]);
 
   return (
     <div>
@@ -119,13 +140,13 @@ function AppRoutes() {
                 <div className="cursor-pointer gap-2 px-2 rounded-lg" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <div className="cursor-pointer border gap-2 px-2 rounded-lg shadow-sm bg-gray-100" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div onClick={() => navigate("/profile")}>
-                      <Avatar variant="outlined" size="sm" src={profilePic || 'https://via.placeholder.com/150'} />
+                      <Avatar variant="outlined" size="sm" src={userData?.profilePic || 'https://via.placeholder.com/150'} />
                     </div>
                     <div onClick={() => navigate("/profile")}>
-                      <Box className='' sx={{ minWidth: 0, color: "" }}>
-                        <Typography className="text-gray-700" level="body-sm">Hello!</Typography>
-                        <Typography className='text-black' level="title-sm">{userData?.name}</Typography>
-                      </Box>
+                      <div className='py-1' sx={{ minWidth: 0, color: "" }}>
+                        <h3 className='text-blue- capitalize font-bold' >{userData?.name}</h3>
+                        <h5 className="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded  border border-yellow-300" >{role}</h5>
+                      </div>
                     </div>
                   </div>
                   <div>
