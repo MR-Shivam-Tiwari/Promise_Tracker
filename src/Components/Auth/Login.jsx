@@ -13,7 +13,7 @@ import { toast } from 'react-toastify';
 import { UserContext } from '../../global/UserContext';
 
 function Login() {
-    const {userData, setUserData} = useContext(UserContext);
+    const { userData, setUserData } = useContext(UserContext);
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -114,11 +114,14 @@ function Login() {
                                                 onChange={(e) => setPassword(e.target.value)}
                                             />
                                         </div>
-                                     <div className='flex justify-end'>
-                                     <button onClick={() => navigate("/forgot-password")} class="font-medium text-blue-600   hover:underline" href="#">
-                                            Forgot password?
-                                        </button>
-                                     </div>
+                                        <div className='flex justify-end'>
+                                            <a href="#" onClick={(e) => {
+                                                e.preventDefault();
+                                                navigate("/forgot-password");
+                                            }} class="font-medium text-blue-600 hover:underline">
+                                                Forgot password?
+                                            </a>
+                                        </div>
                                         <button type='submit' disabled={loader} class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 w-full bg-[#ff8c00] hover:bg-[#ff7b00] text-white py-3">
                                             SIGN IN
                                         </button>

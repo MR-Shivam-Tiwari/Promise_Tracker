@@ -15,7 +15,36 @@ function Role() {
             console.log("Error fetching User Data: ", error);
         }
     };
-
+    const handleInactive = (user, userId) => {
+        if (userId) {
+            const data = { active: false }; // Define your data object
+            axios.put(`http://localhost:5000/api/users/${userId}/deactivate`)
+                .then((res) => {
+                    toast.dismiss();
+                    toast.success(res.data.message);
+                    fetchUserData(); // Assuming this function fetches updated user data
+                })
+                .catch((err) => {
+                    toast.dismiss();
+                    toast.error(err.response.data.message);
+                });
+        }
+    };
+    
+    const handleActive = (user, userId)=>{
+        if(userId ){
+            const data = {active:true}
+            axios.put(`http://localhost:5000/api/users/${userId}/activate` )
+            .then((res)=>{
+                toast.dismiss();
+                toast.success(res.data.message);
+                fetchUserData();
+            }).catch((err)=>{
+                toast.dismiss();
+                toast.error(err.response.data.message);
+            })
+        }
+    }
     const updateUserRole = async (userId, newRole) => {
         try {
             const response = await axios.put(`http://localhost:5000/api/updateUserRole/${userId}`, {
@@ -32,7 +61,10 @@ function Role() {
         fetchUserData();
     }, []);
 
-    const getRole = (role) => {
+    const getRole = (role, active) => {
+        if (!active) {
+            return "INACTIVE";
+        }
         switch (role) {
             case 1:
                 return "DEPARTMENT_HEAD";
@@ -64,7 +96,7 @@ function Role() {
     }
 
     const filteredUserData = userData.filter(user => {
-        const role = getRole(user.userRole).toLowerCase();
+        const role = getRole(user.userRole, user.active).toLowerCase();
         return user.name.toLowerCase().includes(searchTerm.toLowerCase()) || user.email.toLowerCase().includes(searchTerm.toLowerCase()) || role.includes(searchTerm.toLowerCase())
     })
 
@@ -112,11 +144,11 @@ function Role() {
                                                     ? "bg-green-400"
                                                     : user.userRole === 1
                                                         ? "bg-blue-400"
-                                                        : "bg-gray-500"
+                                                        : "bg-gray-500 text-gray-200"
                                                 }`}
                                             data-v0-t="badge"
                                         >
-                                            {highlightText(getRole(user.userRole), searchTerm)}
+                                            {highlightText(getRole(user.userRole, user.active), searchTerm)}
                                         </div>
                                     </td>
                                     {user.userRole !== 0 && (
@@ -132,6 +164,11 @@ function Role() {
                                                     <MenuItem onClick={() => handleRoleChange(user.userId, 3)}>MEMBER</MenuItem>
                                                     <MenuItem onClick={() => handleRoleChange(user.userId, 1)}>DEPARTMENT_HEAD</MenuItem>
                                                     <MenuItem onClick={() => handleRoleChange(user.userId, 2)}>PROJECT_LEAD</MenuItem>
+                                                    {
+                                                        user?.active?<MenuItem onClick={() => handleInactive(user, user.userId)}>INACTIVE</MenuItem>
+                                                        :
+                                                        <MenuItem onClick={() => handleActive(user, user.userId)}>ACTIVE</MenuItem>
+                                                    }
                                                 </Menu>
                                             </Dropdown>
                                         </td>
