@@ -21,10 +21,16 @@ function ChangePassword() {
             .then((res)=>{
                 toast.dismiss();
                 toast.success('Password changed successfully');
+                setOldPassword('')
+                setNewPassword('')
+                setConfirmPassword('')
             })
         }else{
             toast.dismiss();
             toast.error('New Password and Confirm Password should be same');
+            setOldPassword('')
+            setNewPassword('')
+            setConfirmPassword('')
         }
     }
     return (
