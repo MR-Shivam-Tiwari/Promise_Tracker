@@ -7,6 +7,7 @@ import Register from './Components/Auth/Register';
 import Home from './Components/Home';
 import AppRoutes from './AppRoutes';
 import { UserProvider, UserContext } from './global/UserContext';
+import ForgotPassword from './Components/Auth/ForgotPassword';
 
 export default function App() {
   return (
@@ -37,6 +38,7 @@ function NonAuthContent() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/" element={<Home />} />
       <Route path="/*" element={<Navigate to="/login" />} />
     </Routes>
