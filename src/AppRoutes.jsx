@@ -24,6 +24,9 @@ import UnApprovedTask from "./Components/Task/UnApprovedTask";
 import ChangePassword from "./Components/Profile/ChangePassword";
 import PrivateRoute from "./Components/PrivateRoute"; // Import PrivateRoute
 import { UserContext } from "./global/UserContext";
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:5000');
 
 function AppRoutes() {
   const { userData, login, logout } = useContext(UserContext);
@@ -40,25 +43,37 @@ function AppRoutes() {
   const [profilePic, setProfilePic] = useState(null);
   const [allNotifications, setAllNotifications] = useState([]);
   const [newNotifications, setNewNotifications] = useState(0);
+
+  const fetchNotifications = async () => {
+    console.log('alskdjflkasjfdskalfjsklj')
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/notifications"
+      );
+      const allNotifications = response.data
+        .filter((notification) => notification.userId === userid)
+        .reverse();
+      setAllNotifications(allNotifications);
+      setNewNotifications(
+        allNotifications.filter(
+          (notification) => notification.status === "unread"
+        ).length
+      );
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  };
+
+  useEffect(()=>{
+    socket.on('newTask', (data)=>{
+      console.log('asdjfasjflaskjfaldskjfdsalkfjs')
+        fetchNotifications();
+    })
+
+    socket.off('update_notification');
+},[])
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:5000/api/notifications"
-        );
-        const allNotifications = response.data
-          .filter((notification) => notification.userId === userid)
-          .reverse();
-        setAllNotifications(allNotifications);
-        setNewNotifications(
-          allNotifications.filter(
-            (notification) => notification.status === "unread"
-          ).length
-        );
-      } catch (error) {
-        console.error("Error fetching notifications:", error);
-      }
-    };
+    
     fetchNotifications();
   }, [userid]);
 

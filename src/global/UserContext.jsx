@@ -19,6 +19,9 @@ export const UserProvider = ({ children }) => {
       if(res.data.active===false){
         setUserData(null)
       }
+      else{
+        setUserData({...userData, ...res.data})
+      }
     }).catch((err)=>{
       console.log(err)
     })
@@ -26,13 +29,23 @@ export const UserProvider = ({ children }) => {
   }
 
   useEffect(()=>{
-    socket.on('user-deactivated', user=>{
-      if(userData?.userId) fetchUserData()
+    fetchUserData()
+  },[])
+
+
+  useEffect(()=>{
+    socket.on(`user_update${userData?.userId}`, user=>{
+      if(userData?.userId===user?._id){
+        fetchUserData()
+      }
     })
+   
 
     return ()=>{
       socket.off('user-deactivated')
     }
+
+    
   },[])
 
   // Custom setter for userData that also updates localStorage

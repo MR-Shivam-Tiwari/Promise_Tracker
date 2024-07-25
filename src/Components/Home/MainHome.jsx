@@ -34,8 +34,8 @@ const DateComponent = ({ taskData }) => {
     const startDate = new Date(taskData?.startDate);
     const endDate = new Date(taskData?.endDate);
 
-    console.log("Start Date:", startDate);
-    console.log("End Date:", endDate);
+    // console.log("Start Date:", startDate);
+    // console.log("End Date:", endDate);
 
     const isStartDateValid = isValidDate(startDate);
     const isEndDateValid = isValidDate(endDate);
@@ -73,8 +73,8 @@ const DateComponent = ({ taskData }) => {
     const formatStartDate = formatDatee(taskData?.startDate);
     const formatEndDate = formatDatee(taskData?.endDate);
 
-    console.log("Formatted Start Date:", formatStartDate);
-    console.log("Formatted End Date:", formatEndDate);
+    // console.log("Formatted Start Date:", formatStartDate);
+    // console.log("Formatted End Date:", formatEndDate);
 
     return (
         <div className='flex font-semibold text-[11px]'>
@@ -119,9 +119,9 @@ function MainHome() {
         const withoutArchive = taskData.filter(task => task.status !== 'Archive' && task.people.some(person => person.userId === userid));
         const completedTasks = taskData.filter(task => task.status === 'Completed' && task.people.some(person => person.userId === userid));
         const completionPercentage = (completedTasks.length / withoutArchive.length) * 100;
-        console.log('Completion Percentage:', completionPercentage);
-        console.log('Completed Tasks:', completedTasks.length);
-        console.log('Total Tasks:', withoutArchive);
+        // console.log('Completion Percentage:', completionPercentage);
+        // console.log('Completed Tasks:', completedTasks.length);
+        // console.log('Total Tasks:', withoutArchive);
         return completionPercentage;
     };
 
@@ -270,7 +270,7 @@ function MainHome() {
             const response = await axios.post(`http://localhost:5000/api/pin/${_id}`, { userId });
             if (response.status === 200) {
 
-                console.log('Group pinned successfully:', response.data.group);
+                // console.log('Group pinned successfully:', response.data.group);
                 toast.success('Group pinned successfully:');
                 setInterval(() => {
                     window.location.reload();
@@ -290,7 +290,7 @@ function MainHome() {
             const response = await axios.post(`http://localhost:5000/api/unpin/${_id}/${userId}`);
             if (response.status === 200) {
 
-                console.log('Group Unpinned successfully:', response.data.group);
+                // console.log('Group Unpinned successfully:', response.data.group);
                 toast.success('Group Unpinned successfully:');
                 setInterval(() => {
                     window.location.reload();

@@ -153,7 +153,7 @@ function Task() {
     const fetchTasks = () => {
         axios.get('http://localhost:5000/api/tasks')
             .then(response => {
-                console.log('Response data:', response.data); // Log the response data
+                // console.log('Response data:', response.data); // Log the response data
     
                 const filteredTasks = response.data.filter(task => {
                     const isOwner = task.owner.id === userid;
@@ -161,7 +161,7 @@ function Task() {
                     return isOwner || isPerson;
                 });
     
-                console.log('Filtered tasks:', filteredTasks); // Log the filtered tasks
+                // console.log('Filtered tasks:', filteredTasks); // Log the filtered tasks
     
                 const todoTasks =  filteredTasks?.filter(task => !task.status || task.status === 'To Do');
                 const inProgressTasks =  filteredTasks?.filter(task => task.status === 'In Progress');

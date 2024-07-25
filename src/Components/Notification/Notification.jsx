@@ -2,6 +2,9 @@ import { Avatar, Box, Button, Skeleton } from '@mui/joy';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:5000');
 
 function Notification({ handleClose }) {
     const [allNotifications, setAllNotifications] = useState([]);
@@ -9,6 +12,7 @@ function Notification({ handleClose }) {
     const [loading, setLoading] = useState(true); // Add loading state
     const [opennoti, setOpennoti] = useState(false);
     const [userid, setuserid] = useState("");
+    
     const navigate = useNavigate();
     useEffect(() => {
         const userDataString = localStorage.getItem('userData');
@@ -18,30 +22,41 @@ function Notification({ handleClose }) {
             setuserid(userId);
         }
     }, []);
+    const fetchNotifications = async () => {
+        try {
+            const response = await axios.get(`http://localhost:5000/api/notifications`);
+            const allNotifications = response.data;
+            const filteredNotifications = allNotifications.filter(notification => notification.userId === userid);
+            const sortedNotifications = filteredNotifications.sort((a, b) => new Date(b.created) - new Date(a.created));
+            setAllNotifications(sortedNotifications);
+            const newNotificationsCount = sortedNotifications.filter(notification => notification.status === 'unread').length;
+            if (newNotificationsCount !== newNotifications) {
+                setNewNotifications(newNotificationsCount);
+            }
+            setLoading(false); // Set loading to false after data is fetched
+        } catch (error) {
+            console.error("Error fetching notifications:", error);
+            setLoading(false); // Set loading to false in case of error
+        }
+    };
 
     useEffect(() => {
-        const fetchNotifications = async () => {
-            try {
-                const response = await axios.get(`http://localhost:5000/api/notifications`);
-                const allNotifications = response.data;
-                const filteredNotifications = allNotifications.filter(notification => notification.userId === userid);
-                const sortedNotifications = filteredNotifications.sort((a, b) => new Date(b.created) - new Date(a.created));
-                setAllNotifications(sortedNotifications);
-                const newNotificationsCount = sortedNotifications.filter(notification => notification.status === 'unread').length;
-                if (newNotificationsCount !== newNotifications) {
-                    setNewNotifications(newNotificationsCount);
-                }
-                setLoading(false); // Set loading to false after data is fetched
-            } catch (error) {
-                console.error("Error fetching notifications:", error);
-                setLoading(false); // Set loading to false in case of error
-            }
-        };
+      
 
         if (userid) {
             fetchNotifications();
         }
     }, [userid]);
+
+    useEffect(()=>{
+        socket.on('update_notification', (data)=>{
+
+            console.log('alksfdjlaskjfaldskfjsdalkfjadsklfjs')
+            fetchNotifications();
+        })
+
+        socket.off('update_notification');
+    },[])
 
     const handleOpen = () => {
         setOpennoti(true);
@@ -51,12 +66,12 @@ function Notification({ handleClose }) {
         try {
             const notificationIds = allNotifications.map(notification => notification._id);
             await axios.put(`http://localhost:5000/api/notifications/mark-read`, { notificationIds });
-            console.log("All notifications marked as read successfully");
+            // console.log("All notifications marked as read successfully");
             setInterval(() => {
                 window.location.reload();
             }, 1000);
         } catch (error) {
-            console.error("Error marking all notifications as read:", error);
+            // console.error("Error marking all notifications as read:", error);
         }
     };
 
