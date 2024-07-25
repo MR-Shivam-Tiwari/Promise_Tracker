@@ -127,39 +127,40 @@ function AppRoutes() {
   }, [userData]);
 
   return (
-    <div>
+    <div className="lexend-bold">
       <CssVarsProvider disableTransitionOnChange>
         <CssBaseline />
-        <Box sx={{ display: "flex", minHeight: "100dvh" }}>
-          <Header />
+        <Box sx={{ display: "flex" }}>
           <Sidebar />
           <Box
+          
             component="main"
             className="MainContent"
             sx={{
-              px: { xs: 1, md: 6 },
+              px: { xs: 1, },
+              overflow: "auto",
               pt: {
                 xs: "calc(12px + var(--Header-height))",
                 sm: "calc(12px + var(--Header-height))",
-                md: 3,
+                md: 1,
               },
               pb: { xs: 2, sm: 2, md: 3 },
               flex: 1,
               display: "flex",
               flexDirection: "column",
               minWidth: 0,
-              height: "100dvh",
               gap: 1,
+              p:1
             }}
           >
-            <div className="grid col border rounded-lg p-2 gap-3">
-              <div className="flex lg:flex-row items-center lg:items-end justify-end">
+            <div className="grid col border rounded-lg p-2 mt-2 lg:mt-0 gap-3">
+              <div className="flex lg:flex-row items-center lg:items-end justify-between ">
+                  <div>
+                    <Header />
+                  </div>
                 <div
-                  className="cursor-pointer gap-2 px-2 rounded-lg"
+                  className="cursor-pointer gap-2 px-2 rounded-lg flex items-center "
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
                   }}
                 >
                   <div
@@ -170,33 +171,39 @@ function AppRoutes() {
                       justifyContent: "space-between",
                     }}
                   >
+
                     <div onClick={() => navigate("/profile")}>
                       <Avatar
                         variant="outlined"
-                        size="sm"
+                        size="md"
                         src={
                           userData?.profilePic ||
                           "https://via.placeholder.com/150"
                         }
                       />
                     </div>
-                    <div onClick={() => navigate("/profile")}>
-                      <div className="py-1" sx={{ minWidth: 0, color: "" }}>
-                        <h3 className="text-xs capitalize font-bold">
+                    <div
+                      className="py-0.5"
+                      onClick={() => navigate("/profile")}
+                    >
+                      <div sx={{ minWidth: 0, color: "" }}>
+                        <h3 className="text-[17px]  capitalize font-bold">
                           {userData?.name}
                         </h3>
-                        <h5 className="bg-gray-500 text-white text-xs font-medium me-2 px-2.5 rounded  border border-gray-500">
-                          {role}
-                        </h5>
+                        <div className="flex">
+                          <h5 className="bg-gray-500 text-white text-xs font-medium me-2 px-2 text-center  rounded  border border-gray-500">
+                            {role}
+                          </h5>
+                        </div>
                       </div>
                     </div>
                   </div>
                   <div>
-                    <div className="cursor-pointer border gap-2 p-0.5 rounded-lg shadow-sm bg-gray-100">
+                    <div className="cursor-pointer border gap-2   p-1 py-1.5 rounded-lg shadow-sm bg-gray-100">
                       <IconButton
                         size="sm"
                         variant="plain"
-                        className="p-2"
+                        className="p-2 l-2"
                         color="neutral"
                         onClick={handleOpen}
                       >
@@ -212,9 +219,7 @@ function AppRoutes() {
                         </svg>
                         <div class="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900">
                           {newNotifications > 0 && (
-                            <span
-                              className="bg-red-500 text-white rounded-full "
-                            >
+                            <span className="bg-red-500 text-white rounded-full ">
                               {newNotifications}
                             </span>
                           )}
@@ -223,24 +228,18 @@ function AppRoutes() {
                       <Modal open={opennoti} onClose={handleClose}>
                         <Notification handleClose={handleClose} />
                       </Modal>
-                      
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             <Box
-              sx={{
-                display: "flex",
-                mb: 1,
-                gap: 1,
-                flexDirection: { xs: "column", sm: "row" },
-                alignItems: { xs: "start", sm: "center" },
-                flexWrap: "wrap",
-                justifyContent: "space-between",
-              }}
+             
             >
-              <Box className='hidden lg:block' sx={{ display: "flex", alignItems: "center" }}>
+              {/* <Box
+                className="hidden lg:block"
+                sx={{ display: "flex", alignItems: "center" }}
+              >
                 <Breadcrumbs
                   size="sm"
                   aria-label="breadcrumbs"
@@ -260,12 +259,12 @@ function AppRoutes() {
                     {currentRouteName}
                   </Typography>
                 </Breadcrumbs>
-              </Box>
+              </Box> */}
               {/* <Typography level="h2" component="h1" fontSize={20}>
                 {currentRouteName}
               </Typography> */}
             </Box>
-            <div style={{ height: "1000px", overflow: "auto" }}>
+            <div >
               <Routes onChange={handleRouteChange}>
                 <Route
                   path="/profile"

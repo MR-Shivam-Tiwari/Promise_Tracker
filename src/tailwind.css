@@ -24,3 +24,86 @@
 ::-webkit-scrollbar-thumb:hover {
     background: #555; /* Color of the scrollbar handle on hover */
 }
+
+
+/* src/fonts.css */
+
+/* Lexend Font */
+.lexend-regular {
+    font-family: "Lexend", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  .lexend-bold {
+    font-family: "Lexend", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+  }
+  
+  /* Varela Round Font */
+  .varela-round-regular {
+    font-family: "Varela Round", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  /* Josefin Sans Font */
+  .josefin-sans-regular {
+    font-family: "Josefin Sans", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  .josefin-sans-bold {
+    font-family: "Josefin Sans", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+  }
+  
+  /* Josefin Sans Italic */
+  .josefin-sans-italic {
+    font-family: "Josefin Sans", sans-serif;
+    font-weight: 400;
+    font-style: italic;
+  }
+  
+  .josefin-sans-bold-italic {
+    font-family: "Josefin Sans", sans-serif;
+    font-weight: 700;
+    font-style: italic;
+  }
+  
+
+
+
+  .loader {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: inline-block;
+    border-top: 4px solid #0a91d0;
+    border-right: 4px solid transparent;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+  }
+  .loader::after {
+    content: '';  
+    box-sizing: border-box;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border-bottom: 4px solid #ea791d;
+    border-left: 4px solid transparent;
+  }
+  @keyframes rotation {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  } 
