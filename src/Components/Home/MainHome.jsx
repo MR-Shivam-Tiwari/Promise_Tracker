@@ -1,5 +1,5 @@
 import { AspectRatio, Avatar, Box, Button, CircularProgress, Dropdown, IconButton, LinearProgress, Menu, MenuButton, MenuItem, Modal, ModalClose, ModalDialog, Option, Select, Skeleton, Typography } from '@mui/joy'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import axios from 'axios';
@@ -12,6 +12,7 @@ import Add from '@mui/icons-material/Add';
 import CreateGroups from '../Group/CreateGroups';
 import EditGroup from '../Group/EditGroup';
 import { toast } from 'react-toastify';
+import { UserContext } from '../../global/UserContext';
 
 
 
@@ -87,6 +88,7 @@ const DateComponent = ({ taskData }) => {
 
 
 function MainHome() {
+    const {userData, setUserData} = useContext(UserContext);
     const [open, setOpen] = useState(false);
     const [EditModal, setEditModal] = useState(false);
     const theme = useTheme();
@@ -94,23 +96,32 @@ function MainHome() {
     const navigate = useNavigate();
     const progressWidth = isSmallScreen ? '12px' : '24px';
     const progressSize = isSmallScreen ? '120px' : '180px';
-    const [taskData, setTaskData] = useState("");
-    const [userid, setuserid] = useState("")
-    const [userId, setuserId] = useState("")
-    const [userData, setUserData] = useState("")
+    const [userid, setuserid] = useState(userData?.userId)
+    const [userId, setuserId] = useState(userData?.userId)
+    // const [userData, setUserData] = useState("")
     const [loading, setLoading] = React.useState(true);
     const [groupData, setGroupData] = useState("")
     const [pinnedGroup, setPinnedGroup] = useState([]);
     const [openModal, setOpenModal] = useState(false); // State to manage modal visibility
     const [selectedGroup, setSelectedGroup] = useState(null); // State to store selected group data
     const [editedgroup, setEditedgroup] = useState(null); // State to store selected group data
+    const [completionPercentage, setCompletionPercentage] = useState(0);
+    const [completionMessage, setCompletionMessage] = useState('');
+    const [taskData, setTaskData] = useState([]);
 
+
+    useEffect(()=>{
+        setCompletionPercentage(calculateCompletionPercentage())
+        setCompletionMessage(getCompletionMessage(completionPercentage))
+    },[taskData])
     const calculateCompletionPercentage = () => {
         if (taskData.length === 0) return 0;
-
-        const completedTasks = taskData.filter(task => task.status === 'Completed');
-        const completionPercentage = (completedTasks.length / taskData.length) * 100;
-
+        const withoutArchive = taskData.filter(task => task.status !== 'Archive' && task.people.some(person => person.userId === userid));
+        const completedTasks = taskData.filter(task => task.status === 'Completed' && task.people.some(person => person.userId === userid));
+        const completionPercentage = (completedTasks.length / withoutArchive.length) * 100;
+        console.log('Completion Percentage:', completionPercentage);
+        console.log('Completed Tasks:', completedTasks.length);
+        console.log('Total Tasks:', withoutArchive);
         return completionPercentage;
     };
 
@@ -124,42 +135,14 @@ function MainHome() {
         return "Let's get started!";
     };
 
-    const completionPercentage = calculateCompletionPercentage();
-    const completionMessage = getCompletionMessage(completionPercentage);
+    // const completionPercentage = calculateCompletionPercentage();
+    // const completionMessage = getCompletionMessage(completionPercentage);
 
     const handleCloseModal = () => {
         setOpenModal(false);
         setSelectedGroup(null); // Reset selected group data when modal is closed
     };
 
-
-    // const [groupIdToDelete, setGroupIdToDelete] = useState(null);
-    // const [deletemodal, setDeletemodal] = useState(false);
-
-    // const handleClickDelete = (id) => {
-    //     if (!id) {
-    //         toast.error("Group ID is required to delete a group");
-    //         return;
-    //     }
-    //     setGroupIdToDelete(id);
-    //     setDeletemodal(true); // Open the modal for confirmation
-    // };
-
-    // const handleDelete = async (id) => {
-    //     if (!id) return;
-
-    //     try {
-    //         const response = await axios.delete(`http://localhost:5000/api/deletegroup/${id}`);
-    //         console.log(response.data);
-    //         console.log("Delete Group with ID:", id);
-    //         toast.success("Group deleted successfully!");
-    //         setDeletemodal(false); // Close the delete modal
-    //         fetchGroupData(); // Refresh group data
-    //     } catch (error) {
-    //         console.error("Error deleting group:", error);
-    //         toast.error("Failed to delete group. Please try again later.");
-    //     }
-    // };
 
     // Function to handle opening the modal and setting selected group data
     const handleGroupClick = (task) => {
@@ -185,25 +168,22 @@ function MainHome() {
         }
     }, []);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get('http://localhost:5000/api/tasks');
-                const filteredTasks = response.data.filter(task => {
-                    // Check if any of the people in the task match the user's ID
-                    return task.people.some(person => person.userId === userid);
-                });
-                // const filteredTasks = response.data.filter(task => task.people.id === userid);
-                setTaskData(filteredTasks);
-            } catch (error) {
-                console.error('Error fetching tasks:', error);
-            }
-        };
-
-        if (userid) {
-            fetchData();
+    const fetchData = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/tasks');
+            const filteredTasks = response.data.filter(task => {
+                // Check if any of the people in the task match the user's ID
+                return task.people.some(person => person.userId === userid);
+            });
+            // const filteredTasks = response.data.filter(task => task.people.id === userid);
+            setTaskData(filteredTasks);
+        } catch (error) {
+            console.error('Error fetching tasks:', error);
         }
-    }, [userid]);
+    };
+    useEffect(() => {
+            fetchData();
+    }, []);
 
     useEffect(() => {
         const fetchpinnedGroup = async () => {
@@ -255,39 +235,9 @@ function MainHome() {
     }, [userid]);
 
 
-
-
-    // Log pinnedGroup to check its value
-    console.log("pinnedGroup", pinnedGroup);
-
-
-
-
-
-    const fetchUserData = async () => {
-        try {
-            const response = await axios.get('http://localhost:5000/api/userData');
-            setUserData(Array.isArray(response.data) ? response.data : []);
-            console.log(response.data);
-        } catch (error) {
-            console.log("Error fetching Group Data: ", error);
-        }
-    };
-
-    useEffect(() => {
-        fetchUserData();
-    }, []);
-
-    // Find the current user based on the frontendUserId
-    const currentUser = Array.isArray(userData) && userData.find(user => user.userId === userid);
-
-    // Check if the current user has userRole 0, 1, or 2
-    const showButton = currentUser && (currentUser.userRole === 0 || currentUser.userRole === 1 || currentUser.userRole === 2);
-    const dpthead = currentUser && (currentUser.userRole === 0);
-    const prjtlead = currentUser && (currentUser.userRole === 0 || currentUser.userRole === 1);
-
-
-
+        const showButton = [0, 1, 2].includes(userData?.userRole);
+        const dpthead = [0].includes(userData?.userRole);
+        const prjtlead = [0, 1].includes(userData?.userRole);
 
 
 
