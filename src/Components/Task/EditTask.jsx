@@ -7,7 +7,7 @@ const top100Films = [
     // Your top100Films array here...
 ];
 
-function EditTask({data, setEdit }) {
+function EditTask({ data, setEdit }) {
     const Taskid = data?._id
     const [GroupData, setGrouptData] = useState([]);
     const [departmentHeads, setDepartmentHeads] = useState([]);
@@ -16,11 +16,11 @@ function EditTask({data, setEdit }) {
     const [selectmembers, setMembers] = useState([]);
     const [formData, setFormData] = useState({
         owner: data?.owner,
-        taskGroup: data?.taskGroup?.groupName,
+        taskGroup: data?.taskGroup,
         taskName: data?.taskName,
         description: data?.description,
         audioFile: data?.audioFile,
-        startDate:data?.startDate,
+        startDate: data?.startDate,
         endDate: data?.endDate,
         reminder: data?.reminder,
         people: data?.people,
@@ -145,13 +145,13 @@ function EditTask({data, setEdit }) {
                             </label>
                             <select
                                 className="flex bg-white h-10 w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                                value={formData.taskGroup?.groupName}
-                                onChange={(e) => handleChange('taskGroup', e.target.value)}
+                                value={JSON.stringify(formData.taskGroup)}
+                                onChange={(e) => handleChange('taskGroup', JSON.parse(e.target.value))}
                             >
                                 <option value="">Select a Group</option>
                                 {Array.isArray(GroupData) && GroupData.length > 0 ? (
                                     GroupData.map((group) => (
-                                        <option key={group._id} value={group.groupName}>
+                                        <option key={group._id} value={JSON.stringify(group)}>
                                             {group.groupName}
                                         </option>
                                     ))
@@ -159,6 +159,7 @@ function EditTask({data, setEdit }) {
                                     <option value="" disabled>No groups available</option>
                                 )}
                             </select>
+
                         </div>
                         <div className="space-y-2">
                             <label className="text-sm font-medium leading-none" htmlFor="task-name">
