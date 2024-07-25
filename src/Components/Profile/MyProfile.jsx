@@ -200,7 +200,7 @@ export default function MyProfile() {
                 <div className="flex items-center space-x-4">
                   <button
                     onClick={() => setSection("about")}
-                    className={`flex items-center  font-bold text-xl  border-b-2 ${
+                    className={`flex items-center  font-bold text-lg  border-b-2 ${
                       section === "about"
                         ? "border-blue-500 text-blue-500"
                         : "border-transparent text-gray-500 hover:text-gray-900"
@@ -210,7 +210,7 @@ export default function MyProfile() {
                   </button>
                   <button
                     onClick={() => setSection("setting")}
-                    className={`flex items-center font-bold text-xl  border-b-2 ${
+                    className={`flex items-center font-bold text-lg  border-b-2 ${
                       section === "setting"
                         ? "border-blue-500 text-blue-500"
                         : "border-transparent text-gray-500 hover:text-gray-900"

@@ -23,7 +23,7 @@ function MainApp() {
   const isLoggedIn = userData?.token;
 
   return (
-    <div>
+    <div className='lexend-bold'>
       <ToastContainer />
       <Router>
         <Routes>
