@@ -26,7 +26,7 @@ import PrivateRoute from "./Components/PrivateRoute"; // Import PrivateRoute
 import { UserContext } from "./global/UserContext";
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:5000');
+const socket = io(process.env.REACT_APP_API_URL);
 
 function AppRoutes() {
   const { userData, login, logout } = useContext(UserContext);
@@ -48,7 +48,7 @@ function AppRoutes() {
     console.log('alskdjflkasjfdskalfjsklj')
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/notifications"
+        process.env.REACT_APP_API_URL+"/api/notifications"
       );
       const allNotifications = response.data
         .filter((notification) => notification.userId === userid)
@@ -65,7 +65,9 @@ function AppRoutes() {
   };
 
   useEffect(()=>{
-    socket.on('newTask', (data)=>{
+    // socket.on('newTask', (data)=>{
+    socket.on('update_notification', (data)=>{
+
       console.log('asdjfasjflaskjfaldskjfdsalkfjs')
         fetchNotifications();
     })
@@ -83,7 +85,7 @@ function AppRoutes() {
       const notificationIds = allNotifications.map(
         (notification) => notification._id
       );
-      await axios.put("http://localhost:5000/api/notifications/mark-read", {
+      await axios.put(process.env.REACT_APP_API_URL+"/api/notifications/mark-read", {
         notificationIds,
       });
       window.location.reload();
@@ -104,7 +106,7 @@ function AppRoutes() {
   const fetchUserData = async (userId) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/user/${userId}`
+        process.env.REACT_APP_API_URL+`/api/user/${userId}`
       );
       const userData = response.data;
       //   setUserData(userData);

@@ -8,7 +8,7 @@ function AcceptApprovals({ taskId, task, onClose }) {
     const handleApprove = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.put(`http://localhost:5000/api/tasks/taskapprovals/${taskId}`, {
+            const response = await axios.put(process.env.REACT_APP_API_URL+`/api/tasks/taskapprovals/${taskId}`, {
                 status: 'In Progress',
                 endDate: new Date().toISOString() // Set end date to current date/time
             });
@@ -19,6 +19,7 @@ function AcceptApprovals({ taskId, task, onClose }) {
 
             // Handle successful response
             console.log('Task approved successfully');
+            toast.dismiss()
             toast.success('Task approved successfully');
             onClose(true);
 

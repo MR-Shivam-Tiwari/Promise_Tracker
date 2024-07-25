@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:5000');
+const socket = io(process.env.REACT_APP_API_URL);
 
 function Notification({ handleClose }) {
     const [allNotifications, setAllNotifications] = useState([]);
@@ -24,7 +24,7 @@ function Notification({ handleClose }) {
     }, []);
     const fetchNotifications = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/notifications`);
+            const response = await axios.get(process.env.REACT_APP_API_URL+`/api/notifications`);
             const allNotifications = response.data;
             const filteredNotifications = allNotifications.filter(notification => notification.userId === userid);
             const sortedNotifications = filteredNotifications.sort((a, b) => new Date(b.created) - new Date(a.created));
@@ -65,7 +65,7 @@ function Notification({ handleClose }) {
     const markAllNotificationsAsRead = async () => {
         try {
             const notificationIds = allNotifications.map(notification => notification._id);
-            await axios.put(`http://localhost:5000/api/notifications/mark-read`, { notificationIds });
+            await axios.put(process.env.REACT_APP_API_URL+`/api/notifications/mark-read`, { notificationIds });
             // console.log("All notifications marked as read successfully");
             setInterval(() => {
                 window.location.reload();

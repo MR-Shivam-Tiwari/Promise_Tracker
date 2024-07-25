@@ -43,7 +43,7 @@ export default function MyProfile() {
         userId,
       };
       axios
-        .post("http://localhost:5000/api/change-password", data)
+        .post(process.env.REACT_APP_API_URL+"/api/change-password", data)
         .then((res) => {
           toast.dismiss();
           toast.success("Password changed successfully");
@@ -69,7 +69,7 @@ export default function MyProfile() {
     };
 
     axios
-      .put(`http://localhost:5000/api/users/${userData?.userId}`, updatedData)
+      .put(process.env.REACT_APP_API_URL+`/api/users/${userData?.userId}`, updatedData)
       .then((res) => {
         toast.dismiss();
         toast.success("Profile updated successfully");

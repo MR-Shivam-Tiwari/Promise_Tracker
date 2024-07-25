@@ -177,7 +177,7 @@ const Card = ({ id, text, status, card }) => {
     const dueMessage = calculateDueMessage(endDateFormatted);
     const archiveTask = async () => {
         try {
-            const response = await axios.put(`http://localhost:5000/api/tasks/${id}/status`, {
+            const response = await axios.put(process.env.REACT_APP_API_URL+`/api/tasks/${id}/status`, {
                 status: 'Archive',
             }, {
                 headers: {
@@ -192,6 +192,7 @@ const Card = ({ id, text, status, card }) => {
                 // Handle error response
                 console.error('Failed to archive task', response.data);
             }
+            toast.dismiss()
             toast.success("Task archived successfully")
             setInterval(() => {
                 window.location.reload();
@@ -359,7 +360,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
     }, [tasksToDo, tasksInProgress, tasksCompleted, tasksCancelled]);
 
     const updateTaskStatus = async (id, status, body) => {
-        const response = await fetch(`http://localhost:5000/api/tasks/${id}/status`, {
+        const response = await fetch(process.env.REACT_APP_API_URL+`/api/tasks/${id}/status`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -413,7 +414,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
 
         if (currentCard) {
             try {
-                const response = await fetch(`http://localhost:5000/api/tasks/${currentCard._id}/cancel`, {
+                const response = await fetch(process.env.REACT_APP_API_URL+`/api/tasks/${currentCard._id}/cancel`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -428,6 +429,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                 }
 
                 const updatedTask = await response.json();
+                toast.dismiss()
                 toast.success("Task Status Updated");
 
                 const newSections = { ...sections };
@@ -467,7 +469,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
         }
 
         try {
-            const response = await fetch(`http://localhost:5000/api/tasks/${currentCard._id}/complete`, {
+            const response = await fetch(process.env.REACT_APP_API_URL+`/api/tasks/${currentCard._id}/complete`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -489,7 +491,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
             updatedSections[currentCard.fromSection] = updatedSections[currentCard.fromSection].filter(card => card._id !== currentCard._id);
             updatedSections['Completed'] = [...updatedSections['Completed'], { ...currentCard, status: 'Completed' }];
             setSections(updatedSections);
-
+            toast.dismiss()
             toast.success('Task Status Updated');
             handleCompleteModalClose();
             setProofText('');

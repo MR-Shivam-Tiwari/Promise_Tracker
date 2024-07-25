@@ -13,7 +13,7 @@ import { Autocomplete } from '@mui/joy';
 import Add from '@mui/icons-material/Add';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:5000');
+const socket = io(process.env.REACT_APP_API_URL);
 
 function Task() {
     const userDataString = localStorage.getItem('userData');
@@ -101,7 +101,7 @@ function Task() {
         }
 
         try {
-            const response = await axios.post("http://localhost:5000/api/tasksadd", formData);
+            const response = await axios.post(process.env.REACT_APP_API_URL+"/api/tasksadd", formData);
             // console.log(response.data);
             resetForm();
             setModal(false);
@@ -128,7 +128,7 @@ function Task() {
 
     const fetchGroupData = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/groups');
+            const response = await axios.get(process.env.REACT_APP_API_URL+'/api/groups');
             setGroupData(response.data);
             // console.log("groupData", response.data);
         } catch (error) {
@@ -138,7 +138,7 @@ function Task() {
 
     const fetchRegisteredNames = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/userData");
+            const response = await axios.get(process.env.REACT_APP_API_URL+"/api/userData");
             const filteredDepartmentHeads = response.data.filter(user => user.userRole === 1);
             setDepartmentHeads(filteredDepartmentHeads);
             const filteredProjectlead = response.data.filter(user => user.userRole === 2);
@@ -151,7 +151,7 @@ function Task() {
     };
 
     const fetchTasks = () => {
-        axios.get('http://localhost:5000/api/tasks')
+        axios.get(process.env.REACT_APP_API_URL+'/api/tasks')
             .then(response => {
                 // console.log('Response data:', response.data); // Log the response data
     
@@ -185,7 +185,7 @@ function Task() {
                 setTaskGroups(uniqueTaskGroups);
                 setLoading(false);
     
-                return axios.put('http://localhost:5000/api/archiveOldTasks');
+                return axios.put(process.env.REACT_APP_API_URL+'/api/archiveOldTasks');
             })
             .then(() => {
                 // Optionally, handle the response from the PUT request

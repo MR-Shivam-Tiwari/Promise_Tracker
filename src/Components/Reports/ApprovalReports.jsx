@@ -116,7 +116,7 @@ function ApprovalReports() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/allusertask');
+                const response = await fetch(process.env.REACT_APP_API_URL+'/api/allusertask');
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }

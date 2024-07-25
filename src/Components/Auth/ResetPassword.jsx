@@ -34,7 +34,7 @@ function ResetPassword() {
             return;
         }
 
-        axios.post('http://localhost:5000/api/set-password', { userId, password: newPassword })
+        axios.post(process.env.REACT_APP_API_URL+'/api/set-password', { userId, password: newPassword })
         .then((res)=>{
             toast.dismiss()
             toast.success(res.data.message);

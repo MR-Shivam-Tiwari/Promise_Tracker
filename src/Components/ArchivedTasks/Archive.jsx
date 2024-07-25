@@ -4,7 +4,7 @@ import { Dropdown, IconButton, Menu, MenuButton, MenuItem } from '@mui/joy';
 import { toast } from 'react-toastify';
 
 const updateTaskStatus = async (id, status, body) => {
-    const response = await fetch(`http://localhost:5000/api/tasks/${id}/status`, {
+    const response = await fetch(process.env.REACT_APP_API_URL+`/api/tasks/${id}/status`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -15,6 +15,7 @@ const updateTaskStatus = async (id, status, body) => {
     if (!response.ok) {
         throw new Error('Failed to update task status');
     }
+    toast.dismiss()
 
     toast.success("Task Status Updated");
     return response.json();
@@ -27,7 +28,7 @@ function Archive() {
 
     const fetchTasks = async (userId) => {
         try {
-            const response = await axios.get('http://localhost:5000/api/tasks');
+            const response = await axios.get(process.env.REACT_APP_API_URL+'/api/tasks');
             console.log('Response data:', response.data);
 
             const userTasks = response.data.filter(task => {

@@ -78,10 +78,11 @@ function AddTask({ setOpen }) {
         }
 
         try {
-            const response = await axios.post("http://localhost:5000/api/tasksadd", formData);
+            const response = await axios.post(process.env.REACT_APP_API_URL+"/api/tasksadd", formData);
             console.log(response.data);
             resetForm();
             setOpen(false);
+            toast.dismiss()
             toast.success("Task created successfully!");
             // setInterval(() => {
             //     window.location.reload();
@@ -113,7 +114,7 @@ function AddTask({ setOpen }) {
     useEffect(() => {
         const fetchGroupData = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/groups');
+                const response = await axios.get(process.env.REACT_APP_API_URL+'/api/groups');
                 setGroupData(response.data);
                 console.log("groupdata", response.data);
             } catch (error) {
@@ -127,7 +128,7 @@ function AddTask({ setOpen }) {
     useEffect(() => {
         const fetchRegisteredNames = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/api/userData");
+                const response = await axios.get(process.env.REACT_APP_API_URL+"/api/userData");
                 const filteredDepartmentHeads = response.data.filter(
                     (user) => user.userRole === 1
                 );

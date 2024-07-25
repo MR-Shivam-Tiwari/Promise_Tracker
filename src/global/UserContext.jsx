@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { createContext, useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:5000');
+const socket = io(process.env.REACT_APP_API_URL);
 // Create the context
 export const UserContext = createContext();
 
@@ -14,7 +14,7 @@ export const UserProvider = ({ children }) => {
   const [userData, setUserDataState] = useState(userDataObj);
 
   const fetchUserData =  () => {
-    axios.get( 'http://localhost:5000/api/user/'+userData?.userId)
+    axios.get( process.env.REACT_APP_API_URL+'/api/user/'+userData?.userId)
     .then((res)=>{
       if(res.data.active===false){
         setUserData(null)
@@ -27,7 +27,17 @@ export const UserProvider = ({ children }) => {
     })
 
   }
-
+  const roleProtected =async () => {
+    return axios.get(process.env.REACT_APP_API_URL+'/api/user/' + userData?.userId)
+      .then((res) => {
+        setUserData({...userData, ...res.data});
+        return [0, 1].includes(res.data?.userRole);
+      })
+      .catch((err) => {
+        console.log(err);
+        return false;
+      });
+  };
   useEffect(()=>{
     fetchUserData()
   },[])
@@ -79,7 +89,7 @@ export const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ userData, login, logout, setUserData }}>
+    <UserContext.Provider value={{ userData, login, logout, setUserData,roleProtected }}>
       {children}
     </UserContext.Provider>
   );

@@ -50,7 +50,7 @@ function EditTask({ data, setEdit }) {
         const fetchTaskData = async () => {
             if (Taskid) {
                 try {
-                    const response = await axios.get(`http://localhost:5000/api/tasks/${Taskid}`);
+                    const response = await axios.get(process.env.REACT_APP_API_URL+`/api/tasks/${Taskid}`);
                     setFormData(response.data);
                     console.log(response.data)
                 } catch (error) {
@@ -83,9 +83,10 @@ function EditTask({ data, setEdit }) {
         e.preventDefault();
 
         try {
-            const response = await axios.put(`http://localhost:5000/api/tasksedit/${Taskid}`, formData);
+            const response = await axios.put(process.env.REACT_APP_API_URL+`/api/tasksedit/${Taskid}`, formData);
             console.log(response.data);
             setEdit(false)
+            toast.dismiss()
             toast.success("Task updated successfully!");
             setInterval(
                 () => {
@@ -105,7 +106,7 @@ function EditTask({ data, setEdit }) {
     useEffect(() => {
         const fetchGroupData = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/groups');
+                const response = await axios.get(process.env.REACT_APP_API_URL+'/api/groups');
                 setGrouptData(response.data);
             } catch (error) {
                 console.log("Error fetching group data: ", error);
@@ -118,7 +119,7 @@ function EditTask({ data, setEdit }) {
     useEffect(() => {
         const fetchRegisteredNames = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/api/userData");
+                const response = await axios.get(process.env.REACT_APP_API_URL+"/api/userData");
                 setUserNamesEmail(response.data);
                 const filteredDepartmentHeads = response.data.filter((user) => user.userRole === 1);
                 setDepartmentHeads(filteredDepartmentHeads);

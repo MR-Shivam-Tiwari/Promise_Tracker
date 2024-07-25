@@ -25,7 +25,7 @@ function ForgotPassword() {
         e.preventDefault();
         setLoader(true)
 
-        axios.post('http://localhost:5000/api/reset-link', { email: email })
+        axios.post(process.env.REACT_APP_API_URL+'/api/reset-link', { email: email })
         .then((res)=>{
             toast.dismiss()
             toast.success(res.data.message);

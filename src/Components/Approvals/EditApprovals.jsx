@@ -21,7 +21,7 @@ function EditApprovals({ taskId, task, onClose }) {
     const handleApprove = async () => {
         setIsLoading(true);
         try {
-            const response = await fetch(`http://localhost:5000/api/categoryedit/${taskId}`, {
+            const response = await fetch(process.env.REACT_APP_API_URL+`/api/categoryedit/${taskId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -36,6 +36,8 @@ function EditApprovals({ taskId, task, onClose }) {
             }
             // Handle successful response
             console.log('Task approved successfully');
+            toast.dismiss()
+
             toast.success('Task approved successfully');
             onClose(true);
 
@@ -51,7 +53,7 @@ function EditApprovals({ taskId, task, onClose }) {
     const handleUnapprove = async () => {
         setIsLoading(true);
         try {
-            const response = await fetch(`http://localhost:5000/api/categoryedit/${taskId}`, {
+            const response = await fetch(process.env.REACT_APP_API_URL+`/api/categoryedit/${taskId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

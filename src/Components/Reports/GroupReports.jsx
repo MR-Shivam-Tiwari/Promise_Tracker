@@ -8,7 +8,7 @@ function GroupReports() {
     useEffect(() => {
         const fetchGroupData = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/tasksByGroup');
+                const response = await axios.get(process.env.REACT_APP_API_URL+'/api/tasksByGroup');
                 const responseData = response.data;
                 console.log("API Response:", responseData); // Log the response for debugging
     

@@ -170,7 +170,7 @@ function MainHome() {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/tasks');
+            const response = await axios.get(process.env.REACT_APP_API_URL+'/api/tasks');
             const filteredTasks = response.data.filter(task => {
                 // Check if any of the people in the task match the user's ID
                 return task.people.some(person => person.userId === userid);
@@ -188,7 +188,7 @@ function MainHome() {
     useEffect(() => {
         const fetchpinnedGroup = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/groups`);
+                const response = await axios.get(process.env.REACT_APP_API_URL+`/api/groups`);
 
                 // Filter groups based on userId match in pinnedBy array
                 const filteredGroups = response.data.filter(group => {
@@ -212,7 +212,7 @@ function MainHome() {
     useEffect(() => {
         const fetchGroupData = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/groups`);
+                const response = await axios.get(process.env.REACT_APP_API_URL+`/api/groups`);
 
                 // Filter groups based on userId mismatch in pinnedBy array
                 const filteredGroups = response.data.filter(group => {
@@ -267,9 +267,9 @@ function MainHome() {
 
     const handlePinClick = async (_id) => {
         try {
-            const response = await axios.post(`http://localhost:5000/api/pin/${_id}`, { userId });
+            const response = await axios.post(process.env.REACT_APP_API_URL+`/api/pin/${_id}`, { userId });
             if (response.status === 200) {
-
+                toast.dismiss()
                 // console.log('Group pinned successfully:', response.data.group);
                 toast.success('Group pinned successfully:');
                 setInterval(() => {
@@ -287,9 +287,9 @@ function MainHome() {
     };
     const handleunPinClick = async (_id) => {
         try {
-            const response = await axios.post(`http://localhost:5000/api/unpin/${_id}/${userId}`);
+            const response = await axios.post(process.env.REACT_APP_API_URL+`/api/unpin/${_id}/${userId}`);
             if (response.status === 200) {
-
+                toast.dismiss()
                 // console.log('Group Unpinned successfully:', response.data.group);
                 toast.success('Group Unpinned successfully:');
                 setInterval(() => {

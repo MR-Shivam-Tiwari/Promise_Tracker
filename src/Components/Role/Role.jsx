@@ -1,14 +1,18 @@
 import { Dropdown, Menu, MenuButton, MenuItem } from '@mui/joy';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { UserContext } from '../../global/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 function Role() {
+    const navigate = useNavigate()
+    const {roleProtected} = useContext(UserContext)
     const [userData, setUserData] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const fetchUserData = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/userData');
+            const response = await axios.get(process.env.REACT_APP_API_URL+'/api/userData');
             setUserData(Array.isArray(response.data) ? response.data : []);
             console.log(response.data);
         } catch (error) {
@@ -18,7 +22,7 @@ function Role() {
     const handleInactive = (user, userId) => {
         if (userId) {
             const data = { active: false }; // Define your data object
-            axios.put(`http://localhost:5000/api/users/${userId}/deactivate`)
+            axios.put(process.env.REACT_APP_API_URL+`/api/users/${userId}/deactivate`)
                 .then((res) => {
                     toast.dismiss();
                     toast.success(res.data.message);
@@ -34,7 +38,7 @@ function Role() {
     const handleActive = (user, userId)=>{
         if(userId ){
             const data = {active:true}
-            axios.put(`http://localhost:5000/api/users/${userId}/activate` )
+            axios.put(process.env.REACT_APP_API_URL+`/api/users/${userId}/activate` )
             .then((res)=>{
                 toast.dismiss();
                 toast.success(res.data.message);
@@ -47,17 +51,30 @@ function Role() {
     }
     const updateUserRole = async (userId, newRole) => {
         try {
-            const response = await axios.put(`http://localhost:5000/api/updateUserRole/${userId}`, {
+            const response = await axios.put(process.env.REACT_APP_API_URL+`/api/updateUserRole/${userId}`, {
                 userRole: newRole
             });
             setUserData(userData.map(user => user.userId === userId ? { ...user, userRole: newRole } : user));
+            toast.dismiss()
             toast.success("Role Changed Successfully")
         } catch (error) {
             console.log("Error updating User Role: ", error);
         }
     };
 
+    const callProtectedRole = ()=>{
+        console.log('outside protected')
+        console.log('roleProtected',roleProtected())
+        
+        roleProtected().then((result) => {
+            if(!result) {
+                navigate('/home')
+            }
+          });
+    }
+
     useEffect(() => {
+        callProtectedRole();
         fetchUserData();
     }, []);
 

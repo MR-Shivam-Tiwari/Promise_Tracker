@@ -27,10 +27,12 @@ function Login() {
         e.preventDefault();
         try {
             setLoader(true)
-            const response = await axios.post('http://localhost:5000/api/signin', { email, password });
+            const response = await axios.post(process.env.REACT_APP_API_URL+'/api/signin', { email, password });
             setLoader(false)
             setUserData(response.data);
             navigate('/home');
+            toast.dismiss()
+
             toast.success("Login Successfully");
             // setTimeout(() => {
             //     window.location.reload();

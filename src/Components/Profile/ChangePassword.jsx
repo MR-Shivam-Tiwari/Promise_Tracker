@@ -17,7 +17,7 @@ function ChangePassword() {
             const data = {
                 newPassword, oldPassword, userId
             }
-            axios.post('http://localhost:5000/api/change-password',data)
+            axios.post(process.env.REACT_APP_API_URL+'/api/change-password',data)
             .then((res)=>{
                 toast.dismiss();
                 toast.success('Password changed successfully');
