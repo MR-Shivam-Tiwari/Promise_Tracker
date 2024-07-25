@@ -107,7 +107,7 @@ import {
     const progressSize = isSmallScreen ? "120px" : "180px";
     const [userid, setuserid] = useState(userData?.userId);
     const [userId, setuserId] = useState(userData?.userId);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [groupData, setGroupData] = useState("");
     const [pinnedGroup, setPinnedGroup] = useState([]);
     const [openModal, setOpenModal] = useState(false); // State to manage modal visibility
@@ -241,7 +241,7 @@ import {
     };
   
     useEffect(() => {
-      fetchUserData();
+    //   fetchUserData();
     }, []);
   
     // Find the current user based on the frontendUserId
