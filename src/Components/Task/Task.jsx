@@ -18,7 +18,7 @@ const socket = io(process.env.REACT_APP_API_URL);
 function Task() {
     const userDataString = localStorage.getItem('userData');
     const [tasks, setTasks] = useState([]);
-    const [userid, setUserid] = useState(JSON.parse(userDataString)?.userId ||'');
+    const [userid, setUserid] = useState(JSON.parse(userDataString)?.userId || '');
     const selectedDateRef = useRef(null);
     const [tasksToDo, setTasksToDo] = useState([]);
     const [tasksInProgress, setTasksInProgress] = useState([]);
@@ -46,6 +46,13 @@ function Task() {
         reminder: '',
         people: [],
     });
+
+    
+    const [isRecording, setIsRecording] = useState(false);
+  const [audioUrl, setAudioUrl] = useState('');
+  const [uploadResultVoice, setuploadResultVoice] = useState('');
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
 
     useEffect(() => {
         const userDataString = localStorage.getItem('userData');
@@ -91,6 +98,7 @@ function Task() {
     };
 
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         const { taskGroup, taskName, description, startDate, endDate } = formData;
@@ -101,7 +109,7 @@ function Task() {
         }
 
         try {
-            const response = await axios.post(process.env.REACT_APP_API_URL+"/api/tasksadd", formData);
+            const response = await axios.post(process.env.REACT_APP_API_URL + "/api/tasksadd", {...formData, audioFile: uploadResultVoice});
             // console.log(response.data);
             resetForm();
             setModal(false);
@@ -128,7 +136,7 @@ function Task() {
 
     const fetchGroupData = async () => {
         try {
-            const response = await axios.get(process.env.REACT_APP_API_URL+'/api/groups');
+            const response = await axios.get(process.env.REACT_APP_API_URL + '/api/groups');
             setGroupData(response.data);
             // console.log("groupData", response.data);
         } catch (error) {
@@ -138,7 +146,7 @@ function Task() {
 
     const fetchRegisteredNames = async () => {
         try {
-            const response = await axios.get(process.env.REACT_APP_API_URL+"/api/userData");
+            const response = await axios.get(process.env.REACT_APP_API_URL + "/api/userData");
             const filteredDepartmentHeads = response.data.filter(user => user.userRole === 1);
             setDepartmentHeads(filteredDepartmentHeads);
             const filteredProjectlead = response.data.filter(user => user.userRole === 2);
@@ -151,31 +159,31 @@ function Task() {
     };
 
     const fetchTasks = () => {
-        axios.get(process.env.REACT_APP_API_URL+'/api/tasks')
+        axios.get(process.env.REACT_APP_API_URL + '/api/tasks')
             .then(response => {
                 // console.log('Response data:', response.data); // Log the response data
-    
+
                 const filteredTasks = response.data.filter(task => {
                     const isOwner = task.owner.id === userid;
                     const isPerson = task.people.some(person => person.userId === userid);
                     return isOwner || isPerson;
                 });
-    
+
                 // console.log('Filtered tasks:', filteredTasks); // Log the filtered tasks
-    
-                const todoTasks =  filteredTasks?.filter(task => !task.status || task.status === 'To Do');
-                const inProgressTasks =  filteredTasks?.filter(task => task.status === 'In Progress');
-                const completedTasks =  filteredTasks?.filter(task => task.status === 'Completed');
-                const cancelledTasks =  filteredTasks?.filter(task => task.status === 'Cancelled');
-    
+
+                const todoTasks = filteredTasks?.filter(task => !task.status || task.status === 'To Do');
+                const inProgressTasks = filteredTasks?.filter(task => task.status === 'In Progress');
+                const completedTasks = filteredTasks?.filter(task => task.status === 'Completed');
+                const cancelledTasks = filteredTasks?.filter(task => task.status === 'Cancelled');
+
                 const uniqueTaskGroups = [...new Set(filteredTasks.map(task => task?.taskGroup?.groupName))];
-    
+
                 // console.log('Todo tasks:', todoTasks);
                 // console.log('In progress tasks:', inProgressTasks);
                 // console.log('Completed tasks:', completedTasks);
                 // console.log('Cancelled tasks:', cancelledTasks);
                 // console.log('Unique task groups:', uniqueTaskGroups);
-    
+
                 setTasks(filteredTasks);
                 setAllTasks(filteredTasks);
                 setTasksToDo(todoTasks);
@@ -184,8 +192,8 @@ function Task() {
                 setTasksCancelled(cancelledTasks);
                 setTaskGroups(uniqueTaskGroups);
                 setLoading(false);
-    
-                return axios.put(process.env.REACT_APP_API_URL+'/api/archiveOldTasks');
+
+                return axios.put(process.env.REACT_APP_API_URL + '/api/archiveOldTasks');
             })
             .then(() => {
                 // Optionally, handle the response from the PUT request
@@ -195,28 +203,28 @@ function Task() {
                 setLoading(false);
             });
     };
-    
-    
-    
+
+
+
 
 
     // Inside your component
-    
+
     useEffect(() => {
         // const debouncedFetchTasks = debounce(fetchTasks, 300); // 300ms debounce
-    
-        socket.on('newTask', (data)=>{
-            fetchTasks()
-        }); 
-        socket.on('taskStatusUpdate', (data)=>{
+
+        socket.on('newTask', (data) => {
             fetchTasks()
         });
-        socket.on('taskCompleted', (data)=>{
+        socket.on('taskStatusUpdate', (data) => {
+            fetchTasks()
+        });
+        socket.on('taskCompleted', (data) => {
             fetchTasks()
         });
         // socket.on('taskStatusUpdate', debouncedFetchTasks);
         // socket.on('taskCompleted', debouncedFetchTasks);
-    
+
         return () => {
             socket.off('newTask');
             socket.off('taskStatusUpdate');
@@ -264,6 +272,52 @@ function Task() {
         setModal(!modal);
     };
 
+    const startRecording = async () => {
+        setIsRecording(true);
+        audioChunksRef.current = [];
+        
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorderRef.current = new MediaRecorder(stream);
+          mediaRecorderRef.current.ondataavailable = (event) => {
+            audioChunksRef.current.push(event.data);
+          };
+          mediaRecorderRef.current.onstop = async () => {
+            const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            setAudioUrl(audioUrl);
+            await uploadAudio(audioBlob);
+          };
+          mediaRecorderRef.current.start();
+        } catch (error) {
+          console.error('Error starting recording:', error);
+          setIsRecording(false);
+        }
+      };
+    
+      const stopRecording = () => {
+        if (mediaRecorderRef.current) {
+          mediaRecorderRef.current.stop();
+          setIsRecording(false);
+        }
+      };
+    
+      const uploadAudio = async (audioBlob) => {
+        const formData = new FormData();
+        formData.append('voice', audioBlob, 'recording.wav');
+    
+        try {
+          const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/upload-voice`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+          setuploadResultVoice(response.data.result);
+        } catch (error) {
+          setuploadResultVoice(`Upload failed: ${error.response?.data?.error || error.message}`);
+        }
+      };
+
     return (
         <div>
             <div className="flex flex-col h-full bg-white rounded text-black">
@@ -288,7 +342,7 @@ function Task() {
                         )}
                     </div>
                     {modal && (
-                        <div> 
+                        <div>
                             <div
                                 id="default-modal"
                                 tabIndex="-1"
@@ -373,6 +427,68 @@ function Task() {
                                                         required
                                                     />
                                                 </div>
+                                                <div className="p-4 bg-white rounded-lg shadow-md">
+      <label htmlFor="taskname" className="block mb-4 text-lg font-semibold text-gray-900">
+        Record Audio
+      </label>
+      <div className="flex space-x-4 mb-4 items-center">
+        <button 
+          onClick={startRecording} 
+          disabled={isRecording}
+          className={`flex items-center px-4 py-2 text-white font-medium rounded-lg focus:outline-none ${
+            isRecording ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+          }`}
+        >
+          {isRecording ? (
+            <>
+              <svg className="animate-spin mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291l1.414-1.414A5.987 5.987 0 016 12H4c0 2.21.895 4.21 2.291 5.291z"></path>
+              </svg>
+              Recording...
+            </>
+          ) : (
+            <>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 2a2 2 0 00-2 2v4a2 2 0 004 0V4a2 2 0 00-2-2zM5 4a3 3 0 116 0v4a3 3 0 11-6 0V4z"/>
+                <path d="M11.5 10.5a.5.5 0 01-1 0 .5.5 0 011 0zM4.5 10.5a.5.5 0 01-1 0 .5.5 0 011 0zM8 1a1 1 0 011 1v4a1 1 0 01-2 0V2a1 1 0 011-1zM6.5 8a1.5 1.5 0 103 0v-1a1.5 1.5 0 10-3 0v1z"/>
+              </svg>
+              {uploadResultVoice ? 'Record Again' : 'Start Recording'}
+            </>
+          )}
+        </button>
+        <button 
+          onClick={stopRecording} 
+          disabled={!isRecording}
+          className={`flex items-center px-4 py-2 text-white font-medium rounded-lg focus:outline-none ${
+            !isRecording ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600'
+          }`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M5.5 4a.5.5 0 00-.5.5v7a.5.5 0 001 0v-7a.5.5 0 00-.5-.5zM10.5 4a.5.5 0 00-.5.5v7a.5.5 0 001 0v-7a.5.5 0 00-.5-.5zM8 1a1 1 0 00-1 1v2a1 1 0 002 0V2a1 1 0 00-1-1zM6.5 7a1.5 1.5 0 113 0v1a1.5 1.5 0 11-3 0V7z"/>
+          </svg>
+          Stop Recording
+        </button>
+      </div>
+      {uploadResultVoice && (
+        <div className="mb-4">
+          <h3 className="text-lg font-medium text-gray-800 mb-2">Playback:</h3>
+          <audio controls src={uploadResultVoice} className="w-full mb-2"></audio>
+          <button 
+            // onClick={removeRecording} 
+            onClick={(e)=>{
+                e.preventDefault();
+                setuploadResultVoice(null);
+            }}
+            className="px-4 py-2 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 focus:outline-none"
+          >
+            Remove Recording
+          </button>
+        </div>
+      )}
+    </div>
+
+
                                                 <div className='grid grid-cols-2 gap-3'>
                                                     <div>
                                                         <label htmlFor="startDate" className="block mb-2 text-sm font-medium text-gray-900 ">
@@ -410,7 +526,7 @@ function Task() {
                                                         Select Members
                                                     </label>
                                                     <Autocomplete
-                                                    placeholder="Assign to"
+                                                        placeholder="Assign to"
                                                         multiple
                                                         options={selectMembers.map((option) => option.name)}
                                                         onChange={(event, newValue) => handleChange('people', newValue)}

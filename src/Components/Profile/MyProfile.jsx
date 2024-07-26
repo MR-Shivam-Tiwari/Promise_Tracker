@@ -25,9 +25,39 @@ export default function MyProfile() {
   const [role, setRole] = useState("");
 
   // Function to handle file selection
+  const uploadNewImage = async (image) => {
+    if (!image) {
+      // setUploadResult('No file selected.');
+      toast.dismiss();
+      toast.error('Please select an image to upload.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('image', image);
+
+    try {
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/change-proifle-pic/${userId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      // setUploadResult(`Image uploaded successfully: ${response.data.result}`);
+      setUserData({ ...userData, profilePic: response.data.result });
+      toast.dismiss();
+      toast.success(response.data.message);
+    } catch (error) {
+      // setUploadResult(`Upload failed: ${error.response?.data?.error || error.message}`);
+      console.error(error);
+      toast.dismiss();
+      toast.error(error.response?.data?.error || error.message);
+    }
+  };
+
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
-    setSelectedImage(file);
+    uploadNewImage( event.target.files[0]);
+    // console.log(file)
   };
 
   // Function to handle upload button click
@@ -63,9 +93,7 @@ export default function MyProfile() {
       mobilenumber,
       department,
       active,
-      profilePic: selectedImage
-        ? URL.createObjectURL(selectedImage)
-        : userData.profilePic,
+      profilePic: userData?.profilePic,
     };
 
     axios
@@ -137,7 +165,7 @@ export default function MyProfile() {
               <img
                 src={userData?.profilePic}
                 alt="Profile"
-                className="w-full h-full rounded-md shadow-lg mr-6"
+                className="w-full object-cover h-full rounded-md shadow-lg mr-6"
               />
             </div>
             <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
@@ -154,7 +182,7 @@ export default function MyProfile() {
                 component="span"
                 variant="outlined"
                 color="neutral"
-                onClick={handleUploadClick}
+                // onClick={handleUploadClick}
                 className="text-white"
               >
                 <svg
