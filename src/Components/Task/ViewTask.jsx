@@ -40,8 +40,8 @@ function ViewTask({ data, status }) {
             .replace(/<em>/g, `<em style="font-style: italic;">`);
     };
     return (
-        <div>
-            <div class="container mx-auto   p-0 ">
+        <div className='rounded-lg'>
+            <div class="container mx-auto rounded-lg  p-0 ">
                 <div class=" rounded-lg  p-2 py-6 lg:px-8">
                     <div class="flex items-center justify-between mb-6">
                         <h1 class="text-2xl font-bold text-gray-900 ">{data?.taskGroup.groupName}</h1>
@@ -64,7 +64,7 @@ function ViewTask({ data, status }) {
                             />
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                 {data?.audioFile?   <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                         <div>
                             <h2 className="text-lg font-medium text-gray-900  mb-2">Audio Player</h2>
                             <audio controls>
@@ -74,25 +74,12 @@ function ViewTask({ data, status }) {
                         </div>
 
 
-                        <div>
-                            <h2 className="text-lg font-medium text-gray-900  mb-2">PDF Viewer</h2>
-                            {data && data.pdfFile && (
-                                <a
-                                    href={data.pdfFile}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    download
-                                    className="text-blue-500 hover:underline flex items-center gap-1"
-                                >
-                                    <span>{data.pdfFile.split('\\').pop()}</span> {/* Displaying file name */}
-                                </a>
-                            )}
-                        </div>
+                 
 
 
 
 
-                    </div>
+                    </div>:null}
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                         <div>
                             <h2 className="text-lg font-medium text-gray-900  mb-2">Assigned By</h2>
@@ -111,60 +98,7 @@ function ViewTask({ data, status }) {
 
 
                     </div>
-                    {/* <div class="mb-6">
-                        <h2 class="text-lg font-medium text-gray-900  mb-2">Comments</h2>
-                        <div class="bg-gray-100  rounded-lg p-4">
-                            <textarea
-                                class="w-full bg-transparent text-gray-700  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 "
-                                rows="3"
-                                placeholder="Add a comment..."
-                            ></textarea>
-                            <div class="flex justify-end mt-2">
-                                <button class="px-4 py-2 rounded-md text-sm font-medium text-white  bg-black-200  hover:bg-gray-300  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 ">
-                                    Add Comment
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-gray-100  rounded-lg p-6 mb-6">
-                        <h2 class="text-lg font-medium text-gray-900  mb-4">Comment History</h2>
-                        <div class="space-y-4">
-                            <div class="flex items-start space-x-4">
-                                <div class="flex-shrink-0">
-                                    <Avatar src="/placeholder.svg" alt="User Avatar" class="w-10 h-10 rounded-full" />
-                                </div>
-                                <div class="flex-1">
-                                    <h3 class="text-lg font-medium text-gray-900 ">John Doe</h3>
-                                    <p class="text-gray-700 ">
-                                        Great work on the website redesign! I love the new layout and color scheme.
-                                    </p>
-                                    <div class="flex items-center space-x-2 mt-2">
-                                        <span class="text-xs text-gray-500 ">2 days ago</span>
-                                        <button class="px-2 py-1 rounded-md text-xs font-medium text-white  bg-gray-200  hover:bg-gray-300  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 ">
-                                            Reply
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex items-start space-x-4">
-                                <div class="flex-shrink-0">
-                                    <Avatar src="/placeholder.svg" alt="User Avatar" class="w-10 h-10 rounded-full" />
-                                </div>
-                                <div class="flex-1">
-                                    <h3 class="text-lg font-medium text-gray-900 ">Jane Smith</h3>
-                                    <p class="text-gray-700 ">
-                                        I have a few suggestions for the homepage layout. Can we schedule a meeting to discuss?
-                                    </p>
-                                    <div class="flex items-center space-x-2 mt-2">
-                                        <span class="text-xs text-gray-500 ">1 week ago</span>
-                                        <button class="px-2 py-1 rounded-md text-xs font-medium text-white  bg-gray-200  hover:bg-gray-300  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 ">
-                                            Reply
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div> */}
+                  
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                         <div>
                             <h2 class="text-lg font-medium text-gray-900  mb-2">Reminder</h2>

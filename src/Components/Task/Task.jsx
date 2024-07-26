@@ -12,6 +12,7 @@ import { toast } from 'react-toastify';
 import { Autocomplete } from '@mui/joy';
 import Add from '@mui/icons-material/Add';
 import io from 'socket.io-client';
+import { CircularProgress } from '@mui/material';
 
 const socket = io(process.env.REACT_APP_API_URL);
 
@@ -35,6 +36,7 @@ function Task() {
     const [departmentHeads, setDepartmentHeads] = useState([]);
     const [selectProjectLead, setProjectLead] = useState([]);
     const [selectMembers, setMembers] = useState([]);
+    const [audioLoader, setAudioLoader] =useState(false)
     const [formData, setFormData] = useState({
         owner: { id: '' },
         taskGroup: { groupName: '', groupId: '' },
@@ -302,7 +304,8 @@ function Task() {
         }
       };
     
-      const uploadAudio = async (audioBlob) => {
+      const uploadAudio = async (audioBlob) => {    
+        setAudioLoader(true);
         const formData = new FormData();
         formData.append('voice', audioBlob, 'recording.wav');
     
@@ -312,9 +315,11 @@ function Task() {
               'Content-Type': 'multipart/form-data',
             },
           });
+          setAudioLoader(false);
+
           setuploadResultVoice(response.data.result);
         } catch (error) {
-          setuploadResultVoice(`Upload failed: ${error.response?.data?.error || error.message}`);
+          setAudioLoader(false);
         }
       };
 
@@ -470,8 +475,11 @@ function Task() {
           Stop Recording
         </button>
       </div>
-      {uploadResultVoice && (
-        <div className="mb-4">
+     
+
+      {
+        audioLoader?<div className='flex justify-start'><CircularProgress/></div>
+        :uploadResultVoice?<div className="mb-4">
           <h3 className="text-lg font-medium text-gray-800 mb-2">Playback:</h3>
           <audio controls src={uploadResultVoice} className="w-full mb-2"></audio>
           <button 
@@ -484,8 +492,8 @@ function Task() {
           >
             Remove Recording
           </button>
-        </div>
-      )}
+        </div>:null
+      }
     </div>
 
 
