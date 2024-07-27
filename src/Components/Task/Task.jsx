@@ -4,7 +4,7 @@ import DragAndDropComponent from './Task Mange/DragAndDropComponent';
 import Select from '@mui/joy/Select';
 import Option from '@mui/joy/Option';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button } from '@mui/joy';
+import { Button, IconButton } from '@mui/joy';
 import debounce from 'lodash.debounce';
 
 import ReactQuill from 'react-quill';
@@ -36,7 +36,7 @@ function Task() {
     const [departmentHeads, setDepartmentHeads] = useState([]);
     const [selectProjectLead, setProjectLead] = useState([]);
     const [selectMembers, setMembers] = useState([]);
-    const [audioLoader, setAudioLoader] =useState(false)
+    const [audioLoader, setAudioLoader] = useState(false)
     const [formData, setFormData] = useState({
         owner: { id: '' },
         taskGroup: { groupName: '', groupId: '' },
@@ -49,13 +49,13 @@ function Task() {
         people: [],
     });
 
-    
-    const [isRecording, setIsRecording] = useState(false);
-  const [audioUrl, setAudioUrl] = useState('');
-  const [uploadResultVoice, setuploadResultVoice] = useState('');
-  const mediaRecorderRef = useRef(null);
-  const audioChunksRef = useRef([]);
 
+    const [isRecording, setIsRecording] = useState(false);
+    const [audioUrl, setAudioUrl] = useState('');
+    const [uploadResultVoice, setuploadResultVoice] = useState('');
+    const mediaRecorderRef = useRef(null);
+    const audioChunksRef = useRef([]);
+    const [singleFile, setSingleFile] = useState('');
     useEffect(() => {
         const userDataString = localStorage.getItem('userData');
         if (userDataString) {
@@ -111,7 +111,7 @@ function Task() {
         }
 
         try {
-            const response = await axios.post(process.env.REACT_APP_API_URL + "/api/tasksadd", {...formData, audioFile: uploadResultVoice});
+            const response = await axios.post(process.env.REACT_APP_API_URL + "/api/tasksadd", { ...formData, audioFile: uploadResultVoice, pdfFile: singleFile});
             // console.log(response.data);
             resetForm();
             setModal(false);
@@ -206,10 +206,6 @@ function Task() {
             });
     };
 
-
-
-
-
     // Inside your component
 
     useEffect(() => {
@@ -277,51 +273,84 @@ function Task() {
     const startRecording = async () => {
         setIsRecording(true);
         audioChunksRef.current = [];
-        
+
         try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          mediaRecorderRef.current = new MediaRecorder(stream);
-          mediaRecorderRef.current.ondataavailable = (event) => {
-            audioChunksRef.current.push(event.data);
-          };
-          mediaRecorderRef.current.onstop = async () => {
-            const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-            const audioUrl = URL.createObjectURL(audioBlob);
-            setAudioUrl(audioUrl);
-            await uploadAudio(audioBlob);
-          };
-          mediaRecorderRef.current.start();
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorderRef.current = new MediaRecorder(stream);
+            mediaRecorderRef.current.ondataavailable = (event) => {
+                audioChunksRef.current.push(event.data);
+            };
+            mediaRecorderRef.current.onstop = async () => {
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                setAudioUrl(audioUrl);
+                await uploadAudio(audioBlob);
+            };
+            mediaRecorderRef.current.start();
         } catch (error) {
-          console.error('Error starting recording:', error);
-          setIsRecording(false);
+            console.error('Error starting recording:', error);
+            setIsRecording(false);
         }
-      };
-    
-      const stopRecording = () => {
+    };
+
+    const stopRecording = () => {
         if (mediaRecorderRef.current) {
-          mediaRecorderRef.current.stop();
-          setIsRecording(false);
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
         }
-      };
-    
-      const uploadAudio = async (audioBlob) => {    
+    };
+
+    const uploadAudio = async (audioBlob) => {
         setAudioLoader(true);
         const formData = new FormData();
         formData.append('voice', audioBlob, 'recording.wav');
-    
-        try {
-          const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/upload-voice`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
-          setAudioLoader(false);
 
-          setuploadResultVoice(response.data.result);
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/upload-voice`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            setAudioLoader(false);
+
+            setuploadResultVoice(response.data.result);
         } catch (error) {
-          setAudioLoader(false);
+            setAudioLoader(false);
         }
-      };
+    };
+    const uploadSingleFile = async (file) => {
+        if (!file) {
+            // setUploadResult('No file selected.');
+            toast.dismiss();
+            toast.error('Please select an file to upload.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/upload-file`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            setSingleFile(response.data.result);
+            toast.dismiss();
+            toast.success(response.data.message);
+        } catch (error) {
+            console.error(error);
+            toast.dismiss();
+            toast.error(error.response?.data?.error || error.message);
+        }
+    }
+
+    const handleFileSelect = (event) => {
+        uploadSingleFile(event.target.files[0]);
+    };
+    const handleUploadClick = () => {
+        document.getElementById("image-upload").click();
+    };
 
     return (
         <div>
@@ -432,69 +461,115 @@ function Task() {
                                                         required
                                                     />
                                                 </div>
-                                                <div className="p-4 bg-white rounded-lg shadow-md">
-      <label htmlFor="taskname" className="block mb-4 text-lg font-semibold text-gray-900">
-        Record Audio
-      </label>
-      <div className="flex space-x-4 mb-4 items-center">
-        <button 
-          onClick={startRecording} 
-          disabled={isRecording}
-          className={`flex items-center px-4 py-2 text-white font-medium rounded-lg focus:outline-none ${
-            isRecording ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
-          }`}
-        >
-          {isRecording ? (
-            <>
-              <svg className="animate-spin mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291l1.414-1.414A5.987 5.987 0 016 12H4c0 2.21.895 4.21 2.291 5.291z"></path>
-              </svg>
-              Recording...
-            </>
-          ) : (
-            <>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M8 2a2 2 0 00-2 2v4a2 2 0 004 0V4a2 2 0 00-2-2zM5 4a3 3 0 116 0v4a3 3 0 11-6 0V4z"/>
-                <path d="M11.5 10.5a.5.5 0 01-1 0 .5.5 0 011 0zM4.5 10.5a.5.5 0 01-1 0 .5.5 0 011 0zM8 1a1 1 0 011 1v4a1 1 0 01-2 0V2a1 1 0 011-1zM6.5 8a1.5 1.5 0 103 0v-1a1.5 1.5 0 10-3 0v1z"/>
-              </svg>
-              {uploadResultVoice ? 'Record Again' : 'Start Recording'}
-            </>
-          )}
-        </button>
-        <button 
-          onClick={stopRecording} 
-          disabled={!isRecording}
-          className={`flex items-center px-4 py-2 text-white font-medium rounded-lg focus:outline-none ${
-            !isRecording ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600'
-          }`}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M5.5 4a.5.5 0 00-.5.5v7a.5.5 0 001 0v-7a.5.5 0 00-.5-.5zM10.5 4a.5.5 0 00-.5.5v7a.5.5 0 001 0v-7a.5.5 0 00-.5-.5zM8 1a1 1 0 00-1 1v2a1 1 0 002 0V2a1 1 0 00-1-1zM6.5 7a1.5 1.5 0 113 0v1a1.5 1.5 0 11-3 0V7z"/>
-          </svg>
-          Stop Recording
-        </button>
-      </div>
-     
 
-      {
-        audioLoader?<div className='flex justify-start'><CircularProgress/></div>
-        :uploadResultVoice?<div className="mb-4">
-          <h3 className="text-lg font-medium text-gray-800 mb-2">Playback:</h3>
-          <audio controls src={uploadResultVoice} className="w-full mb-2"></audio>
-          <button 
-            // onClick={removeRecording} 
-            onClick={(e)=>{
-                e.preventDefault();
-                setuploadResultVoice(null);
-            }}
-            className="px-4 py-2 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 focus:outline-none"
-          >
-            Remove Recording
-          </button>
-        </div>:null
-      }
-    </div>
+                                                <div className="p-4 bg-white rounded-lg shadow-md">
+                                                    <label htmlFor="taskname" className="block mb-4 text-lg font-semibold text-gray-900">
+                                                        Record Audio
+                                                    </label>
+                                                    <div className="flex space-x-4 mb-4 items-center">
+                                                        <button
+                                                            onClick={startRecording}
+                                                            disabled={isRecording}
+                                                            className={`flex items-center px-4 py-2 text-white font-medium rounded-lg focus:outline-none ${isRecording ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                                                                }`}
+                                                        >
+                                                            {isRecording ? (
+                                                                <>
+                                                                    <svg className="animate-spin mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291l1.414-1.414A5.987 5.987 0 016 12H4c0 2.21.895 4.21 2.291 5.291z"></path>
+                                                                    </svg>
+                                                                    Recording...
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 16 16" fill="currentColor">
+                                                                        <path d="M8 2a2 2 0 00-2 2v4a2 2 0 004 0V4a2 2 0 00-2-2zM5 4a3 3 0 116 0v4a3 3 0 11-6 0V4z" />
+                                                                        <path d="M11.5 10.5a.5.5 0 01-1 0 .5.5 0 011 0zM4.5 10.5a.5.5 0 01-1 0 .5.5 0 011 0zM8 1a1 1 0 011 1v4a1 1 0 01-2 0V2a1 1 0 011-1zM6.5 8a1.5 1.5 0 103 0v-1a1.5 1.5 0 10-3 0v1z" />
+                                                                    </svg>
+                                                                    {uploadResultVoice ? 'Record Again' : 'Start Recording'}
+                                                                </>
+                                                            )}
+                                                        </button>
+                                                        <button
+                                                            onClick={stopRecording}
+                                                            disabled={!isRecording}
+                                                            className={`flex items-center px-4 py-2 text-white font-medium rounded-lg focus:outline-none ${!isRecording ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600'
+                                                                }`}
+                                                        >
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 16 16" fill="currentColor">
+                                                                <path d="M5.5 4a.5.5 0 00-.5.5v7a.5.5 0 001 0v-7a.5.5 0 00-.5-.5zM10.5 4a.5.5 0 00-.5.5v7a.5.5 0 001 0v-7a.5.5 0 00-.5-.5zM8 1a1 1 0 00-1 1v2a1 1 0 002 0V2a1 1 0 00-1-1zM6.5 7a1.5 1.5 0 113 0v1a1.5 1.5 0 11-3 0V7z" />
+                                                            </svg>
+                                                            Stop Recording
+                                                        </button>
+                                                    </div>
+
+
+                                                    {
+                                                        audioLoader ? <div className='flex justify-start'><CircularProgress /></div>
+                                                            : uploadResultVoice ? <div className="mb-4">
+                                                                <h3 className="text-lg font-medium text-gray-800 mb-2">Playback:</h3>
+                                                                <audio controls src={uploadResultVoice} className="w-full mb-2"></audio>
+                                                                <button
+                                                                    // onClick={removeRecording} 
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        setuploadResultVoice(null);
+                                                                    }}
+                                                                    className="px-4 py-2 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 focus:outline-none"
+                                                                >
+                                                                    Remove Recording
+                                                                </button>
+                                                            </div> : null
+                                                    }
+                                                </div>
+                                                <div className="p-4">
+                                                    <label htmlFor="description" className="block mb-2 text-lg font-medium text-gray-900">
+                                                        Upload File
+                                                    </label>
+                                                    <input
+                                                        accept="file/*"
+                                                        id="image-upload"
+                                                        type="file"
+                                                        style={{ display: 'none' }}
+                                                        onChange={handleFileSelect}
+                                                    />
+                                                    <button
+                                                        onClick={handleUploadClick}
+                                                        className="flex items-center px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+                                                    >
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            width="24"
+                                                            height="24"
+                                                            fill="currentColor"
+                                                            className="bi bi-upload mr-2"
+                                                            viewBox="0 0 16 16"
+                                                        >
+                                                            <path d="M.5 9.9a.5.5 0 0 1 .5-.4h4.5v-8a.5.5 0 0 1 1 0v8h4.5a.5.5 0 0 1 .4.6l-1.5 3.5a.5.5 0 0 1-.9 0L7 11.5H2.9l-1.4 3.5a.5.5 0 0 1-.9 0l-1.5-3.5a.5.5 0 0 1-.1-.1z" />
+                                                            <path fillRule="evenodd" d="M4.5 6V.5A.5.5 0 0 1 5 0h1a.5.5 0 0 1 .5.5V6h1.5a.5.5 0 0 1 .4.6L7 9.5H5l-1.5-2.9a.5.5 0 0 1 .1-.6H4.5z" />
+                                                        </svg>
+                                                        Upload
+                                                    </button>
+                                                    {singleFile && (
+                                                        <div className="mt-4">
+                                                            <h3 className="text-lg font-medium text-gray-800 mb-2">Uploaded File:</h3>
+                                                            <div className="flex items-center">
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    width="24"
+                                                                    height="24"
+                                                                    fill="currentColor"
+                                                                    className="bi bi-file-earmark"
+                                                                    viewBox="0 0 16 16"
+                                                                >
+                                                                    <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h4.5L14 4.5zM10 4a1 1 0 0 1-1-1V1.5L14 5h-3.5A1.5 1.5 0 0 1 9 3.5V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5H10z" />
+                                                                </svg>
+                                                                <a href={singleFile} className="ml-2 text-gray-700">File</a>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
 
 
                                                 <div className='grid grid-cols-2 gap-3'>
