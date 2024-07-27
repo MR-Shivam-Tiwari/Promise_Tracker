@@ -396,7 +396,7 @@ function Approvals() {
 
   return (
     <div>
-      <header className="bg-gray-100 lg:rounded-lg rounded-[3px]  px-4 flex items-center mb-2 justify-between">
+      <header className="bg-gray-100 lg:rounded-lg rounded-[3px]  lg:px-4 px-2 flex items-center mb-2 justify-between">
         <div className="flex items-center gap-4 w-full">
           <div className="bg-blue-50 py-1 rounded-lg w-full">
             <div className="flex items-center gap-4 overflow-x-auto h-14 w-full">

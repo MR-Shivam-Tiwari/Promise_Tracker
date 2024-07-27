@@ -55,7 +55,7 @@ function UnApprovedTask() {
 
     return (
         <div>
-            <div className="border lg:rounded-lg rounded-[3px] overflow-hidden">
+            <div className="border lg:rounded-lg rounded-[3px] overflow-hidden lexend-bold">
                 <div className="relative w-full overflow-auto">
                     <table className="w-full caption-bottom text-sm">
                         <thead className="[&_tr]:border-b">
