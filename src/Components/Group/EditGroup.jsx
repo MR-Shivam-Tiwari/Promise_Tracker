@@ -3,7 +3,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-function EditGroup({ Editid, setEditModal, fetchpinnedGroup, fetchGroupData }) {
+function EditGroup({ Editid,  fetchpinnedGroup, fetchGroupData , setIseditModalOpen }) {
   const [departmentHeads, setDepartmentHeads] = useState([]);
   const [selectProjectLead, setProjectLead] = useState([]);
   const [selectMembers, setMembers] = useState([]);
@@ -55,6 +55,7 @@ function EditGroup({ Editid, setEditModal, fetchpinnedGroup, fetchGroupData }) {
       toast.success("Successfully updated Group");
       fetchpinnedGroup();
       fetchGroupData();
+      setIseditModalOpen(false);
     } catch (error) {
       console.error("Error updating group:", error);
       toast.error("Error updating group:", error.message);
@@ -105,7 +106,7 @@ function EditGroup({ Editid, setEditModal, fetchpinnedGroup, fetchGroupData }) {
   }, [Editid]);
 
   return (
-    <div className="lg:h-[465px]  lg:w-[500px] ">
+    <div className="w-[100%]  lg:w-[100vh] overflow-auto h-[80vh] ">
       {loading ? (
         <div className="flex  justify-center  ">
           <span class="loader2"></span>
@@ -115,9 +116,7 @@ function EditGroup({ Editid, setEditModal, fetchpinnedGroup, fetchGroupData }) {
           className="rounded-lg text-card-foreground px-1 w-full "
           data-v0-t="card"
         >
-          <div className="flex justify-end ">
-            <button onClick={setEditModal(true)} className="">✖️</button>
-          </div>
+      
           <form>
             <div className="flex justify-center">
               <div className="relative flex  shrink-0 border-2 overflow-hidden rounded-full  cursor-pointer group">
@@ -134,7 +133,7 @@ function EditGroup({ Editid, setEditModal, fetchpinnedGroup, fetchGroupData }) {
                     className="h-[80px] w-[80px] object-cover rounded-full"
                   />
                 ) : (
-                  <span className="flex h-full w-full items-center justify-center rounded-full bg-muted">
+                  <span className="flex h-full w-full  items-center justify-center rounded-full bg-muted">
                     <span className="text-gray-500">Upload</span>
                   </span>
                 )}
@@ -276,7 +275,9 @@ function EditGroup({ Editid, setEditModal, fetchpinnedGroup, fetchGroupData }) {
               </div>
               <div>
                 <button
-                  onClick={handleSubmit}
+                  onClick={(event) => {
+                    handleSubmit(event);
+                  }}
                   className="w-full rounded-lg mt-3 bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-700"
                 >
                   Update Group

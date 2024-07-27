@@ -152,7 +152,7 @@ function AppRoutes() {
           <Box
           
             component="main"
-            className="MainContent"
+            className="MainContent m-1"
             sx={{
               px: { xs: 1, },
               overflow: "auto",
@@ -170,7 +170,7 @@ function AppRoutes() {
               p:1
             }}
           >
-            <div className="grid col border rounded-lg p-2 mt-2 lg:mt-0 gap-3">
+            <div className="grid col  border rounded-lg p-2 mt-2 lg:mt-0 gap-3">
               <div className="flex lg:flex-row items-center lg:items-end justify-between ">
                   <div>
                     <Header />
