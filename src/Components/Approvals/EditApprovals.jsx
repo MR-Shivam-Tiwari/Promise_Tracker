@@ -103,7 +103,7 @@ function EditApprovals({ taskId, task, onClose }) {
         <div>
             <div>
                 {/* {toast && <div className="absolute top-0 right-0 m-4 bg-white rounded shadow-lg px-6 py-4">{toast}</div>} */}
-                <div class="w-[600px] max-w-full  mt-5 bg-gradient-to-br from-[#f0f0f0] to-[#d0d0d0] rounded-lg shadow-lg">
+                <div class="w-[600px] max-w-full  mt-5 bg-gradient-to-br from-[#f0f0f0] to-[#d0d0d0] lg:rounded-lg rounded-[3px] shadow-lg">
                     <div class="border-b px-6 py-4">
                         <h3 class="text-lg font-semibold text-gray-800">Company Offsite</h3>
                     </div>
@@ -147,7 +147,7 @@ function EditApprovals({ taskId, task, onClose }) {
                                                 <img
                                                     src={`data:image/png;base64,${task.pow.file}`}
                                                     alt="Preview"
-                                                    className="max-w-full h-[200px] rounded-lg"
+                                                    className="max-w-full h-[200px] lg:rounded-lg rounded-[3px]"
                                                 />
                                             </div>
                                         )}

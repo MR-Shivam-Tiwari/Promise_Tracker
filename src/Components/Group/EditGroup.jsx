@@ -113,7 +113,7 @@ function EditGroup({ Editid,  fetchpinnedGroup, fetchGroupData , setIseditModalO
         </div>
       ) : (
         <div
-          className="rounded-lg text-card-foreground px-1 w-full "
+          className="lg:rounded-lg rounded-[3px] text-card-foreground px-1 w-full "
           data-v0-t="card"
         >
       
@@ -278,7 +278,7 @@ function EditGroup({ Editid,  fetchpinnedGroup, fetchGroupData , setIseditModalO
                   onClick={(event) => {
                     handleSubmit(event);
                   }}
-                  className="w-full rounded-lg mt-3 bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-700"
+                  className="w-full lg:rounded-lg rounded-[3px] mt-3 bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-700"
                 >
                   Update Group
                 </button>

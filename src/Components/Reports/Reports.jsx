@@ -17,9 +17,9 @@ function Reports() {
 
   return (
     <div>
-      <header className="bg-gray-100 rounded-lg px-4 flex items-center justify-between">
+      <header className="bg-gray-100 lg:rounded-lg rounded-[3px] px-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className=' bg-blue-50 py-1 rounded-lg'>
+          <div className=' bg-blue-50 py-1 lg:rounded-lg rounded-[3px]'>
             <div className="flex items-center gap-4 overflow-x-auto h-14">
               {['Group Reports', 'Assigned User Reports', 'Approval Reports'].map(status => (
                 <button
@@ -36,7 +36,7 @@ function Reports() {
       </header>
 
       <div className='p-2'>
-        <div className='rounded-lg'>
+        <div className='lg:rounded-lg rounded-[3px]'>
           {renderSelectedComponent()}
         </div>
       </div>

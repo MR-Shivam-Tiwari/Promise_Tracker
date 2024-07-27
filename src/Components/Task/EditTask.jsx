@@ -137,7 +137,7 @@ function EditTask({ data, setEdit }) {
 
     return (
         <div>
-            <div className="w-full max-w-3xl mx-auto p-6 md:p-8 lg:p-10 bg-gray-200 text-black rounded-lg shadow-lg">
+            <div className="w-full max-w-3xl mx-auto p-6 md:p-8 lg:p-10 bg-gray-200 text-black lg:rounded-lg rounded-[3px] shadow-lg">
                 <form className="space-y-6" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-2">
