@@ -29,7 +29,7 @@ function ViewTask({ data, status }) {
     };
 
     const italicStyle = {
-        fontStyle: 'italic', 
+        fontStyle: 'italic',
     };
     const setInlineStyles = (html) => {
         return html.replace(/<p>/g, `<p style="margin: 0 0 1em;">`)
@@ -64,7 +64,8 @@ function ViewTask({ data, status }) {
                             />
                         </div>
                     </div>
-                 {data?.audioFile?   <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 align-center'>
+                    {data?.audioFile ? <div class="">
                         <div>
                             <h2 className="text-lg font-medium text-gray-900  mb-2">Audio Player</h2>
                             <audio controls>
@@ -72,14 +73,28 @@ function ViewTask({ data, status }) {
                                 Your browser does not support the audio element.
                             </audio>
                         </div>
+                    </div> : null}
+                    {data?.pdfFile && (
+                        <div >
+                            <h3 className="text-lg font-medium text-gray-800 mb-2">Attached File</h3>
+                            <a href={data?.pdfFile} className="flex items-center  bg-blue-400 hover:bg-blue-300 cursor-pointer p-4 rounded-lg ">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    fill="currentColor"
+                                    className="bi bi-file-earmark"
+                                    viewBox="0 0 16 16"
+                                >
+                                    <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h4.5L14 4.5zM10 4a1 1 0 0 1-1-1V1.5L14 5h-3.5A1.5 1.5 0 0 1 9 3.5V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5H10z" />
+                                </svg>
+                                <span  className="ml-2 font-bold ">Download File</span>
+                            </a>
+                        </div>
+                    )}
+                    </div>
 
 
-                 
-
-
-
-
-                    </div>:null}
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                         <div>
                             <h2 className="text-lg font-medium text-gray-900  mb-2">Assigned By</h2>
@@ -98,7 +113,7 @@ function ViewTask({ data, status }) {
 
 
                     </div>
-                  
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                         <div>
                             <h2 class="text-lg font-medium text-gray-900  mb-2">Reminder</h2>

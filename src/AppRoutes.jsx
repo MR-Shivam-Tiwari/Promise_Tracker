@@ -25,6 +25,7 @@ import ChangePassword from "./Components/Profile/ChangePassword";
 import PrivateRoute from "./Components/PrivateRoute"; // Import PrivateRoute
 import { UserContext } from "./global/UserContext";
 import io from 'socket.io-client';
+import SubTask from "./Components/SubTask/SubTask";
 
 const socket = io(process.env.REACT_APP_API_URL);
 
@@ -253,33 +254,7 @@ function AppRoutes() {
             <Box
              
             >
-              {/* <Box
-                className="hidden lg:block"
-                sx={{ display: "flex", alignItems: "center" }}
-              >
-                <Breadcrumbs
-                  size="sm"
-                  aria-label="breadcrumbs"
-                  separator={<ChevronRightRoundedIcon fontSize="sm" />}
-                  sx={{ pl: 0 }}
-                >
-                  <Link
-                    underline="none"
-                    color="neutral"
-                    href="/"
-                    aria-label="Home"
-                    fontSize={17}
-                  >
-                    <HomeRoundedIcon />
-                  </Link>
-                  <Typography color="primary" fontWeight={500} fontSize={17}>
-                    {currentRouteName}
-                  </Typography>
-                </Breadcrumbs>
-              </Box> */}
-              {/* <Typography level="h2" component="h1" fontSize={20}>
-                {currentRouteName}
-              </Typography> */}
+           
             </Box>
             <div >
               <Routes onChange={handleRouteChange}>
@@ -306,6 +281,10 @@ function AppRoutes() {
                 <Route
                   path="/task"
                   element={<PrivateRoute element={<Task />} />}
+                />
+                <Route
+                  path="/sub-tasks"
+                  element={<PrivateRoute element={<SubTask />} />}
                 />
                 <Route
                   path="/reports"
