@@ -21,7 +21,7 @@ const Section = ({ title, cards, moveCard, loading }) => {
     });
 
     return (
-        <div className="flex flex-col mt-5  gap-4 rounded-lg border h-[670px] w-full" ref={drop}>
+        <div className="flex flex-col mt-5  gap-4 lg:rounded-lg rounded-[3px] border h-[670px] w-full" ref={drop}>
             <div className="flex items-center justify-between bg-gray-100 px-4 py-3 ">
                 <h3 className="text-lg font-medium">{title}</h3>
                 <div className="inline-flex w-fit items-center whitespace-nowrap border font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground rounded-full px-3 py-1 text-sm">
@@ -267,7 +267,7 @@ const Card = ({ id, text, status, card }) => {
                     </div>
                 </div>
                 <div className="flex items-center justify-between">
-                    <p className='text-sm  flex  gap-1 bg-gray-200 text-black border px-1 rounded-lg'>
+                    <p className='text-sm  flex  gap-1 bg-gray-200 text-black border px-1 lg:rounded-lg rounded-[3px]'>
                         <svg width="20px" height="20px" viewBox="0 0 32 32" id="icon" xmlns="http://www.w3.org/2000/svg">
                             <defs></defs>
                             <title>alarm</title>

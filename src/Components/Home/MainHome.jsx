@@ -118,6 +118,19 @@ function MainHome() {
   const [completionPercentage, setCompletionPercentage] = useState(0);
   const [completionMessage, setCompletionMessage] = useState("");
   const [taskData, setTaskData] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [iseditModalOpen, setIseditModalOpen] = useState(false);
+
+  const handleOutsideClick = (e) => {
+    if (e.target.id === "modal-background") {
+      setIsModalOpen(false);
+    }
+  };
+  const handleeditOutsideClick = (e) => {
+    if (e && e.target && e.target.id === "modal-background") {
+      setIseditModalOpen(false);
+    }
+  };
 
   useEffect(() => {
     setCompletionPercentage(calculateCompletionPercentage());
@@ -159,7 +172,6 @@ function MainHome() {
   // Function to handle opening the modal and setting selected group data
   const handleGroupClick = (task) => {
     setSelectedGroup(task);
-    setOpenModal(true);
   };
   const handleEditGroup = (task) => {
     setEditedgroup(task);
@@ -341,11 +353,11 @@ function MainHome() {
 
   return (
     <div>
-      <div className="flex flex-col w-full rounded-lg">
-        <main className="flex-1 p-2 md:p-4 grid gap-4 md:gap-4">
+      <div className="flex flex-col w-full lg:rounded-lg rounded-[3px]">
+        <main className="flex-1  grid gap-4 md:gap-4">
           <div className=" gap-4 md:gap-4">
             <div
-              className="rounded-lg border bg-card    shadow-sm"
+              className="lg:rounded-lg rounded-[3px] border bg-card    shadow-sm"
               style={{ background: "#0A91D0" }}
             >
               <div className="flex gap-9 items-center justify-between lg:justify-center p-8">
@@ -392,7 +404,7 @@ function MainHome() {
             <h2 className="text-xl text-black font-semibold mb-2">
               In Progress
             </h2>
-            <main className="flex flex-col gap-6 bg-gray-100 py-3 rounded-lg justify-center mt-4 mb-4">
+            <main className="flex flex-col gap-6 bg-gray-100 py-3 lg:rounded-lg rounded-[3px] justify-center mt-4 mb-4">
               <div className="">
                 {loading ? (
                   <div className="flex justify-center items-center  w-full">
@@ -407,7 +419,7 @@ function MainHome() {
                           <div
                             onClick={() => navigate("/task")}
                             key={task?.id}
-                            className="cursor-pointer lg:w-[300px] w-full mb-3 bg-blue-50 bg-card text-card-foreground shadow hover:shadow-md transition-all rounded-lg"
+                            className="cursor-pointer lg:w-[300px] w-full mb-3 bg-blue-50 bg-card text-card-foreground shadow hover:shadow-md transition-all lg:rounded-lg rounded-[3px]"
                             style={randomColor}
                           >
                             <div className="p-3" data-v0-t="card">
@@ -471,7 +483,7 @@ function MainHome() {
                 onClose={() => setOpen(false)}
               >
                 <ModalDialog
-                  className=" px-5 max-w-md rounded-lg bg-white shadow-lg "
+                  className=" px-5 max-w-md lg:rounded-lg rounded-[3px] bg-white shadow-lg "
                   minWidth={500}
                   style={{ height: "580px", overflow: "auto" }}
                 >
@@ -483,10 +495,10 @@ function MainHome() {
                 </ModalDialog>
               </Modal>
             </div>
-            <div className="   mt-4 rounded-lg ">
+            <div className="   mt-4 lg:rounded-lg rounded-[3px] ">
               <div style={{ minWidth: "100%", display: "table" }}>
                 <div className=" space-y-4">
-                  <div class="flex flex-col space-y-1.5 bg-gray-100 px-4 pb-4 pt-1 rounded-lg">
+                  <div class="flex flex-col space-y-1.5 bg-gray-100 px-4 pb-4 pt-1 lg:rounded-lg rounded-[3px]">
                     <div class="flex items-center justify-between">
                       <div class="text-lg font-medium">Pinned Group</div>
                       <button class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10 rounded-full">
@@ -521,7 +533,7 @@ function MainHome() {
                             className="flex items-center justify-center"
                           >
                             <div
-                              className="rounded-lg lg:w-[300px] w-[320px] border bg-card bg-[#0A91D04D] text-card-foreground shadow-sm"
+                              className="lg:rounded-lg rounded-[3px] lg:w-[300px] w-[320px] border bg-card bg-[#0A91D04D] text-card-foreground shadow-sm"
                               data-v0-t="card"
                             >
                               <div className="px-2 py-2 flex flex-col gap-4">
@@ -591,7 +603,10 @@ function MainHome() {
                                         </MenuItem>
                                         {/* {showButton && ( */}
                                         <MenuItem
-                                          onClick={() => handleEditGroup(task)}
+                                          onClick={() => {
+                                            handleEditGroup(task);
+                                            setIseditModalOpen(true);
+                                          }}
                                         >
                                           EDIT GROUP
                                         </MenuItem>
@@ -611,7 +626,10 @@ function MainHome() {
                                   </button>
 
                                   <button
-                                    onClick={() => handleGroupClick(task)}
+                                    onClick={() => {
+                                      handleGroupClick(task);
+                                      setIsModalOpen(true);
+                                    }}
                                     className="inline-flex bg-white hover:bg-gray-300 items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-7 rounded-[3px] px-3"
                                   >
                                     View Group
@@ -624,7 +642,7 @@ function MainHome() {
                       )}
                     </div>
                   </div>
-                  <div className="flex flex-col space-y-1.5 bg-gray-100 px-4 pb-4 pt-1 rounded-lg">
+                  <div className="flex flex-col space-y-1.5 bg-gray-100 px-4 pb-4 pt-1 lg:rounded-lg rounded-[3px]">
                     <div className="flex itmes-start">
                       <div class="text-lg font-medium">Group</div>
                     </div>
@@ -641,7 +659,7 @@ function MainHome() {
                             className="flex  items-center justify-center "
                           >
                             <div class="">
-                              <div class="rounded-lg lg:w-[300px] w-[320px]  border bg-card bg-[#EF7F1A4D]  shadow-sm">
+                              <div class="lg:rounded-lg rounded-[3px] lg:w-[300px] w-[320px]  border bg-card bg-[#EF7F1A4D]  shadow-sm">
                                 <div class="px-2 py-3 flex flex-col gap-4">
                                   <div class=" flex items-center justify-between  gap-3 ">
                                     <div class=" flex items-center  gap-3 ">
@@ -686,9 +704,10 @@ function MainHome() {
                                           </MenuItem>
                                           {/* {showButton && ( */}
                                           <MenuItem
-                                            onClick={() =>
-                                              handleEditGroup(task)
-                                            }
+                                            onClick={() => {
+                                              handleEditGroup(task);
+                                              setIseditModalOpen(true);
+                                            }}
                                           >
                                             EDIT GROUP
                                           </MenuItem>
@@ -708,130 +727,97 @@ function MainHome() {
                                     </button>
 
                                     <button
-                                      onClick={() => handleGroupClick(task)}
+                                      onClick={() => {
+                                        handleGroupClick(task);
+                                        setIsModalOpen(true);
+                                      }}
                                       class="inline-flex bg-white hover:bg-gray-300  items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-7 rounded-[3px] px-3"
                                     >
                                       View Group
                                     </button>
 
-                                    <Modal
-                                      className=""
-                                      open={EditModal}
-                                      onClose={() => setEditModal(false)}
-                                    >
-                                      <ModalDialog className="bg-gray-200 h-100% w-full lg:w-[540px] ">
-                                        <div
-                                        //   onSubmit={() => setEditModal(false)}
-                                        >
+                                    {iseditModalOpen && (
+                                      <div
+                                        id="modal-background"
+                                        className="fixed inset-0 z-10 bg-opacity-20 bg-gray-700  flex justify-center items-center"
+                                        onClick={handleeditOutsideClick}
+                                      >
+                                        <div></div>
+                                        <div className="bg-white p-4 lg:rounded-lg rounded-[3px]  relative ">
+                                          <div className="flex justify-end">
+                                            <button
+                                              onClick={() =>
+                                                setIseditModalOpen(false)
+                                              }
+                                              class="text-muted-foreground hover:text-muted"
+                                            >
+                                              ✖️
+                                            </button>
+                                          </div>
                                           {editedgroup && (
                                             <EditGroup
                                               dpthead={dpthead}
                                               prjtlead={prjtlead}
-                                              setEditModal={setEditModal}
                                               Editid={editedgroup?._id}
                                               fetchGroupData={fetchGroupData}
-                                              fetchpinnedGroup={fetchpinnedGroup}
+                                              setIseditModalOpen={
+                                                setIseditModalOpen
+                                              }
+                                              fetchpinnedGroup={
+                                                fetchpinnedGroup
+                                              }
                                             />
                                           )}
                                         </div>
-                                      </ModalDialog>
-                                    </Modal>
-                                    <Modal
-                                      open={openModal}
-                                      onClose={handleCloseModal}
-                                    >
-                                      <ModalDialog className="  bg-gray-200 ">
-                                        <form onSubmit={handleCloseModal}>
+                                      </div>
+                                    )}
+
+                                    {isModalOpen && (
+                                      <div
+                                        id="modal-background"
+                                        className="fixed inset-0 z-10 bg-opacity-20 bg-gray-700 flex justify-center items-center"
+                                        onClick={handleOutsideClick}
+                                      >
+                                        <div className="bg-white p-3 lg:rounded-lg rounded-[3px]  relative">
                                           {selectedGroup && (
-                                            <div>
-                                              <main className="w-[100%]  lg:w-[100vh] overflow-auto h-[75vh] ">
-                                                <div class="bg-card p-1 ">
-                                                  <div class="flex justify-between items-center mb-4">
-                                                    <h2 class="text-lg flex josefin-sans-bold items-center  gap-3 font-semibold">
-                                                      <Avatar
-                                                        className="flex items-center justify-center h-8 shadow-md  w-8 rounded-full border border-gray-400 text-black bg-gray-100"
-                                                        src={
-                                                          selectedGroup?.profilePic
-                                                        }
-                                                      />{" "}
-                                                      {selectedGroup?.groupName}
-                                                    </h2>
-                                                    <button class="text-muted-foreground hover:text-muted">
-                                                      ✖️
-                                                    </button>
-                                                  </div>
-                                                  <div class="bg-gray-300 p-4 varela-round-regular rounded-lg mb-4">
-                                                    <h3 class="font-semibold">
-                                                      Department Head
-                                                    </h3>
-                                                    <div className="flex flex-wrap gap-2">
-                                                      <span>
-                                                        {selectedGroup?.deptHead
-                                                          ?.length ? (
-                                                          selectedGroup.deptHead.map(
-                                                            (person, index) =>
-                                                              person ? (
-                                                                <span
-                                                                  key={index}
-                                                                  className="inline-block   py-1 rounded-full me-2 "
-                                                                >
-                                                                  <li className="">
-                                                                    <span className="border lexend-bold px-2 shadow  bg-gray-200 rounded ">
-                                                                      {
-                                                                        person.name
-                                                                      }
-                                                                    </span>
-                                                                  </li>
-                                                                </span>
-                                                              ) : null
-                                                          )
-                                                        ) : (
-                                                          <span>
-                                                            No department heads
-                                                            available.
-                                                          </span>
-                                                        )}
-                                                      </span>
-                                                    </div>
-                                                  </div>
-                                                  <div class="bg-gray-300 p-4 varela-round-regular  rounded-lg mb-4">
-                                                    <h3 class="font-semibold">
-                                                      Team Members
-                                                    </h3>
-                                                    <ul class="list-disc list-inside">
-                                                      {selectedGroup?.members?.map(
-                                                        (person, index) => (
-                                                          <span
-                                                            key={index}
-                                                            className="   "
-                                                          >
-                                                            <li className="mb-1">
-                                                              <span className="border px-2  lexend-bold bg-orange-200 border-orange-200 shadow  rounded ">
-                                                                {person.name}
-                                                              </span>
-                                                            </li>
-                                                          </span>
-                                                        )
-                                                      )}
-                                                    </ul>
-                                                  </div>
-                                                  <div class="bg-gray-300 p-4  varela-round-regular  rounded-lg">
-                                                    <h3 class="font-semibold">
-                                                      Project Lead
-                                                    </h3>
+                                            <main className="w-[100%]  lg:w-[100vh] overflow-auto h-[70vh] ">
+                                              <div class="bg-card p-1 ">
+                                                <div class="flex justify-between items-center mb-4">
+                                                  <h2 class="text-lg flex josefin-sans-bold items-center  gap-3 font-semibold">
+                                                    <Avatar
+                                                      className="flex items-center justify-center h-8 shadow-md  w-8 rounded-full border border-gray-400 text-black bg-gray-100"
+                                                      src={
+                                                        selectedGroup?.profilePic
+                                                      }
+                                                    />{" "}
+                                                    {selectedGroup?.groupName}
+                                                  </h2>
+                                                  <button
+                                                    onClick={() =>
+                                                      setIsModalOpen(false)
+                                                    }
+                                                    class="text-muted-foreground hover:text-muted"
+                                                  >
+                                                    ✖️
+                                                  </button>
+                                                </div>
+                                                <div class="bg-gray-300 p-4 min-h-[100px] varela-round-regular lg:rounded-lg rounded-[3px] mb-4">
+                                                  <h3 class="font-semibold">
+                                                    Department Head
+                                                  </h3>
+                                                  <div className="flex flex-wrap gap-2 ">
                                                     <span>
-                                                      {selectedGroup
-                                                        ?.projectLead
+                                                      {selectedGroup?.deptHead
                                                         ?.length ? (
-                                                        selectedGroup.projectLead.map(
+                                                        selectedGroup.deptHead.map(
                                                           (person, index) =>
                                                             person ? (
                                                               <span
                                                                 key={index}
-                                                                className="inline-block py-1 rounded-full mr-2 "
+                                                                className="inline-block   py-1 rounded-full me-2 "
                                                               >
-                                                                <li className="mb-1">
-                                                                  <span className="border px-2 lexend-bold  bg-blue-200 border-blue-200 shadow  rounded ">
+                                                                <li className="">
+                                                                  <span className="border lexend-bold px-2 shadow  bg-gray-200 rounded ">
                                                                     {
                                                                       person.name
                                                                     }
@@ -849,12 +835,65 @@ function MainHome() {
                                                     </span>
                                                   </div>
                                                 </div>
-                                              </main>
-                                            </div>
+
+                                                <div class="bg-gray-300 p-4 mb-4 min-h-[100px]  varela-round-regular  lg:rounded-lg rounded-[3px]">
+                                                  <h3 class="font-semibold">
+                                                    Project Lead
+                                                  </h3>
+                                                  <span>
+                                                    {selectedGroup?.projectLead
+                                                      ?.length ? (
+                                                      selectedGroup.projectLead.map(
+                                                        (person, index) =>
+                                                          person ? (
+                                                            <span
+                                                              key={index}
+                                                              className="inline-block py-1 rounded-full mr-2 "
+                                                            >
+                                                              <li className="mb-1">
+                                                                <span className="border px-2 lexend-bold  bg-blue-200 border-blue-200 shadow  rounded ">
+                                                                  {person.name}
+                                                                </span>
+                                                              </li>
+                                                            </span>
+                                                          ) : null
+                                                      )
+                                                    ) : (
+                                                      <span>
+                                                        No department heads
+                                                        available.
+                                                      </span>
+                                                    )}
+                                                  </span>
+                                                </div>
+                                                <div class="bg-gray-300 p-4 min-h-[100px] varela-round-regular  lg:rounded-lg rounded-[3px]">
+                                                  <h3 class="font-semibold">
+                                                    Team Members
+                                                  </h3>
+                                                  <ul class="list-disc list-inside">
+                                                    {selectedGroup?.members?.map(
+                                                      (person, index) => (
+                                                        <span
+                                                          key={index}
+                                                          className="   "
+                                                        >
+                                                          <li className="mb-1">
+                                                            <span className="border px-2  lexend-bold bg-orange-200 border-orange-200 shadow  rounded ">
+                                                              {person.name}
+                                                            </span>
+                                                          </li>
+                                                        </span>
+                                                      )
+                                                    )}
+                                                  </ul>
+                                                </div>
+                                              </div>
+                                            </main>
                                           )}
-                                        </form>
-                                      </ModalDialog>
-                                    </Modal>
+                                        </div>
+                                      </div>
+                                    )}
+                                    
                                   </div>
                                 </div>
                               </div>

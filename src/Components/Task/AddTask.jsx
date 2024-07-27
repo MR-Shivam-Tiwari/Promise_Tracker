@@ -153,7 +153,7 @@ function AddTask({ setOpen }) {
     }, []);
     return (
         <div>
-            <div className="w-full bg-gray-200 text-black rounded-lg">
+            <div className="w-full bg-gray-200 text-black lg:rounded-lg rounded-[3px]">
                 <div className="max-w-4xl mx-auto p-0 md:p-10">
                     <h1 className="text-2xl font-bold mb-6">Create New Task</h1>
                     <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleSubmit}>

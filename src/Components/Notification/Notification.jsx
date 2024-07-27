@@ -83,8 +83,8 @@ function Notification({ handleClose }) {
 
     return (
         <div>
-            <Box sx={{ p: 3, bgcolor: 'white', boxShadow: 24, borderRadius: 2, maxWidth: 500, margin: 'auto', marginTop: '5%' }} className="bg-white  rounded-lg h-[70%]">
-                <div className="rounded-lg bg-card shadow-sm w-full max-w-md">
+            <Box sx={{ p: 3, bgcolor: 'white', boxShadow: 24, borderRadius: 2, maxWidth: 500, margin: 'auto', marginTop: '5%' }} className="bg-white  lg:rounded-lg rounded-[3px] h-[70%]">
+                <div className="lg:rounded-lg rounded-[3px] bg-card shadow-sm w-full max-w-md">
                     <header className="mb-6 flex justify-between items-center">
                         <h1 className="text-2xl text-black font-bold">Notifications</h1>
                         <Button variant='plain' className='text-black rounded-full' onClick={handleClose}>
@@ -93,7 +93,7 @@ function Notification({ handleClose }) {
                             </svg>
                         </Button>
                     </header>
-                    <div className='overflow-auto rounded-lg bg-gray-100 p-2' style={{ maxHeight: '480px' }}>
+                    <div className='overflow-auto lg:rounded-lg rounded-[3px] bg-gray-100 p-2' style={{ maxHeight: '480px' }}>
                         {loading ? (
                             Array(5).fill().map((_, index) => (
                                 <Box key={index} mb={2} display="flex" alignItems="center">

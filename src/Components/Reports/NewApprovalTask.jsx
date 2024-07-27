@@ -62,10 +62,10 @@ console.log("totalTask", tasks)
         }
       `}</style>
             <div class="flex flex-col h-screen">
-                {/* <header class="bg-gray-100 rounded-lg px-4 flex items-center justify-between">
+                {/* <header class="bg-gray-100 lg:rounded-lg rounded-[3px] px-4 flex items-center justify-between">
                     <div class="flex items-center gap-4">
 
-                        <div className=' bg-blue-50  py-1 rounded-lg'>
+                        <div className=' bg-blue-50  py-1 lg:rounded-lg rounded-[3px]'>
                             <div className="flex items-center gap-4 overflow-x-auto h-14">
                                 {['All', 'Approved', 'Unapproved'].map(status => (
                                     <button
@@ -82,7 +82,7 @@ console.log("totalTask", tasks)
                 </header> */}
                 <main class="flex-1 overflow-auto p-1 mt-3">
                     <div class="grid gap-4">
-                        <div class="border rounded-lg overflow-hidden">
+                        <div class="border lg:rounded-lg rounded-[3px] overflow-hidden">
                             <div class="relative w-full overflow-auto">
                                 <table class="w-full caption-bottom text-sm">
                                     <thead class="[&amp;_tr]:border-b">

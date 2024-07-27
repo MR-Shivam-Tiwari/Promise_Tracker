@@ -125,7 +125,7 @@ function CreateGroups() {
                     </label>
                     <input
                         id="profile-pic"
-                        className="block w-full rounded-lg border p-2.5 text-gray-900 bg-white"
+                        className="block w-full lg:rounded-lg rounded-[3px] border p-2.5 text-gray-900 bg-white"
                         type="file"
                         onChange={handleImageChange}
                     />
@@ -136,7 +136,7 @@ function CreateGroups() {
                     </label>
                     <input
                         id="group-name"
-                        className="block w-full rounded-lg border border-gray-300 bg-white p-2.5 text-gray-900 "
+                        className="block w-full lg:rounded-lg rounded-[3px] border border-gray-300 bg-white p-2.5 text-gray-900 "
                         placeholder="Enter group name"
                         required
                         type="text"

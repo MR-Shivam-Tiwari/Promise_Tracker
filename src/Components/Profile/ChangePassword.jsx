@@ -34,7 +34,7 @@ function ChangePassword() {
         }
     }
     return (
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm w-full max-w-3xl mx-auto">
+        <div className="lg:rounded-lg rounded-[3px] border bg-card text-card-foreground shadow-sm w-full max-w-3xl mx-auto">
             <div className="flex flex-col p-6 space-y-1">
                 <h3 className="whitespace-nowrap text-2xl font-semibold leading-none tracking-tight">Change Password</h3>
                 <p className="text-sm text-muted-foreground">

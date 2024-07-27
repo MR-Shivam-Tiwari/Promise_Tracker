@@ -40,9 +40,9 @@ function ViewTask({ data, status }) {
             .replace(/<em>/g, `<em style="font-style: italic;">`);
     };
     return (
-        <div className='rounded-lg'>
-            <div class="container mx-auto rounded-lg  p-0 ">
-                <div class=" rounded-lg  p-2 py-6 lg:px-8">
+        <div className='lg:rounded-lg rounded-[3px]'>
+            <div class="container mx-auto lg:rounded-lg rounded-[3px]  p-0 ">
+                <div class=" lg:rounded-lg rounded-[3px]  p-2 py-6 lg:px-8">
                     <div class="flex items-center justify-between mb-6">
                         <h1 class="text-2xl font-bold text-gray-900 ">{data?.taskGroup.groupName}</h1>
 
@@ -77,7 +77,7 @@ function ViewTask({ data, status }) {
                     {data?.pdfFile && (
                         <div >
                             <h3 className="text-lg font-medium text-gray-800 mb-2">Attached File</h3>
-                            <a href={data?.pdfFile} className="flex items-center  bg-blue-400 hover:bg-blue-300 cursor-pointer p-4 rounded-lg ">
+                            <a href={data?.pdfFile} className="flex items-center  bg-blue-400 hover:bg-blue-300 cursor-pointer p-4 lg:rounded-lg rounded-[3px] ">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     width="24"

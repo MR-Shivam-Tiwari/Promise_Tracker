@@ -168,7 +168,7 @@ export default function MyProfile() {
                 className="w-full object-cover h-full rounded-md shadow-lg mr-6"
               />
             </div>
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity lg:rounded-lg rounded-[3px]">
               <input
                 accept="image/*"
                 id="image-upload"

@@ -6,8 +6,9 @@
 
 /* Customize scrollbar */
 ::-webkit-scrollbar {
-    width: 6px;
+    width: 3px;
     border-radius: 5px;
+    height: 5px;
 }
     
 /* Track */
@@ -107,6 +108,18 @@
       transform: rotate(360deg);
     }
   } 
+
+/* Add this to your CSS file */
+.custom-backdrop {
+  backdrop-filter: blur(0.5px); /* Very slight blur */
+  background: rgba(0, 0, 0, 0.2); /* Subtle gray tone */
+}
+
+.custom-modal {
+  z-index: 1000; /* Ensure this is higher than the other elements */
+}
+
+
 
 
 
