@@ -353,11 +353,11 @@ function MainHome() {
 
   return (
     <div>
-      <div className="flex flex-col w-full rounded-lg">
+      <div className="flex flex-col w-full lg:rounded-lg rounded-[3px]">
         <main className="flex-1  grid gap-4 md:gap-4">
           <div className=" gap-4 md:gap-4">
             <div
-              className="rounded-lg border bg-card    shadow-sm"
+              className="lg:rounded-lg rounded-[3px] border bg-card    shadow-sm"
               style={{ background: "#0A91D0" }}
             >
               <div className="flex gap-9 items-center justify-between lg:justify-center p-8">
@@ -404,7 +404,7 @@ function MainHome() {
             <h2 className="text-xl text-black font-semibold mb-2">
               In Progress
             </h2>
-            <main className="flex flex-col gap-6 bg-gray-100 py-3 rounded-lg justify-center mt-4 mb-4">
+            <main className="flex flex-col gap-6 bg-gray-100 py-3 lg:rounded-lg rounded-[3px] justify-center mt-4 mb-4">
               <div className="">
                 {loading ? (
                   <div className="flex justify-center items-center  w-full">
@@ -419,7 +419,7 @@ function MainHome() {
                           <div
                             onClick={() => navigate("/task")}
                             key={task?.id}
-                            className="cursor-pointer lg:w-[300px] w-full mb-3 bg-blue-50 bg-card text-card-foreground shadow hover:shadow-md transition-all rounded-lg"
+                            className="cursor-pointer lg:w-[300px] w-full mb-3 bg-blue-50 bg-card text-card-foreground shadow hover:shadow-md transition-all lg:rounded-lg rounded-[3px]"
                             style={randomColor}
                           >
                             <div className="p-3" data-v0-t="card">
@@ -483,7 +483,7 @@ function MainHome() {
                 onClose={() => setOpen(false)}
               >
                 <ModalDialog
-                  className=" px-5 max-w-md rounded-lg bg-white shadow-lg "
+                  className=" px-5 max-w-md lg:rounded-lg rounded-[3px] bg-white shadow-lg "
                   minWidth={500}
                   style={{ height: "580px", overflow: "auto" }}
                 >
@@ -495,10 +495,10 @@ function MainHome() {
                 </ModalDialog>
               </Modal>
             </div>
-            <div className="   mt-4 rounded-lg ">
+            <div className="   mt-4 lg:rounded-lg rounded-[3px] ">
               <div style={{ minWidth: "100%", display: "table" }}>
                 <div className=" space-y-4">
-                  <div class="flex flex-col space-y-1.5 bg-gray-100 px-4 pb-4 pt-1 rounded-lg">
+                  <div class="flex flex-col space-y-1.5 bg-gray-100 px-4 pb-4 pt-1 lg:rounded-lg rounded-[3px]">
                     <div class="flex items-center justify-between">
                       <div class="text-lg font-medium">Pinned Group</div>
                       <button class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10 rounded-full">
@@ -533,7 +533,7 @@ function MainHome() {
                             className="flex items-center justify-center"
                           >
                             <div
-                              className="rounded-lg lg:w-[300px] w-[320px] border bg-card bg-[#0A91D04D] text-card-foreground shadow-sm"
+                              className="lg:rounded-lg rounded-[3px] lg:w-[300px] w-[320px] border bg-card bg-[#0A91D04D] text-card-foreground shadow-sm"
                               data-v0-t="card"
                             >
                               <div className="px-2 py-2 flex flex-col gap-4">
@@ -642,7 +642,7 @@ function MainHome() {
                       )}
                     </div>
                   </div>
-                  <div className="flex flex-col space-y-1.5 bg-gray-100 px-4 pb-4 pt-1 rounded-lg">
+                  <div className="flex flex-col space-y-1.5 bg-gray-100 px-4 pb-4 pt-1 lg:rounded-lg rounded-[3px]">
                     <div className="flex itmes-start">
                       <div class="text-lg font-medium">Group</div>
                     </div>
@@ -659,7 +659,7 @@ function MainHome() {
                             className="flex  items-center justify-center "
                           >
                             <div class="">
-                              <div class="rounded-lg lg:w-[300px] w-[320px]  border bg-card bg-[#EF7F1A4D]  shadow-sm">
+                              <div class="lg:rounded-lg rounded-[3px] lg:w-[300px] w-[320px]  border bg-card bg-[#EF7F1A4D]  shadow-sm">
                                 <div class="px-2 py-3 flex flex-col gap-4">
                                   <div class=" flex items-center justify-between  gap-3 ">
                                     <div class=" flex items-center  gap-3 ">
@@ -743,7 +743,7 @@ function MainHome() {
                                         onClick={handleeditOutsideClick}
                                       >
                                         <div></div>
-                                        <div className="bg-white p-4 rounded-lg  relative ">
+                                        <div className="bg-white p-4 lg:rounded-lg rounded-[3px]  relative ">
                                           <div className="flex justify-end">
                                             <button
                                               onClick={() =>
@@ -778,7 +778,7 @@ function MainHome() {
                                         className="fixed inset-0 z-10 bg-opacity-20 bg-gray-700 flex justify-center items-center"
                                         onClick={handleOutsideClick}
                                       >
-                                        <div className="bg-white p-3 rounded-lg  relative">
+                                        <div className="bg-white p-3 lg:rounded-lg rounded-[3px]  relative">
                                           {selectedGroup && (
                                             <main className="w-[100%]  lg:w-[100vh] overflow-auto h-[70vh] ">
                                               <div class="bg-card p-1 ">
@@ -801,7 +801,7 @@ function MainHome() {
                                                     ✖️
                                                   </button>
                                                 </div>
-                                                <div class="bg-gray-300 p-4 min-h-[100px] varela-round-regular rounded-lg mb-4">
+                                                <div class="bg-gray-300 p-4 min-h-[100px] varela-round-regular lg:rounded-lg rounded-[3px] mb-4">
                                                   <h3 class="font-semibold">
                                                     Department Head
                                                   </h3>
@@ -836,7 +836,7 @@ function MainHome() {
                                                   </div>
                                                 </div>
 
-                                                <div class="bg-gray-300 p-4 mb-4 min-h-[100px]  varela-round-regular  rounded-lg">
+                                                <div class="bg-gray-300 p-4 mb-4 min-h-[100px]  varela-round-regular  lg:rounded-lg rounded-[3px]">
                                                   <h3 class="font-semibold">
                                                     Project Lead
                                                   </h3>
@@ -866,7 +866,7 @@ function MainHome() {
                                                     )}
                                                   </span>
                                                 </div>
-                                                <div class="bg-gray-300 p-4 min-h-[100px] varela-round-regular  rounded-lg">
+                                                <div class="bg-gray-300 p-4 min-h-[100px] varela-round-regular  lg:rounded-lg rounded-[3px]">
                                                   <h3 class="font-semibold">
                                                     Team Members
                                                   </h3>

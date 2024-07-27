@@ -171,7 +171,7 @@ function AppRoutes() {
               p:1
             }}
           >
-            <div className="grid col  border rounded-lg p-2 mt-2 lg:mt-0 gap-3">
+            <div className="grid col  border lg:rounded-lg rounded-[3px] p-2 mt-2 lg:mt-0 gap-3">
               <div className="flex lg:flex-row items-center lg:items-end justify-between ">
                   <div>
                     <Header />

@@ -384,11 +384,11 @@ function Task() {
                                 className="fixed inset-0 flex items-center justify-center z-50 w-full p-4 overflow-x-hidden overflow-y-auto max-h-full"
                             >
                                 <div className="relative w-full max-w-4xl max-h-full">
-                                    <div className="relative bg-white rounded-lg shadow ">
+                                    <div className="relative bg-white lg:rounded-lg rounded-[3px] shadow ">
                                         <button
                                             type="button"
                                             onClick={toggleModal}
-                                            className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center  "
+                                            className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 lg:rounded-lg rounded-[3px] text-sm p-1.5 ml-auto inline-flex items-center  "
                                             data-modal-hide="default-modal"
                                         >
                                             <svg
@@ -422,7 +422,7 @@ function Task() {
                                                             id="taskname"
                                                             value={formData.taskName}
                                                             onChange={(e) => handleChange('taskName', e.target.value)}
-                                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm lg:rounded-lg rounded-[3px] focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                                             placeholder="Task Name"
                                                             required
                                                         />
@@ -462,7 +462,7 @@ function Task() {
                                                     />
                                                 </div>
 
-                                                <div className="p-4 bg-white rounded-lg shadow-md">
+                                                <div className="p-4 bg-white lg:rounded-lg rounded-[3px] shadow-md">
                                                     <label htmlFor="taskname" className="block mb-4 text-lg font-semibold text-gray-900">
                                                         Record Audio
                                                     </label>
@@ -470,7 +470,7 @@ function Task() {
                                                         <button
                                                             onClick={startRecording}
                                                             disabled={isRecording}
-                                                            className={`flex items-center px-4 py-2 text-white font-medium rounded-lg focus:outline-none ${isRecording ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                                                            className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${isRecording ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
                                                                 }`}
                                                         >
                                                             {isRecording ? (
@@ -494,7 +494,7 @@ function Task() {
                                                         <button
                                                             onClick={stopRecording}
                                                             disabled={!isRecording}
-                                                            className={`flex items-center px-4 py-2 text-white font-medium rounded-lg focus:outline-none ${!isRecording ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600'
+                                                            className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${!isRecording ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600'
                                                                 }`}
                                                         >
                                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 16 16" fill="currentColor">
@@ -516,7 +516,7 @@ function Task() {
                                                                         e.preventDefault();
                                                                         setuploadResultVoice(null);
                                                                     }}
-                                                                    className="px-4 py-2 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 focus:outline-none"
+                                                                    className="px-4 py-2 bg-red-500 text-white font-medium lg:rounded-lg rounded-[3px] hover:bg-red-600 focus:outline-none"
                                                                 >
                                                                     Remove Recording
                                                                 </button>
@@ -583,7 +583,7 @@ function Task() {
                                                             id="startDate"
                                                             value={formData.startDate}
                                                             onChange={(e) => handleChange('startDate', e.target.value)}
-                                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm lg:rounded-lg rounded-[3px] focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                                             placeholder="Start Date"
                                                             required
                                                         />
@@ -598,7 +598,7 @@ function Task() {
                                                             id="endDate"
                                                             value={formData.endDate}
                                                             onChange={(e) => handleChange('endDate', e.target.value)}
-                                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm lg:rounded-lg rounded-[3px] focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                                             placeholder="End Date"
                                                             required
                                                         />
@@ -617,7 +617,7 @@ function Task() {
                                                         renderInput={(params) => (
                                                             <input
                                                                 {...params}
-                                                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm lg:rounded-lg rounded-[3px] focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                                                 placeholder="Select Members"
                                                             />
                                                         )}
@@ -625,7 +625,7 @@ function Task() {
                                                 </div>
                                                 <button
                                                     type="submit"
-                                                    className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                                                    className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium lg:rounded-lg rounded-[3px] text-sm px-5 py-2.5 text-center"
                                                 >
                                                     Submit
                                                 </button>
