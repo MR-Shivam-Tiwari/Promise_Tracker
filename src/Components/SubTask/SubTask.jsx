@@ -18,7 +18,7 @@ const SubTask = () => {
         console.log('inside the option')
         if (selectedOption === 'pendingTask') {
             console.log('insdie the if condition')
-            setFilterUserTasks(userTasks.filter(task => ['In Progress', 'To Do', 'Archive'].includes(task.status)))
+            setFilterUserTasks(userTasks?.filter(task => ['In Progress', 'To Do'].includes(task.status)))
         } else {
             setFilterUserTasks(userTasks)
         }
@@ -113,6 +113,21 @@ const SubTask = () => {
         setShowModal(true);
     };
 
+    const addWithTask = (parentTask) => {
+        setNewSubTask(prev => {
+            return { ...prev, parentTask }
+        });
+        setShowModal(true);
+    }
+
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setNewSubTask({ subTaskName: '', description: '' });
+        setIsEditing(false);
+        setCurrentTaskId(null);
+    };
+
 
 
     return (
@@ -143,16 +158,7 @@ const SubTask = () => {
                 </ul>
             </div>
 
-            {/* {
-        userTasks?.map((task) => (
-          <div key={task._id} className="mb-4">
 
-            <h3>{task?.taskName}</h3>
-      
-          </div>
-        ))
-            
-      } */}
 
             {selectedOption === 'all' && subTasks?.map((task) => (
                 <div key={task._id} className="mb-4">
@@ -229,7 +235,7 @@ const SubTask = () => {
                                         e.stopPropagation();
                                         // toggleCompletion(task._id);
                                         setIsEditing(false);
-                                        setShowModal(true);
+                                        addWithTask(task._id);
                                     }}
                                 >
                                     Add SubTask
@@ -280,7 +286,7 @@ const SubTask = () => {
                                                 </div>
                                                 {expandedTasks.has(subTask._id) && (
                                                     <div className="p-1 mx-[40px] bg-red-100 rounded shadow mt-2">
-                                                       <p className='font-normal text-sm'><span className='font-bold text-md'>Description :</span>{subTask.description}</p>
+                                                        <p className='font-normal text-sm'><span className='font-bold text-md'>Description :</span>{subTask.description}</p>
                                                     </div>
                                                 )}
                                             </div>
@@ -301,45 +307,60 @@ const SubTask = () => {
             {showModal && (
                 <div
                     className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-                    onClick={() => setShowModal(false)} // Close modal on backdrop click
+                    onClick={() => handleCloseModal()} // Close modal on backdrop click
                 >
                     <div
                         className="bg-white p-6 rounded shadow-lg w-1/3 relative"
                         onClick={(e) => e.stopPropagation()} // Prevent click inside modal from closing it
                     >
-                        <h2 className="text-xl font-semibold mb-4">
+                        <h2 className="text-2xl font-semibold mb-4">
                             {isEditing ? 'Edit Subtask' : 'Create Subtask'}
                         </h2>
                         <form onSubmit={handleCreateOrUpdateSubTask}>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700">Subtask Name</label>
+                                <label className="block text-md font-medium text-gray-700">Subtask Name</label>
                                 <input
                                     type="text"
-                                    value={newSubTask.subTaskName}
+                                    value={newSubTask?.subTaskName}
                                     onChange={(e) => setNewSubTask({ ...newSubTask, subTaskName: e.target.value })}
-                                    className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+                                    className="mt-1 block w-full border  border-gray-300 rounded px-3 py-2"
                                     required
+
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700">Description</label>
+                                <label className="block text-md font-medium text-gray-700">Description</label>
                                 <textarea
-                                    value={newSubTask.description}
+
+                                    value={newSubTask?.description}
                                     onChange={(e) => setNewSubTask({ ...newSubTask, description: e.target.value })}
-                                    className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+                                    className="mt-1 block w-full  border border-gray-300 rounded px-3 py-2"
                                 />
+                            </div>
+                            <div className="mb-4">
+                                <select
+                                    value={newSubTask?.parentTask}
+                                    onChange={(e) => setNewSubTask({ ...newSubTask, parentTask: e.target.value })}
+                                    id="small"
+                                    className="block w-full p-2 mb-6 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                >
+                                    <option value="" disabled selected>Choose a task</option>
+                                    {userTasks?.map((task) => (
+                                        <option key={task._id} value={task._id}>{task.taskName}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="flex justify-end space-x-4">
                                 <button
                                     type="button"
-                                    className="px-4 py-2 bg-gray-500 text-white rounded"
+                                    className="px-2 py-1 text-md font-normal bg-gray-500 text-white rounded"
                                     onClick={() => setShowModal(false)}
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 bg-blue-500 text-white rounded"
+                                    className="px-2 py-1 text-md font-normal bg-blue-500 text-white rounded"
                                 >
                                     {isEditing ? 'Update' : 'Create'}
                                 </button>
