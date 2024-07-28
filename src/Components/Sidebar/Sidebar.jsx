@@ -96,7 +96,7 @@ export default function Sidebar({ onSidebarItemClick }) {
 
   return (
     <Sheet
-      className="Sidebar lexend-bold"
+      className="Sidebar z-10 lg:z-0 lexend-bold"
       sx={{
         position: { xs: "fixed", md: "sticky" },
         transform: {
@@ -104,7 +104,7 @@ export default function Sidebar({ onSidebarItemClick }) {
           md: "none",
         },
         transition: "transform 0.4s, width 0.4s",
-        zIndex: 10,
+        // zIndex: 10,
         height: "100dvh",
         width: "var(--Sidebar-width)",
         top: 0,
