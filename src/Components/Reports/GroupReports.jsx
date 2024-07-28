@@ -88,7 +88,7 @@ function GroupReports() {
         {loading ? (
           <div className="flex justify-center items-center mt-20">
             <span className="loader"></span>
-          </div>
+          </div> 
         ) : (
           <>
             <table className="w-full text-sm text-left  text-gray-500 bg-gray-200">
