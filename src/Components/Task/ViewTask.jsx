@@ -3,8 +3,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../../global/UserContext';
 import { toast } from 'react-toastify';
 import { CircularProgress } from '@mui/material';
+import moment from 'moment';
+import Logs from '../logs/Logs';
 
-function ViewTask({ data, status }) {
+function ViewTask({ data, status,setOpen }) {
     // console.log("status", status)
     // console.log("task", data)
     const [subTasks, setSubTasks] = useState([]);
@@ -18,6 +20,7 @@ function ViewTask({ data, status }) {
     const [selectedOption, setSelectedOption] = useState('all');
     const [filterUserTasks, setFilterUserTasks] = useState([]);
     const [loader, setLoader] = useState(false);
+    const [logs, setLogs] = useState([]);
 
     const getAllUserSubTasks = () => {
         axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/${data?._id}/task/${userData?.userId}/user_tasks`)
@@ -28,6 +31,18 @@ function ViewTask({ data, status }) {
             });
     };
 
+    const getAllLogs = ()=>{
+        axios.get(`${process.env.REACT_APP_API_URL}/api/logs/${data?._id}`)
+        .then((res) => {
+            setLogs(res.data);
+        }).catch((err) => {
+            console.log(err);
+        });
+    }
+
+    useEffect(() => {
+        getAllLogs();
+    }, []);
 
 
     const getAllUserTasks = () => {
@@ -192,7 +207,11 @@ function ViewTask({ data, status }) {
                 <div class=" lg:rounded-lg rounded-[3px]  p-2 py-6 lg:px-8">
                     <div class="flex items-center justify-between mb-6">
                         <h1 class="text-2xl font-bold text-gray-900 ">{data?.taskGroup.groupName}</h1>
-
+                        <button onClick={(e)=>{
+                            e.stopPropagation()
+                            setOpen(false)
+                            }
+                        }>Close</button>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                         <div>
@@ -291,8 +310,11 @@ function ViewTask({ data, status }) {
                     </div>
                     <hr className='mt-4 mb-4 ' />
                     <div>
-                        <div className='flex justify-between mb-8'>
-                            <h3 className='text-lg font-medium'>Your Sub Tasks</h3>
+                        <div className='flex justify-between items-center mb-8'>
+                            <div>
+                            <h3 className='text-xl font-bold'>Your Sub Tasks  <span className='text-white cursor-pointer px-2 py-1 text-sm bg-orange-500 rounded-full  font-bold'> {subTasks?.filter((subTask) => subTask.status === 'done').length}/{subTasks?.length}</span></h3>
+                            <span className='text-gray-500 '>Below Subtasks are only visible to you</span>
+                            </div>
                             <button
                                 className={`px-4 py-1 text-md rounded text-white hover:bg-green-700 active:bg-green-900 ${'bg-green-800'}`}
                                 onClick={() => {
@@ -307,7 +329,7 @@ function ViewTask({ data, status }) {
                             subTasks?.map((subTask) => {
                                 return (
                                     <>
-                                        <div key={subTask._id} className="mx-10 mb-4">
+                                        <div key={subTask._id} className="mx-4 mb-4">
                                             <div
                                                 className="flex justify-between items-center px-2 py-1 bg-white rounded shadow cursor-pointer"
                                                 onClick={() => toggleTask(subTask._id)}
@@ -423,6 +445,25 @@ function ViewTask({ data, status }) {
                         <div >
                             {status}
 
+                        </div>
+                    </div>
+                    <hr className='font-bold text-gray-800'/>
+                    <div className='mt-5 mb-5'>
+                        <div>
+                            <h3 className='text-black text-xl mb-5 font-bold'>All logs</h3>
+                        </div>
+                        <div className='ml-5'>
+                            {
+                                logs?.map((log)=>{
+                                    return (
+                                        <>
+                                            <div>
+                                                <Logs log={log}/>
+                                            </div>
+                                        </>
+                                    )
+                                })
+                            }
                         </div>
                     </div>
 

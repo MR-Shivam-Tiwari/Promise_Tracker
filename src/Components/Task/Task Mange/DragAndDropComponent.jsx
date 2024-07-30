@@ -257,8 +257,8 @@ const Card = ({ id, text, status, card }) => {
                                 className=' bg-white rounded-lg h-[min-500px] '
                                
                             >
-                                <ModalClose variant="plain" sx={{ m: 1 }} onClick={() => setOpen(false)} />
-                                <ViewTask data={card} />
+                                {/* <ModalClose variant="plain" sx={{ m: 1 }} onClick={() => setOpen(false)} /> */}
+                                <ViewTask data={card} setOpen={setOpen} />
                             </div>
                         </Modal>
                     </div>

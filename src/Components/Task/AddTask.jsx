@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-quill/dist/quill.snow.css'; // Import Quill styles
 import ReactQuill from 'react-quill'; // Import Quill
 import { EditorProvider } from 'react-simple-wysiwyg';
 import { Autocomplete } from '@mui/joy';
+import { UserContext } from '../../global/UserContext';
 
 
 
 function AddTask({ setOpen }) {
+    const {userData} = useContext(UserContext)
     const [GroupData, setGroupData] = useState([]);
     const [departmentHeads, setDepartmentHeads] = useState([]);
     const [userid, setUserid] = useState("");
@@ -80,7 +82,8 @@ function AddTask({ setOpen }) {
         try {
             const response = await axios.post(process.env.REACT_APP_API_URL+"/api/tasksadd", formData);
             console.log(response.data);
-            resetForm();
+            generateAddTaskLog(response.data.taskId, formData)
+            // resetForm();
             setOpen(false);
             toast.dismiss()
             toast.success("Task created successfully!");
@@ -90,12 +93,34 @@ function AddTask({ setOpen }) {
         } catch (error) {
             console.error("Error creating group:", error);
             if (error.response && error.response.data && error.response.data.error) {
+                toast.dismiss()
                 toast.error("Error: " + error.response.data.error);
             } else {
+                toast.dismiss()
                 toast.error("Failed to create group. Please try again later.");
             }
         }
     };
+
+    const generateAddTaskLog = (taskId, formData)=>{
+        const data = {
+            userId:userData?.userId,
+            taskId,
+            action:"create",
+            userName:userData?.userName,
+            details:{
+                member:[...formData.people],
+            }
+        }
+        axios.post(`${process.env.REACT_APP_API_URL}/api/logs`,data )
+        .then(res=>{
+            resetForm();
+            console.log('res', res.data)
+        }).catch((err)=>{
+            toast.dismiss();
+            toast.error('Internal Server Error');
+        })
+    }
 
     const resetForm = () => {
         setFormData({

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import DragAndDropComponent from './Task Mange/DragAndDropComponent';
 import Select from '@mui/joy/Select';
@@ -13,10 +13,12 @@ import { Autocomplete } from '@mui/joy';
 import Add from '@mui/icons-material/Add';
 import io from 'socket.io-client';
 import { CircularProgress } from '@mui/material';
+import { UserContext } from '../../global/UserContext';
 
 const socket = io(process.env.REACT_APP_API_URL);
 
 function Task() {
+    const {userData} = useContext(UserContext)
     const userDataString = localStorage.getItem('userData');
     const [tasks, setTasks] = useState([]);
     const [userid, setUserid] = useState(JSON.parse(userDataString)?.userId || '');
@@ -98,7 +100,26 @@ function Task() {
             }));
         }
     };
-
+    const generateAddTaskLog = (taskId, formData)=>{
+        console.log('laskdfjalskfjladskfjsdlakfjsdafjsa', taskId)
+        const data = {
+            userId:userData?.userId,
+            taskId,
+            action:"create",
+            userName:userData?.name,
+            details:{
+                member:[...formData.people],
+            }
+        }
+        axios.post(`${process.env.REACT_APP_API_URL}/api/logs`,data )
+        .then(res=>{
+            resetForm();
+            console.log('res', res.data)
+        }).catch((err)=>{
+            toast.dismiss();
+            toast.error('Internal Server Error');
+        })
+    }
 
 
     const handleSubmit = async (e) => {
@@ -113,7 +134,9 @@ function Task() {
         try {
             const response = await axios.post(process.env.REACT_APP_API_URL + "/api/tasksadd", { ...formData, audioFile: uploadResultVoice, pdfFile: singleFile});
             // console.log(response.data);
-            resetForm();
+            console.log(response.data)
+            generateAddTaskLog(response.data.newTask._id, formData)
+            // resetForm();
             setModal(false);
             // toast.success("Task created successfully!");
             await fetchTasks(); // Refetch tasks after creating a new one
@@ -195,7 +218,7 @@ function Task() {
                 setTaskGroups(uniqueTaskGroups);
                 setLoading(false);
 
-                return axios.put(process.env.REACT_APP_API_URL + '/api/archiveOldTasks');
+                // return axios.put(process.env.REACT_APP_API_URL + '/api/archiveOldTasks');
             })
             .then(() => {
                 // Optionally, handle the response from the PUT request
