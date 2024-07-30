@@ -283,7 +283,7 @@ export default function Sidebar({ onSidebarItemClick }) {
                         className="lexend-bold"
                         style={{ fontSize: "17px", fontWeight: "bold" }}
                       >
-                        Roles
+                        Members
                       </Typography>
                     </ListItemContent>
                   </ListItemButton>
