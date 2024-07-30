@@ -377,6 +377,11 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
     const moveCard = async (id, toSection) => {
         const newSections = { ...sections };
         const fromSection = Object.keys(newSections).find(section => newSections[section].find(card => card._id === id));
+        if(fromSection==='Completed'){
+            toast.dismiss();
+            toast.error(`Can't Move Completed Task to ${toSection}`);
+            return;
+        }
         if (fromSection !== toSection) {
             if (toSection === 'Postponed') {
                 const cardToMove = newSections[fromSection].find((card) => card._id === id);

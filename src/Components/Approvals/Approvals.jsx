@@ -7,17 +7,21 @@ import {
   Skeleton,
 } from "@mui/joy";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import EditApprovals from "./EditApprovals";
 import AcceptApprovals from "./AcceptApprovals";
+import { toast } from "react-toastify";
+import { UserContext } from "../../global/UserContext";
 
 function Approvals() {
+  const {userData} = useContext(UserContext)
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [tasks, setTasks] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [userid, setUserid] = useState("");
   const [loading, setLoading] = useState(true);
+
   const fetchData = async () => {
     try {
       const response = await axios.get(
@@ -26,20 +30,37 @@ function Approvals() {
       setTasks(response.data);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching tasks:", error);
+      // console.error("Error fetching tasks:", error); 
       setLoading(false);
     }
   };
 
-  console.log("6669423368af8aedd6ff220e", tasks);
+  const getAllReleventTask = ()=>{
+    setLoading(true)
+    axios.get(`${process.env.REACT_APP_API_URL}/api/tasks/deptHead_projectLead/${userData?.userId}/all_approval_task`)
+    .then((res)=>{
+      setLoading(false)
+      setTasks(res.data);
+    }).catch((err)=>{
+      setLoading(false)
+      toast.dismiss()
+      toast.error('Internal Server Error')
+    })
+  }
+  
+
   useEffect(() => {
-    fetchData();
+    // fetchData();
+    if(userData?.userId){
+      getAllReleventTask();
+    }
   }, []);
 
   const handleCloseModal = () => {
     setOpen(false);
     setSelectedTask(null);
-    fetchData(); // Call fetchData function when modal is closed
+    getAllReleventTask()
+    // fetchData(); // Call fetchData function when modal is closed
   };
 
   useEffect(() => {
@@ -48,7 +69,7 @@ function Approvals() {
     if (userDataString) {
       const userDataObj = JSON.parse(userDataString);
       const userId = userDataObj.userId;
-      console.log(userId);
+      // console.log(userId);
       setUserid(userId);
     }
   }, []);
@@ -126,7 +147,7 @@ function Approvals() {
                         {task?.people.map((person) => person.name).join(", ")}
                       </td>
                       <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
-                        {/* {task?.taskGroup.groupName} */}
+                        {task?.taskGroup.groupName}
                       </td>
                       <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
                         {task?.reminder}
