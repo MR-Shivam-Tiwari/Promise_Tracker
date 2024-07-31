@@ -12,7 +12,7 @@ const Logs = ({ log }) => {
             <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> created task 
             <span className='font-bold text-orange-500'> "{log?.taskId?.taskName}"</span> on {moment(log?.timestamp).format('DD-MM-YYYY')}
           </p>
-            <span className='font-bold text-md '>Assigned To :</span>
+            <span className='font-bold text-md ml-4'>Assigned To :</span>
                 <span className='font-bold text-gray-600'> {
                     log?.details?.member?.map((user, index) => {return (user?.name)}).join(', ')}</span>
              </div>
@@ -62,6 +62,16 @@ const Logs = ({ log }) => {
               <hr/>
              </>
             );
+            case 'changeStatus':
+              return (
+               <>
+                   <div className='text-gray-600 mt-2 mb-2'>
+                  <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> <span className='text-gray-500 '>change Status </span>
+                  <span className='font-bold text-orange-500'> "{log?.details?.fromStatus || "Todo"}"</span> to <span className='font-bold text-green-500'> "{log?.details?.toStatus || "Todo"}"</span> on {moment(log?.timestamp).format('DD-MM-YYYY')}
+                </div>
+                <hr/>
+               </>
+              );
       default:
         return <p>Unknown action</p>;
     }

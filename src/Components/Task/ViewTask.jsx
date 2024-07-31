@@ -204,8 +204,10 @@ function ViewTask({ data, status,setOpen }) {
     return (
         <div className='lg:rounded-lg rounded-[3px]'>
          <div class="flex px-5 pt-4 items-center justify-between mb-6">
+                      <div className='flex items-center gap-4'>
                         <h1 class="text-2xl font-bold text-gray-900 ">{data?.taskGroup.groupName}</h1>
-                        
+                        <span className='text-gray-600 font-bold'>({data?.status || "To Do"})</span>
+                      </div>
                         <button  onClick={(e)=>{
                             e.stopPropagation()
                             setOpen(false)
@@ -443,7 +445,7 @@ function ViewTask({ data, status,setOpen }) {
                     <hr className='font-bold text-gray-800'/>
                     <div className='mt-5 mb-5'>
                         <div>
-                            <h3 className='text-black text-xl mb-5 font-bold'>All logs</h3>
+                            <h3 className='text-black text-xl mb-5 font-bold'>All logs <span className='text-gray-500 font-bold text-md'>({logs?.length})</span></h3>
                         </div>
                         <div className='ml-5'>
                             {
