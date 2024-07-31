@@ -54,6 +54,7 @@ function Role() {
         .then((res) => {
           toast.dismiss();
           toast.success(res.data.message);
+          toast.success("Member Deactivated");
           fetchUserData();
         })
         .catch((err) => {
@@ -71,6 +72,7 @@ function Role() {
         .then((res) => {
           toast.dismiss();
           toast.success(res.data.message);
+          toast.success("Member Activated");
           fetchUserData();
         })
         .catch((err) => {
@@ -385,8 +387,8 @@ function Role() {
                             : handleActive(user, user.userId);
                         }}
                         className={`rounded-[5px] ${
-                          user.active ? "bg-red-500" : "bg-green-500"
-                        } hover:bg-red-600 text-white font-bold py-2 px-4 rounded`}
+                          user.active ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
+                        }  text-white font-bold py-2 px-4 rounded`}
                       >
                         {user.active ? "Deactivate" : "Activate"}
                       </button>
