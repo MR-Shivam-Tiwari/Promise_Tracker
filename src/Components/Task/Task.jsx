@@ -302,6 +302,7 @@ function Task() {
 
     const uploadAudio = async (audioBlob) => {
         setAudioLoader(true);
+        console.log('alsjdfklsajfdlkafjdslkaf', audioBlob)
         const formData = new FormData();
         formData.append('voice', audioBlob, 'recording.wav');
 

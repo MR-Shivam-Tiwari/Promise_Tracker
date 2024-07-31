@@ -1,6 +1,8 @@
 import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../../global/UserContext';
+import { toast } from 'react-toastify';
+import { CircularProgress } from '@mui/material';
 
 const SubTask = () => {
     const { userData } = useContext(UserContext);
@@ -13,12 +15,12 @@ const SubTask = () => {
     const [newSubTask, setNewSubTask] = useState({ subTaskName: '', description: '' });
     const [selectedOption, setSelectedOption] = useState('all');
     const [filterUserTasks, setFilterUserTasks] = useState([]);
-
+    const [loader, setLoader] = useState(false);
     useEffect(() => {
         console.log('inside the option')
         if (selectedOption === 'pendingTask') {
             console.log('insdie the if condition')
-            setFilterUserTasks(userTasks?.filter(task => ['In Progress', 'To Do'].includes(task.status)))
+            setFilterUserTasks(userTasks?.filter(task => ['In Progress', 'To do', ""].includes(task.status)))
         } else {
             setFilterUserTasks(userTasks)
         }
@@ -27,20 +29,26 @@ const SubTask = () => {
 
 
     const getAllUserSubTasks = () => {
+        setLoader(true)
         axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/${userData?.userId}/user_tasks`)
             .then((res) => {
+                setLoader(false)
                 setSubTasks(res.data);
             }).catch((err) => {
+                setLoader(false)
                 console.log(err);
             });
     };
 
     const getAllUserTasks = () => {
+        setLoader(true)
         axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/assigned/${userData?.userId}`)
             .then((res) => {
                 setUserTasks(res.data);
+                setLoader(false)
             }).catch((err) => {
                 console.log(err);
+                setLoader(false)
             })
     }
 
@@ -62,21 +70,25 @@ const SubTask = () => {
     };
 
     const toggleCompletion = (id) => {
+        setLoader(true)
         const taskToUpdate = subTasks.find(task => task._id === id);
-        const newStatus = taskToUpdate.status === 'pending' ? 'done' : 'pending';
+        const newStatus = taskToUpdate.status === 'Undo' ? 'done' : 'Undo';
 
         axios.put(`${process.env.REACT_APP_API_URL}/api/subtask/${id}`, { status: newStatus })
             .then((res) => {
+                setLoader(false)
                 setSubTasks(subTasks.map(task =>
                     task._id === id ? { ...task, status: newStatus } : task
                 ));
             })
             .catch((err) => {
+                setLoader(false)
                 console.log(err);
             });
     };
 
     const handleCreateOrUpdateSubTask = (e) => {
+        setLoader(true)
         e.preventDefault();
         const apiUrl = isEditing
             ? `${process.env.REACT_APP_API_URL}/api/subtask/${currentTaskId}`
@@ -89,22 +101,39 @@ const SubTask = () => {
             ...newSubTask,
         })
             .then((res) => {
-                if (isEditing) {
-                    setSubTasks(subTasks.map(task =>
-                        task._id === currentTaskId ? res.data : task
-                    ));
-                } else {
-                    setSubTasks([...subTasks, res.data]);
-                }
+                setLoader(false)
+                // if (isEditing) {
+                //     setSubTasks(subTasks.map(task =>
+                //         task._id === currentTaskId ? res.data : task
+                //     ));
+                // } else {
+                //     setSubTasks([...subTasks, res.data]);
+                // }
+                getAllUserSubTasks();
+
                 setShowModal(false);
                 setNewSubTask({ subTaskName: '', description: '' });
                 setIsEditing(false);
                 setCurrentTaskId(null);
             })
             .catch((err) => {
+                setLoader(false)
                 console.log(err);
             });
     };
+    const deleteSubTask = (id)=>{
+        setLoader(true)
+        axios.delete(`${process.env.REACT_APP_API_URL}/api/subtask/${id}`)
+        .then((res)=>{
+            setLoader(false)
+            getAllUserSubTasks();
+        }).catch((err)=>{
+            setLoader(false)
+            console.log(err);
+            toast.dismiss()
+            toast.error('Something went wrong!')
+        })
+    }
 
     const openEditModal = (task) => {
         setNewSubTask({ subTaskName: task.subTaskName, description: task.description });
@@ -159,8 +188,7 @@ const SubTask = () => {
             </div>
 
 
-
-            {selectedOption === 'all' && subTasks?.map((task) => (
+            {selectedOption === 'all' &&  subTasks?.map((task) => (
                 <div key={task._id} className="mb-4">
                     <div
                         className="flex justify-between items-center p-4 bg-white rounded shadow cursor-pointer"
@@ -168,7 +196,7 @@ const SubTask = () => {
                     >
                         <div className="flex items-center">
                             <span
-                                className={`h-4 w-4 rounded-full mr-3 ${task.status === 'done' ? 'bg-green-600' : expandedTasks.has(task._id) ? 'bg-purple-600' : 'bg-gray-300'}`}
+                                className={`h-4 w-4 rounded-full mr-3 ${task.status === 'done' ? 'bg-green-600' : 'bg-gray-300'}`}
                             ></span>
                             <span
                                 className={`text-lg ${task.status === 'done' ? 'line-through text-gray-500' : ''} cursor-pointer select-none`}
@@ -184,24 +212,36 @@ const SubTask = () => {
                                     toggleCompletion(task._id);
                                 }}
                             >
-                                {task.status === 'done' ? 'Pending' : 'Done'}
+                                {task.status === 'done' ? 'Undo' : 'Done'}
                             </button>
-                            <button
-                                className="px-2 py-1 bg-yellow-500 text-white rounded"
+                            {/* <button
+                                className="px-2 py-1 bg-red-500 text-white rounded"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     openEditModal(task);
                                 }}
                             >
                                 Edit
+                            </button> */}
+                            <button
+                                className="px-2 py-1 bg-red-800 text-white rounded"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    deleteSubTask(task._id);
+                                }}
+                            >
+                                Delete
                             </button>
                         </div>
                     </div>
-                    {expandedTasks.has(task._id) && (
+                    {/* {expandedTasks.has(task._id) && (
                         <div className="p-4 bg-purple-100 rounded shadow mt-2">
-                            <p>{task.description}</p>
+                        {task?.description?<p className='font-normal text-sm'><span className='font-bold text-md'>Description :</span>{task.description}</p>
+                            :<p className='font-normal text-sm'>No Description</p>
+                        }
+
                         </div>
-                    )}
+                    )} */}
                 </div>
             ))}
 
@@ -255,7 +295,7 @@ const SubTask = () => {
                                                 >
                                                     <div className="flex items-center">
                                                         <span
-                                                            className={`h-4 w-4 rounded-full mr-3 ${subTask.status === 'done' ? 'bg-green-600' : expandedTasks.has(subTask._id) ? 'bg-purple-600' : 'bg-gray-300'}`}
+                                                            className={`h-4 w-4 rounded-full mr-3 ${subTask.status === 'done' ? 'bg-green-600'  : 'bg-gray-300'}`}
                                                         ></span>
                                                         <span
                                                             className={`text-sm ${subTask.status === 'done' ? 'line-through text-gray-500' : ''} cursor-pointer select-none`}
@@ -271,10 +311,10 @@ const SubTask = () => {
                                                                 toggleCompletion(subTask._id);
                                                             }}
                                                         >
-                                                            {subTask.status === 'done' ? 'Pending' : 'Done'}
+                                                            {subTask.status === 'done' ? 'Undo' : 'Done'}
                                                         </button>
                                                         <button
-                                                            className=" px-2 py-1 text-sm bg-yellow-500 text-white rounded"
+                                                            className=" px-2 py-1 text-sm bg-red-500 text-white rounded"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 openEditModal(subTask);
@@ -284,11 +324,11 @@ const SubTask = () => {
                                                         </button>
                                                     </div>
                                                 </div>
-                                                {expandedTasks.has(subTask._id) && (
+                                                {/* {expandedTasks.has(subTask._id) && (
                                                     <div className="p-1 mx-[40px] bg-red-100 rounded shadow mt-2">
-                                                        <p className='font-normal text-sm'><span className='font-bold text-md'>Description :</span>{subTask.description}</p>
+                                                        {subTask?.description?<p className='font-normal text-sm'><span className='font-bold text-md'>Description :</span>{subTask.description}</p>:'No description provided'}
                                                     </div>
-                                                )}
+                                                )} */}
                                             </div>
                                         )
                                     })

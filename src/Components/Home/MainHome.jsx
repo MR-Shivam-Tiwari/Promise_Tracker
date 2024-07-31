@@ -182,16 +182,16 @@ function MainHome() {
     setOpenModal(true);
   };
 
-  useEffect(() => {
-    // Retrieve userData from localStorage
-    const userDataString = localStorage.getItem("userData");
-    if (userDataString) {
-      const userDataObj = JSON.parse(userDataString);
-      const userId = userDataObj.userId;
-      setuserid(userId);
-      setuserId(userId);
-    }
-  }, []);
+  // useEffect(() => {
+  //   // Retrieve userData from localStorage
+  //   const userDataString = localStorage.getItem("userData");
+  //   if (userDataString) {
+  //     const userDataObj = JSON.parse(userDataString);
+  //     const userId = userDataObj.userId;
+  //     setuserid(userId);
+  //     setuserId(userId);
+  //   }
+  // }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -267,8 +267,8 @@ function MainHome() {
   }, [userid]);
 
   // Find the current user based on the frontendUserId
-  const currentUser =
-    Array.isArray(userData) && userData.find((user) => user.userId === userid);
+  const currentUser = userData;
+    // Array.isArray(userData) && userData.find((user) => user.userId === userid);
 
   // Check if the current user has userRole 0, 1, or 2
   const showButton =

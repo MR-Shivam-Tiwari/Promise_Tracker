@@ -1,9 +1,156 @@
-import { Avatar, Chip } from '@mui/joy'
-import React from 'react'
+import axios from 'axios';
+import React, { useContext, useEffect, useState } from 'react';
+import { UserContext } from '../../global/UserContext';
+import { toast } from 'react-toastify';
+import { CircularProgress } from '@mui/material';
 
 function ViewTask({ data, status }) {
-    console.log("status", status)
-    console.log("task", data)
+    // console.log("status", status)
+    // console.log("task", data)
+    const [subTasks, setSubTasks] = useState([]);
+    const { userData } = useContext(UserContext);
+    const [userTasks, setUserTasks] = useState([]);
+    const [expandedTasks, setExpandedTasks] = useState(new Set()); // Track expanded tasks
+    const [showModal, setShowModal] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [currentTaskId, setCurrentTaskId] = useState(null);
+    const [newSubTask, setNewSubTask] = useState({ subTaskName: '', description: '' });
+    const [selectedOption, setSelectedOption] = useState('all');
+    const [filterUserTasks, setFilterUserTasks] = useState([]);
+    const [loader, setLoader] = useState(false);
+
+    const getAllUserSubTasks = () => {
+        axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/${data?._id}/task/${userData?.userId}/user_tasks`)
+            .then((res) => {
+                setSubTasks(res.data);
+            }).catch((err) => {
+                console.log(err);
+            });
+    };
+
+
+
+    const getAllUserTasks = () => {
+        setLoader(true)
+        axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/assigned/${userData?.userId}`)
+            .then((res) => {
+                setUserTasks(res.data);
+                setLoader(false)
+            }).catch((err) => {
+                console.log(err);
+                setLoader(false)
+            })
+    }
+
+    useEffect(() => {
+        getAllUserSubTasks();
+        getAllUserTasks()
+    }, []);
+
+    const toggleTask = (id) => {
+        setExpandedTasks(prev => {
+            const newExpanded = new Set(prev);
+            if (newExpanded.has(id)) {
+                newExpanded.delete(id); // Close task if already open
+            } else {
+                newExpanded.add(id); // Open task
+            }
+            return newExpanded;
+        });
+    };
+
+    const toggleCompletion = (id) => {
+        setLoader(true)
+        const taskToUpdate = subTasks.find(task => task._id === id);
+        const newStatus = taskToUpdate.status === 'pending' ? 'done' : 'pending';
+
+        axios.put(`${process.env.REACT_APP_API_URL}/api/subtask/${id}`, { status: newStatus })
+            .then((res) => {
+                setLoader(false)
+                setSubTasks(subTasks.map(task =>
+                    task._id === id ? { ...task, status: newStatus } : task
+                ));
+            })
+            .catch((err) => {
+                setLoader(false)
+                console.log(err);
+            });
+    };
+
+    const handleCreateOrUpdateSubTask = (e) => {
+        setLoader(true)
+        e.preventDefault();
+        const apiUrl = isEditing
+            ? `${process.env.REACT_APP_API_URL}/api/subtask/${currentTaskId}`
+            : `${process.env.REACT_APP_API_URL}/api/subtask`;
+
+        const method = isEditing ? 'put' : 'post';
+
+        axios[method](apiUrl, {
+            userId: userData?.userId,
+            parentTask: data?._id,
+            ...newSubTask,
+        })
+            .then((res) => {
+                setLoader(false)
+                // if (isEditing) {
+                //     setSubTasks(subTasks.map(task =>
+                //         task._id === currentTaskId ? res.data : task
+                //     ));
+                // } else {
+                //     setSubTasks([...subTasks, res.data]);
+                // }
+                getAllUserSubTasks();
+
+                setShowModal(false);
+                setNewSubTask({ subTaskName: '', description: '' });
+                setIsEditing(false);
+                setCurrentTaskId(null);
+            })
+            .catch((err) => {
+                setLoader(false)
+                console.log(err);
+            });
+    };
+    const deleteSubTask = (id) => {
+        setLoader(true)
+        axios.delete(`${process.env.REACT_APP_API_URL}/api/subtask/${id}`)
+            .then((res) => {
+                setLoader(false)
+                getAllUserSubTasks();
+            }).catch((err) => {
+                setLoader(false)
+                console.log(err);
+                toast.dismiss()
+                toast.error('Something went wrong!')
+            })
+    }
+
+    const openEditModal = (task) => {
+        setNewSubTask({ subTaskName: task.subTaskName, description: task.description });
+        setCurrentTaskId(task._id);
+        setIsEditing(true);
+        setShowModal(true);
+    };
+
+    const addWithTask = (parentTask) => {
+        setNewSubTask(prev => {
+            return { ...prev, parentTask }
+        });
+        setShowModal(true);
+    }
+
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setNewSubTask({ subTaskName: '', description: '' });
+        setIsEditing(false);
+        setCurrentTaskId(null);
+    };
+
+    useEffect(() => {
+        getAllUserSubTasks()
+    }, [])
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -41,7 +188,7 @@ function ViewTask({ data, status }) {
     };
     return (
         <div className='lg:rounded-lg rounded-[3px]'>
-            <div class="container mx-auto lg:rounded-lg rounded-[3px]  p-0 ">
+            <div class="container mx-auto lg:rounded-lg rounded-[3px]  p-0 h-[80vh] md:w-[70vw] w-[80vw] overflow-scroll">
                 <div class=" lg:rounded-lg rounded-[3px]  p-2 py-6 lg:px-8">
                     <div class="flex items-center justify-between mb-6">
                         <h1 class="text-2xl font-bold text-gray-900 ">{data?.taskGroup.groupName}</h1>
@@ -65,33 +212,33 @@ function ViewTask({ data, status }) {
                         </div>
                     </div>
                     <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 align-center'>
-                    {data?.audioFile ? <div class="">
-                        <div>
-                            <h2 className="text-lg font-medium text-gray-900  mb-2">Audio Player</h2>
-                            <audio controls>
-                                <source src={data?.audioFile} type="audio/mp4" />
-                                Your browser does not support the audio element.
-                            </audio>
-                        </div>
-                    </div> : null}
-                    {data?.pdfFile && (
-                        <div >
-                            <h3 className="text-lg font-medium text-gray-800 mb-2">Attached File</h3>
-                            <a href={data?.pdfFile} className="flex items-center  bg-blue-400 hover:bg-blue-300 cursor-pointer p-4 lg:rounded-lg rounded-[3px] ">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    fill="currentColor"
-                                    className="bi bi-file-earmark"
-                                    viewBox="0 0 16 16"
-                                >
-                                    <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h4.5L14 4.5zM10 4a1 1 0 0 1-1-1V1.5L14 5h-3.5A1.5 1.5 0 0 1 9 3.5V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5H10z" />
-                                </svg>
-                                <span  className="ml-2 font-bold ">Download File</span>
-                            </a>
-                        </div>
-                    )}
+                        {data?.audioFile ? <div class="">
+                            <div>
+                                <h2 className="text-lg font-medium text-gray-900  mb-2">Audio Player</h2>
+                                <audio controls>
+                                    <source src={data?.audioFile} type="audio/mp4" />
+                                    Your browser does not support the audio element.
+                                </audio>
+                            </div>
+                        </div> : null}
+                        {data?.pdfFile && (
+                            <div >
+                                <h3 className="text-lg font-medium text-gray-800 mb-2">Attached File</h3>
+                                <a href={data?.pdfFile} className="flex items-center  bg-blue-400 hover:bg-blue-300 cursor-pointer p-4 lg:rounded-lg rounded-[3px] ">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24"
+                                        height="24"
+                                        fill="currentColor"
+                                        className="bi bi-file-earmark"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h4.5L14 4.5zM10 4a1 1 0 0 1-1-1V1.5L14 5h-3.5A1.5 1.5 0 0 1 9 3.5V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5H10z" />
+                                    </svg>
+                                    <span className="ml-2 font-bold ">Download File</span>
+                                </a>
+                            </div>
+                        )}
                     </div>
 
 
@@ -126,7 +273,8 @@ function ViewTask({ data, status }) {
                                 </div>
 
                             </div>
-                        </div><div>
+                        </div>
+                        <div>
                             <h2 className="text-lg font-medium text-gray-900  mb-2">Dates</h2>
                             <p className="text-gray-700 mb-2 gap-2 flex  ">
                                 Start:<p className='border px-2 font-bold  rounded bg-gray-200'>
@@ -141,6 +289,136 @@ function ViewTask({ data, status }) {
                             </p>
                         </div>
                     </div>
+                    <hr className='mt-4 mb-4 ' />
+                    <div>
+                        <div className='flex justify-between mb-8'>
+                            <h3 className='text-lg font-medium'>Your Sub Tasks</h3>
+                            <button
+                                className={`px-4 py-1 text-md rounded text-white hover:bg-green-700 active:bg-green-900 ${'bg-green-800'}`}
+                                onClick={() => {
+                        setIsEditing(false);
+                        setShowModal(true);
+                    }}
+                            >
+                            Create
+                            </button>
+                        </div>
+                        {
+                            subTasks?.map((subTask) => {
+                                return (
+                                    <>
+                                        <div key={subTask._id} className="mx-10 mb-4">
+                                            <div
+                                                className="flex justify-between items-center px-2 py-1 bg-white rounded shadow cursor-pointer"
+                                                onClick={() => toggleTask(subTask._id)}
+                                            >
+                                                <div className="flex items-center">
+                                                    <span
+                                                        className={`h-4 w-4 rounded-full mr-3 ${subTask.status === 'done' ? 'bg-green-600' : 'bg-gray-300'}`}
+                                                    ></span>
+                                                    <span
+                                                        className={`text-sm ${subTask.status === 'done' ? 'line-through text-gray-500' : ''} cursor-pointer select-none`}
+                                                    >
+                                                        {subTask.subTaskName}
+                                                    </span>
+                                                </div>
+                                                <div className="flex  items-center space-x-4">
+                                                    <button
+                                                        className={`px-2 py-1 text-sm rounded text-white ${subTask.status === 'done' ? 'bg-red-500' : 'bg-green-500'}`}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            toggleCompletion(subTask._id);
+                                                        }}
+                                                    >
+                                                        {subTask.status === 'done' ? 'Undo' : 'Done'}
+                                                    </button>
+                                                    {/* <button
+                                                            className=" px-2 py-1 text-sm bg-yellow-500 text-white rounded"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                // openEditModal(subTask);
+                                                            }}
+                                                        >
+                                                            Edit
+                                                        </button> */}
+                                                </div>
+                                            </div>
+                                            {/* {expandedTasks.has(subTask._id) && (
+                                                    <div className="p-1 mx-[40px] bg-red-100 rounded shadow mt-2">
+                                                        {subTask?.description?<p className='font-normal text-sm'><span className='font-bold text-md'>Description :</span>{subTask.description}</p>:'No description provided'}
+                                                    </div>
+                                                )} */}
+                                        </div>
+                                    </>
+                                )
+                            })
+                        }
+                    </div>
+                    {showModal && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+                    onClick={() => handleCloseModal()} // Close modal on backdrop click
+                >
+                    <div
+                        className="bg-white p-6 rounded shadow-lg md:w-[500px] relative"
+                        onClick={(e) => e.stopPropagation()} // Prevent click inside modal from closing it
+                    >
+                        <h2 className="text-2xl font-semibold mb-4">
+                            {isEditing ? 'Edit Subtask' : 'Create Subtask'}
+                        </h2>
+                        <form onSubmit={handleCreateOrUpdateSubTask}>
+                            <div className="mb-4">
+                                <label className="block text-md font-medium text-gray-700">Subtask Name</label>
+                                <input
+                                    type="text"
+                                    value={newSubTask?.subTaskName}
+                                    onChange={(e) => setNewSubTask({ ...newSubTask, subTaskName: e.target.value })}
+                                    className="mt-1 block w-full border  border-gray-300 rounded px-3 py-2"
+                                    required
+
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-md font-medium text-gray-700">Description</label>
+                                <textarea
+
+                                    value={newSubTask?.description}
+                                    onChange={(e) => setNewSubTask({ ...newSubTask, description: e.target.value })}
+                                    className="mt-1 block w-full  border border-gray-300 rounded px-3 py-2"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <select
+                                    value={newSubTask?.parentTask}
+                                    onChange={(e) => setNewSubTask({ ...newSubTask, parentTask: e.target.value })}
+                                    id="small"
+                                    className="block w-full p-2 mb-6 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                >
+                                    <option value="" disabled selected>Choose a task</option>
+                                    {userTasks?.map((task) => (
+                                        <option key={task._id} value={task._id}>{task.taskName}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex justify-end space-x-4">
+                                <button
+                                    type="button"
+                                    className="px-2 py-1 text-md font-normal bg-gray-500 text-white rounded"
+                                    onClick={() => setShowModal(false)}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-2 py-1 text-md font-normal bg-blue-500 text-white rounded"
+                                >
+                                    {isEditing ? 'Update' : 'Create'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
                     <div className='text-black'>
                         <div >
                             {status}

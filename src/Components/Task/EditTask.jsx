@@ -145,21 +145,25 @@ function EditTask({ data, setEdit }) {
                                 Group Name
                             </label>
                             <select
-                                className="flex bg-white h-10 w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                                value={JSON.stringify(formData.taskGroup)}
-                                onChange={(e) => handleChange('taskGroup', JSON.parse(e.target.value))}
-                            >
-                                <option value="">Select a Group</option>
-                                {Array.isArray(GroupData) && GroupData.length > 0 ? (
-                                    GroupData.map((group) => (
-                                        <option key={group._id} value={JSON.stringify(group)}>
-                                            {group.groupName}
-                                        </option>
-                                    ))
-                                ) : (
-                                    <option value="" disabled>No groups available</option>
-                                )}
-                            </select>
+    className="flex bg-white h-10 w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+    value={JSON.stringify(formData?.taskGroup || { groupId: "", groupName: "" })}
+    onChange={(e) => {
+        const selectedGroup = JSON.parse(e.target.value);
+        handleChange('taskGroup', selectedGroup);
+    }}
+>
+    <option value={JSON.stringify({ groupId: "", groupName: "" })}>Select a Group</option>
+    {
+        GroupData.map((group) => (
+            <option
+                key={group?._id}
+                value={JSON.stringify({ groupId: group?._id, groupName: group.groupName })}
+            >
+                {group.groupName}
+            </option>
+        ))
+    }
+</select>
 
                         </div>
                         <div className="space-y-2">
