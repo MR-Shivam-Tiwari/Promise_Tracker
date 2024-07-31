@@ -1,34 +1,58 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { UserContext } from '../../global/UserContext';
 
-const updateTaskStatus = async (id, status, body) => {
-    try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/tasks/${id}/status`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ status, ...body }), // Include additional data in the body
-        });
 
-        if (!response.ok) {
-            throw new Error('Failed to update task status');
-        }
-        toast.dismiss();
-        toast.success('Task Status Updated');
-        return response.json();
-    } catch (error) {
-        console.error('Error updating task status:', error);
-        toast.error('Failed to update task status');
-    }
-};
+
 
 function Archive() {
+    const { userData } = useContext(UserContext);
     const [userid, setUserId] = useState('');
     const [loading, setLoading] = useState(true);
     const [archiveTasks, setArchiveTasks] = useState([]);
 
+    const generateAddTaskLog = (taskId , to)=>{
+        const data = {
+            userId:userData?.userId,
+            taskId,
+            action:"changeStatus",
+            userName:userData?.name,
+            details:{
+                fromStatus:"Archive",
+                toStatus:to
+            }
+        }
+        axios.post(`${process.env.REACT_APP_API_URL}/api/logs`,data )
+        .then(res=>{
+            console.log('res', res.data)
+        }).catch((err)=>{
+            toast.dismiss();
+            toast.error('Internal Server Error');
+        })
+    }
+    const updateTaskStatus = async (id, status, body) => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/tasks/${id}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status, ...body }), // Include additional data in the body
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to update task status');
+            }
+            generateAddTaskLog(id, status);
+            toast.dismiss();
+            toast.success('Task Status Updated');
+            return response.json();
+        } catch (error) {
+            console.error('Error updating task status:', error);
+            toast.error('Failed to update task status');
+        }
+    };
     const fetchTasks = async (userId) => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/tasks`);

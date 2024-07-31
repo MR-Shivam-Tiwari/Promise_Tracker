@@ -1,5 +1,5 @@
 import { AspectRatio, Box, Button, Chip, Dropdown, IconButton, Menu, MenuButton, MenuItem, Modal, Sheet, Skeleton, Typography } from '@mui/joy';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,7 @@ import ViewTask from '../ViewTask';
 import EditTask from '../EditTask';
 import Load from './Loading.gif'
 import axios from 'axios';
+import { UserContext } from '../../../global/UserContext';
 const ItemTypes = {
     CARD: 'card',
 };
@@ -62,6 +63,7 @@ const Section = ({ title, cards, moveCard, loading }) => {
     );
 };
 const Card = ({ id, text, status, card }) => {
+    const { userData } = useContext(UserContext)
     const [showOptions, setShowOptions] = useState(false);
     const [selectedOption, setSelectedOption] = useState('');
     const navigate = useNavigate()
@@ -175,6 +177,25 @@ const Card = ({ id, text, status, card }) => {
     };
     const endDateFormatted = formatDate2(card?.endDate);
     const dueMessage = calculateDueMessage(endDateFormatted);
+    const generateAddTaskLog = (taskId,from)=>{
+        const data = {
+            userId:userData?.userId,
+            taskId,
+            action:"changeStatus",
+            userName:userData?.name,
+            details:{
+                fromStatus:from?from:"",
+                toStatus:"Archive"
+            }
+        }
+        axios.post(`${process.env.REACT_APP_API_URL}/api/logs`,data )
+        .then(res=>{
+            console.log('res', res.data)
+        }).catch((err)=>{
+            toast.dismiss();
+            toast.error('Internal Server Error');
+        })
+    }
     const archiveTask = async () => {
         try {
             const response = await axios.put(process.env.REACT_APP_API_URL+`/api/tasks/${id}/status`, {
@@ -193,6 +214,7 @@ const Card = ({ id, text, status, card }) => {
                 console.error('Failed to archive task', response.data);
             }
             toast.dismiss()
+            generateAddTaskLog(id,card?.status)
             toast.success("Task archived successfully")
             setInterval(() => {
                 window.location.reload();
@@ -257,8 +279,8 @@ const Card = ({ id, text, status, card }) => {
                                 className=' bg-white rounded-lg h-[min-500px] '
                                
                             >
-                                <ModalClose variant="plain" sx={{ m: 1 }} onClick={() => setOpen(false)} />
-                                <ViewTask data={card} />
+                                {/* <ModalClose variant="plain" sx={{ m: 1 }} onClick={() => setOpen(false)} /> */}
+                                <ViewTask data={card} setOpen={setOpen} />
                             </div>
                         </Modal>
                     </div>
@@ -327,7 +349,7 @@ const Card = ({ id, text, status, card }) => {
     );
 };
 const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksCompleted, tasksInProgress }) => {
-
+    const {userData} = useContext(UserContext)
     const [sections, setSections] = useState({
         'Todo': tasksToDo,
         'In Progress': tasksInProgress,
@@ -373,6 +395,25 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
 
         return response.json();
     };
+    const generateAddTaskLog = (taskId, from , to)=>{
+        const data = {
+            userId:userData?.userId,
+            taskId,
+            action:"changeStatus",
+            userName:userData?.name,
+            details:{
+                fromStatus:from==='Todo'?"":from,
+                toStatus:to==='Todo'?"":to
+            }
+        }
+        axios.post(`${process.env.REACT_APP_API_URL}/api/logs`,data )
+        .then(res=>{
+            console.log('res', res.data)
+        }).catch((err)=>{
+            toast.dismiss();
+            toast.error('Internal Server Error');
+        })
+    }
 
     const moveCard = async (id, toSection) => {
         const newSections = { ...sections };
@@ -387,14 +428,19 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                 const cardToMove = newSections[fromSection].find((card) => card._id === id);
                 setCurrentCard({ ...cardToMove, fromSection });
                 setIsCancelModalOpen(true);
+                generateAddTaskLog(id,fromSection, toSection)
+
                 return;
             } else if (toSection === 'Completed') {
                 const cardToMove = newSections[fromSection].find((card) => card._id === id);
                 setCurrentCard({ ...cardToMove, fromSection });
                 setIsCompleteModalOpen(true);
+                generateAddTaskLog(id,fromSection, toSection)
+
                 return;
             }
             try {
+                generateAddTaskLog(id,fromSection, toSection)
                 let updatedStatus = toSection === 'Todo' ? '' : toSection;
                 const updatedTask = await updateTaskStatus(id, updatedStatus);
                 const cardToMove = newSections[fromSection].find((card) => card._id === id);
