@@ -33,6 +33,7 @@
     "socket.io-client": "^4.7.5",
     "typescript": "latest",
     "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5",
     "yup": "^1.4.0"
   },
   "description": "https://github.com/mui/material-ui/blob/v5.15.15/docs/data/joy/templates/order-dashboard/App.tsx",

@@ -73,15 +73,17 @@ export default function Sidebar({ onSidebarItemClick }) {
     setSelectedItem(itemName);
   };
 
-    const fetchUserData = async () => {
-        try {
-            const response = await axios.get(process.env.REACT_APP_API_URL+'/api/userData');
-            // setUserData(Array.isArray(response.data) ? response.data : []);
-            console.log(response.data);
-        } catch (error) {
-            console.log("Error fetching Group Data: ", error);
-        }
-    };
+  const fetchUserData = async () => {
+    try {
+      const response = await axios.get(
+        process.env.REACT_APP_API_URL + "/api/userData"
+      );
+      // setUserData(Array.isArray(response.data) ? response.data : []);
+      console.log(response.data);
+    } catch (error) {
+      console.log("Error fetching Group Data: ", error);
+    }
+  };
 
   useEffect(() => {
     // fetchUserData();
@@ -147,7 +149,7 @@ export default function Sidebar({ onSidebarItemClick }) {
         onClick={() => closeSidebar()}
       />
       <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-        <Typography className="text-2xl  " style={{  fontWeight: "bold" }}>
+        <Typography className="text-2xl  " style={{ fontWeight: "bold" }}>
           Promise Tracker
         </Typography>
       </Box>
@@ -253,6 +255,38 @@ export default function Sidebar({ onSidebarItemClick }) {
               )}
             ></Toggler>
           </ListItem>
+       
+
+          <ListItem
+            nested
+            onClick={() => {
+              navigate("/reports");
+              handleItemClick("reports");
+            }}
+          >
+            <Toggler
+              renderToggle={({ open, setOpen }) => (
+                <ListItemButton
+                  selected={selectedItem === "reports"}
+                  className="p-2 px-3"
+                  onClick={() => setOpen(!open)}
+                >
+                  <img
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABqklEQVR4nO2YwUoDMRCG//bSix4VfQBP4jPo0dYH8D161Hfw5kN4EN/FLfRuPVsvghRkJDALg+52s5tkkpb5IXRpk5n5mskkG8C0W6KEbQngdB9ASBOGuKWyqwZDiUEq8XmcwM8/h6nsHgF41ZgZSgwCLRhSAFGBISWQ5DCkCOKUDEYbJBlMDpAkMLlAosNo7Oy+rYrhMLaGns2KA1GPgwwkrshmhGWpFVlkqZUhtW4AvANYAZjmnJFtgfjIjav9vQXE0ag+BrYF0qURgHUJIO7iYCP6fwGY9PBz/wfiemAcrfIx4CAW3M/B/PDzE4Cxh48Zj3FtFhBH8HtDJY7aJwDOAXzwd48d9s9ESt0FxBH1Tc5B1LoE8M2/zVvGH4g/4YXXiSpIXZ3qNbFouVy7FSnjnqVc0M9i/OGAOHqpyYCsTpuOG8I593Ozc9WwuNecXkPiiAriU2YfuO8ngAvPxa0CMmWYpjLZpDFXMBIVjXhWQuLIckSZ8N5CIqVGu3rWWgXs/FQSSN+ULBYkaxxkIHFFNiMsS63IIkstlqVWqalFhbTB2hsQE5T1CwsPr7cDvXGAAAAAAElFTkSuQmCC"
+                    style={{ width: "22px" }}
+                  />{" "}
+                  <ListItemContent>
+                    <Typography
+                      className="lexend-bold"
+                      style={{ fontSize: "17px", fontWeight: "bold" }}
+                    >
+                      Reports
+                    </Typography>
+                  </ListItemContent>
+                </ListItemButton>
+              )}
+            ></Toggler>
+          </ListItem>
           {showButton && (
             <ListItem
               nested
@@ -291,37 +325,6 @@ export default function Sidebar({ onSidebarItemClick }) {
               ></Toggler>
             </ListItem>
           )}
-
-          <ListItem
-            nested
-            onClick={() => {
-              navigate("/reports");
-              handleItemClick("reports");
-            }}
-          >
-            <Toggler
-              renderToggle={({ open, setOpen }) => (
-                <ListItemButton
-                  selected={selectedItem === "reports"}
-                  className="p-2 px-3"
-                  onClick={() => setOpen(!open)}
-                >
-                  <img
-                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABqklEQVR4nO2YwUoDMRCG//bSix4VfQBP4jPo0dYH8D161Hfw5kN4EN/FLfRuPVsvghRkJDALg+52s5tkkpb5IXRpk5n5mskkG8C0W6KEbQngdB9ASBOGuKWyqwZDiUEq8XmcwM8/h6nsHgF41ZgZSgwCLRhSAFGBISWQ5DCkCOKUDEYbJBlMDpAkMLlAosNo7Oy+rYrhMLaGns2KA1GPgwwkrshmhGWpFVlkqZUhtW4AvANYAZjmnJFtgfjIjav9vQXE0ag+BrYF0qURgHUJIO7iYCP6fwGY9PBz/wfiemAcrfIx4CAW3M/B/PDzE4Cxh48Zj3FtFhBH8HtDJY7aJwDOAXzwd48d9s9ESt0FxBH1Tc5B1LoE8M2/zVvGH4g/4YXXiSpIXZ3qNbFouVy7FSnjnqVc0M9i/OGAOHqpyYCsTpuOG8I593Ozc9WwuNecXkPiiAriU2YfuO8ngAvPxa0CMmWYpjLZpDFXMBIVjXhWQuLIckSZ8N5CIqVGu3rWWgXs/FQSSN+ULBYkaxxkIHFFNiMsS63IIkstlqVWqalFhbTB2hsQE5T1CwsPr7cDvXGAAAAAAElFTkSuQmCC"
-                    style={{ width: "22px" }}
-                  />{" "}
-                  <ListItemContent>
-                    <Typography
-                      className="lexend-bold"
-                      style={{ fontSize: "17px", fontWeight: "bold" }}
-                    >
-                      Reports
-                    </Typography>
-                  </ListItemContent>
-                </ListItemButton>
-              )}
-            ></Toggler>
-          </ListItem>
           <ListItem
             nested
             onClick={() => {
@@ -361,7 +364,66 @@ export default function Sidebar({ onSidebarItemClick }) {
               )}
             ></Toggler>
           </ListItem>
-
+          <ListItem
+            nested
+            onClick={() => {
+              navigate("/sub-tasks");
+              handleItemClick("sub-tasks");
+            }}
+          >
+            <Toggler
+              renderToggle={({ open, setOpen }) => (
+                <ListItemButton
+                  selected={selectedItem === "sub-tasks"}
+                  className="p-2 px-3"
+                  onClick={() => setOpen(!open)}
+                >
+                  <svg
+                    width="25px"
+                    height="25px"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <rect
+                      x="16"
+                      y="9"
+                      width="4"
+                      height="4"
+                      rx="2"
+                      transform="rotate(90 16 9)"
+                      stroke="#222222"
+                    />
+                    <rect
+                      x="20"
+                      y="17"
+                      width="4"
+                      height="4"
+                      rx="2"
+                      transform="rotate(90 20 17)"
+                      stroke="#222222"
+                    />
+                    <path
+                      d="M5 4V15C5 16.8856 5 17.8284 5.58579 18.4142C6.17157 19 7.11438 19 9 19H16"
+                      stroke="#222222"
+                    />
+                    <path
+                      d="M5 7V7C5 8.88562 5 9.82843 5.58579 10.4142C6.17157 11 7.11438 11 9 11H12"
+                      stroke="#222222"
+                    />
+                  </svg>
+                  <ListItemContent>
+                    <Typography
+                      className="lexend-bold"
+                      style={{ fontSize: "17px", fontWeight: "bold" }}
+                    >
+                      Sub Tasks
+                    </Typography>
+                  </ListItemContent>
+                </ListItemButton>
+              )}
+            ></Toggler>
+          </ListItem>
           <ListItem
             nested
             onClick={() => {
@@ -398,45 +460,9 @@ export default function Sidebar({ onSidebarItemClick }) {
               )}
             ></Toggler>
           </ListItem>
-          <ListItem
-            nested
-            onClick={() => {
-              navigate("/sub-tasks");
-              handleItemClick("sub-tasks");
-            }}
-          >
-            <Toggler
-              renderToggle={({ open, setOpen }) => (
-                <ListItemButton
-                  selected={selectedItem === "archive-task"}
-                  className="p-2 px-3"
-                  onClick={() => setOpen(!open)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="22"
-                    height="22"
-                    fill="currentColor"
-                    class="bi bi-archive"
-                    viewBox="0 0 16 16"
-                  >
-                    <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5zm13-3H1v2h14zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5" />
-                  </svg>
-                  <ListItemContent>
-                    <Typography
-                      className="lexend-bold"
-                      style={{ fontSize: "17px", fontWeight: "bold" }}
-                    >
-                      Sub Tasks
-                    </Typography>
-                  </ListItemContent>
-                </ListItemButton>
-              )}
-            ></Toggler>
-          </ListItem>
         </List>
       </Box>
-     
+
       <div className="">
         <ListItem
           nested
