@@ -1,7 +1,8 @@
 import { Autocomplete } from '@mui/joy';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { UserContext } from '../../global/UserContext';
 
 const top100Films = [
     // Your top100Films array here...
@@ -9,6 +10,7 @@ const top100Films = [
 
 function EditTask({ data, setEdit }) {
     const Taskid = data?._id
+    const {userData} = useContext(UserContext)
     const [GroupData, setGrouptData] = useState([]);
     const [departmentHeads, setDepartmentHeads] = useState([]);
     const [userid, setuserid] = useState("");
@@ -78,6 +80,24 @@ function EditTask({ data, setEdit }) {
             }));
         }
     };
+    const generateAddTaskLog = (taskId, formData)=>{
+        const data = {
+            userId:userData?.userId,
+            taskId,
+            action:"edit",
+            userName:userData?.name,
+            details:{
+                member:[...formData.people],
+            }
+        }
+        axios.post(`${process.env.REACT_APP_API_URL}/api/logs`,data )
+        .then(res=>{
+            console.log('res', res.data)
+        }).catch((err)=>{
+            toast.dismiss();
+            toast.error('Internal Server Error');
+        })
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -85,6 +105,7 @@ function EditTask({ data, setEdit }) {
         try {
             const response = await axios.put(process.env.REACT_APP_API_URL+`/api/tasksedit/${Taskid}`, formData);
             console.log(response.data);
+            generateAddTaskLog(response.data._id, formData)
             setEdit(false)
             toast.dismiss()
             toast.success("Task updated successfully!");

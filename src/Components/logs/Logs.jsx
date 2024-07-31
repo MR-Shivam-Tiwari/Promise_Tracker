@@ -7,20 +7,22 @@ const Logs = ({ log }) => {
       case 'create':
         return (
          <>
-             <p>
-            <span className='font-bold text-blue-500'>{log?.userId?.name}</span> created task 
-            <span className='font-bold text-orange-500'> {log?.taskId?.taskName}</span> on {moment(log?.timestamp).format('DD-MM-YYYY')}
+             <div className='mb-2 mt-2'>
+             <p className='text-gray-600'>
+            <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> created task 
+            <span className='font-bold text-orange-500'> "{log?.taskId?.taskName}"</span> on {moment(log?.timestamp).format('DD-MM-YYYY')}
           </p>
-            <span className='font-bold text-md'>Assigned To :</span>
+            <span className='font-bold text-md '>Assigned To :</span>
                 <span className='font-bold text-gray-600'> {
                     log?.details?.member?.map((user, index) => {return (user?.name)}).join(', ')}</span>
+             </div>
            <hr/>
          </>
         );
       case 'assign':
         return (
           <p>
-            <span className='font-bold'>{log?.userId?.name}</span> assigned task 
+            <span className='font-bold'>"{log?.userId?.name}"</span> assigned task 
             <span className='font-bold'> {log?.taskId?.taskName}</span> to 
             <span className='font-bold'> {log?.details?.assignedUser}</span> on 
             {moment(log?.timestamp).format('DD-MM-YYYY')}
@@ -52,11 +54,13 @@ const Logs = ({ log }) => {
         );
         case 'edit':
             return (
-              <p>
-                <span className='font-bold'>{log?.userId?.name}</span> edit task 
-                <span className='font-bold'> {log?.taskId?.taskName}</span> on 
-                {moment(log?.timestamp).format('DD-MM-YYYY')}
-              </p>
+             <>
+                 <div className='text-gray-600 mt-2 mb-2'>
+                <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> edit task 
+                <span className='font-bold text-orange-500'> "{log?.taskId?.taskName}"</span> on {moment(log?.timestamp).format('DD-MM-YYYY')}
+              </div>
+              <hr/>
+             </>
             );
       default:
         return <p>Unknown action</p>;
@@ -64,7 +68,7 @@ const Logs = ({ log }) => {
   };
 
   return (
-    <div>
+    <div className='px-2 py-1  bg-purple-100 rounded-lg mb-4'>
       {renderLogMessage()}
     </div>
   );
