@@ -203,22 +203,27 @@ function ViewTask({ data, status,setOpen }) {
     };
     return (
         <div className='lg:rounded-lg rounded-[3px]'>
-            <div class="container mx-auto lg:rounded-lg rounded-[3px]  p-0 h-[80vh] md:w-[70vw] w-[80vw] overflow-scroll">
-                <div class=" lg:rounded-lg rounded-[3px]  p-2 py-6 lg:px-8">
-                    <div class="flex items-center justify-between mb-6">
+         <div class="flex px-5 pt-4 items-center justify-between mb-6">
                         <h1 class="text-2xl font-bold text-gray-900 ">{data?.taskGroup.groupName}</h1>
-                        <button onClick={(e)=>{
+                        
+                        <button  onClick={(e)=>{
                             e.stopPropagation()
                             setOpen(false)
                             }
-                        }>Close</button>
+                        }  type="button" class="close font-bold text-4xl" aria-label="Close">
+  <span aria-hidden="true">&times;</span>
+</button>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+            <div class="container mx-auto lg:rounded-lg rounded-[3px]  p-0 h-[80vh] md:w-[70vw] w-[80vw] overflow-scroll">
+                <div class=" lg:rounded-lg rounded-[3px]   lg:px-8">
+                   
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
                         <div>
-                            <h2 class="text-lg font-medium text-gray-900  mb-2">Task Name</h2>
-                            <p class="  ">
-                                {data?.taskName}
-                            </p>
+                            <h2 class="text-md font-medium text-gray-900  mb-2">Task Name</h2>
+                            
+                            <input disabled type="text" value={data?.taskName} id="first_name" class="bg-gray-100 p-4 rounded-lg w-full " placeholder="John" required />
+        
+
 
                         </div>
                         <div>
@@ -230,7 +235,7 @@ function ViewTask({ data, status,setOpen }) {
                             />
                         </div>
                     </div>
-                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 align-center'>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3 align-center'>
                         {data?.audioFile ? <div class="">
                             <div>
                                 <h2 className="text-lg font-medium text-gray-900  mb-2">Audio Player</h2>
@@ -265,7 +270,7 @@ function ViewTask({ data, status,setOpen }) {
                         <div>
                             <h2 className="text-lg font-medium text-gray-900  mb-2">Assigned By</h2>
                             <p className="text-gray-700 mb-2 gap-2 flex  ">
-                                <p class="font-bold  bg-yellow-500 px-2 rounded-sm text-black"> {data?.owner?.name}</p>
+                                <p class="font-bold  bg-yellow-500 px-2 rounded-lg text-white"> {data?.owner?.name}</p>
                             </p>
 
                         </div>
@@ -273,7 +278,7 @@ function ViewTask({ data, status,setOpen }) {
                             <h2 class="text-lg font-medium text-gray-900  mb-2">Assigned To</h2>
                             <div className='flex '>
 
-                                <p class="font-bold  bg-green-500 text-black  px-2 rounded-sm"> {data?.people.map(person => person.name).join(', ')}</p>
+                                <p class="font-bold  bg-green-500 text-white  px-2 rounded-lg"> {data?.people.map(person => person.name).join(', ')}</p>
                             </div>
                         </div>
 
@@ -382,7 +387,7 @@ function ViewTask({ data, status,setOpen }) {
                     onClick={() => handleCloseModal()} // Close modal on backdrop click
                 >
                     <div
-                        className="bg-white p-6 rounded shadow-lg md:w-[500px] relative"
+                        className="bg-white p-6 rounded shadow-lg md:w-[500px] "
                         onClick={(e) => e.stopPropagation()} // Prevent click inside modal from closing it
                     >
                         <h2 className="text-2xl font-semibold mb-4">
@@ -409,19 +414,7 @@ function ViewTask({ data, status,setOpen }) {
                                     className="mt-1 block w-full  border border-gray-300 rounded px-3 py-2"
                                 />
                             </div>
-                            <div className="mb-4">
-                                <select
-                                    value={newSubTask?.parentTask}
-                                    onChange={(e) => setNewSubTask({ ...newSubTask, parentTask: e.target.value })}
-                                    id="small"
-                                    className="block w-full p-2 mb-6 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                >
-                                    <option value="" disabled selected>Choose a task</option>
-                                    {userTasks?.map((task) => (
-                                        <option key={task._id} value={task._id}>{task.taskName}</option>
-                                    ))}
-                                </select>
-                            </div>
+                         
                             <div className="flex justify-end space-x-4">
                                 <button
                                     type="button"
