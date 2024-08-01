@@ -8,6 +8,7 @@ function EditGroup({ Editid,  fetchpinnedGroup, fetchGroupData , setIseditModalO
   const [selectProjectLead, setProjectLead] = useState([]);
   const [selectMembers, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [allStaff, setAllStaff] = useState([]);
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     groupName: "",
@@ -18,16 +19,21 @@ function EditGroup({ Editid,  fetchpinnedGroup, fetchGroupData , setIseditModalO
   });
 
   const handleChange = (e, value, fieldName) => {
-    const selectedUsers = value.map((name) => {
-      if (fieldName === "deptHead") {
-        return departmentHeads.find((head) => head.name === name);
-      } else if (fieldName === "projectLead") {
-        return selectProjectLead.find((lead) => lead.name === name);
-      } else if (fieldName === "members") {
-        return selectMembers.find((member) => member.name === name);
-      }
-      return null;
-    });
+    let selectedUsers = [];
+
+    // const selectedUsers = value.map((name) => {
+    //   if (fieldName === "deptHead") {
+    //     return departmentHeads.find((head) => head.name === name);
+    //   } else if (fieldName === "projectLead") {
+    //     return selectProjectLead.find((lead) => lead.name === name);
+    //   } else if (fieldName === "members") {
+    //     return selectMembers.find((member) => member.name === name);
+    //   }
+    //   return null;
+    // });
+    selectedUsers = value.map((name) => {
+      return  allStaff?.find((user) => user.name === name);
+   });
 
     setFormData({ ...formData, [fieldName]: selectedUsers });
   };
@@ -61,25 +67,28 @@ function EditGroup({ Editid,  fetchpinnedGroup, fetchGroupData , setIseditModalO
       toast.error("Error updating group:", error.message);
     }
   };
+  const fetchRegisteredNames = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/userData`
+      );
+      const users = response.data;
+      setAllStaff(response.data);
+      setDepartmentHeads(users.filter((user) => user.userRole === 1));
+      setProjectLead(users.filter((user) => user.userRole === 2));
+      setMembers(users.filter((user) => user.userRole === 3));
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError("Internal Server Error");
+      setLoading(false);
+    }
+  };
+
+
 
   useEffect(() => {
-    const fetchRegisteredNames = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/userData`
-        );
-        const users = response.data;
-        setDepartmentHeads(users.filter((user) => user.userRole === 1));
-        setProjectLead(users.filter((user) => user.userRole === 2));
-        setMembers(users.filter((user) => user.userRole === 3));
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setError("Internal Server Error");
-        setLoading(false);
-      }
-    };
-
+   
     const fetchGroupData = async () => {
       try {
         const response = await axios.get(
@@ -98,7 +107,6 @@ function EditGroup({ Editid,  fetchpinnedGroup, fetchGroupData , setIseditModalO
         setError("Internal Server Error");
       }
     };
-
     fetchRegisteredNames();
     if (Editid) {
       fetchGroupData();
@@ -171,17 +179,17 @@ function EditGroup({ Editid,  fetchpinnedGroup, fetchGroupData , setIseditModalO
                   Department Head
                 </label>
                 <div>
-                  {departmentHeads.length > 0 && (
+                  {allStaff.length > 0 && (
                     <Autocomplete
                       id="department-head"
                       className=""
-                      options={departmentHeads.map((head) => head.name)}
+                      options={allStaff?.map((head) => head?.name) || []}
                       multiple
-                      getOptionLabel={(option) => option}
+                      getOptionLabel={(option) => option || ""}
                       onChange={(e, value) =>
                         handleChange(e, value, "deptHead")
                       }
-                      value={formData?.deptHead?.map((head) => head?.name)}
+                      value={formData?.deptHead?.map((head) => head?.name) || []}
                       renderOption={(props, option, { selected }) => (
                         <li
                           {...props}
@@ -209,17 +217,18 @@ function EditGroup({ Editid,  fetchpinnedGroup, fetchGroupData , setIseditModalO
                 >
                   Project Lead
                 </label>
-                {selectProjectLead.length > 0 && (
+                {allStaff.length > 0 && (
                   <Autocomplete
                     id="project-lead"
                     className=""
-                    options={selectProjectLead.map((lead) => lead.name)}
+                    options={allStaff?.map((lead) => lead?.name)}
+
                     multiple
                     onChange={(e, value) =>
                       handleChange(e, value, "projectLead")
                     }
                     value={formData?.projectLead?.map((lead) => lead?.name)}
-                    getOptionLabel={(option) => option}
+                    getOptionLabel={(option) => option || ""}
                     renderOption={(props, option, { selected }) => (
                       <li
                         {...props}
@@ -246,13 +255,15 @@ function EditGroup({ Editid,  fetchpinnedGroup, fetchGroupData , setIseditModalO
                 >
                   Members
                 </label>
-                {selectMembers.length > 0 && (
+                {allStaff.length > 0 && (
                   <Autocomplete
                     id="members"
                     placeholder="Search Members"
-                    options={selectMembers.map((member) => member.name)}
-                    onChange={(e, value) => handleChange(e, value, "members")}
-                    value={formData?.members?.map((member) => member?.name)}
+                    options={allStaff.map((member) => member?.name)}
+                    getOptionLabel={(option) => option || ""}
+
+                    onChange={(e, value) => handleChange(e, value, "members") }
+                    value={formData?.members?.map((member) => member?.name) || []}
                     multiple
                     renderOption={(props, option, { selected }) => (
                       <li

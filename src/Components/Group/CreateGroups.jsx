@@ -10,6 +10,7 @@ function CreateGroups() {
     const [userNamesEmail, setUserNamesEmail] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [allStaff, setAllStaff] = useState([]);
     const [formData, setFormData] = useState({
         groupName: '',
         deptHead: [],
@@ -21,19 +22,22 @@ function CreateGroups() {
     const handleChange = (e, value, fieldName) => {
         let selectedUsers = [];
 
-        if (fieldName === 'deptHead') {
-            selectedUsers = value.map((name) => {
-                return departmentHeads.find((head) => head.name === name);
-            });
-        } else if (fieldName === 'projectLead') {
-            selectedUsers = value.map((name) => {
-                return selectProjectLead.find((lead) => lead.name === name);
-            });
-        } else if (fieldName === 'members') {
-            selectedUsers = value.map((name) => {
-                return selectmembers.find((member) => member.name === name);
-            });
-        }
+        // if (fieldName === 'deptHead') {
+        //     selectedUsers = value.map((name) => {
+        //         return departmentHeads.find((head) => head.name === name);
+        //     });
+        // } else if (fieldName === 'projectLead') {
+        //     selectedUsers = value.map((name) => {
+        //         return selectProjectLead.find((lead) => lead.name === name);
+        //     });
+        // } else if (fieldName === 'members') {
+        //     selectedUsers = value.map((name) => {
+        //         return selectmembers.find((member) => member.name === name);
+        //     });
+        // }
+        selectedUsers = value.map((name) => {
+           return  allStaff?.find((user) => user.name === name);
+        });
 
         console.log(`Selected users for ${fieldName}:`, selectedUsers);
         setFormData({ ...formData, [fieldName]: selectedUsers });
@@ -86,35 +90,37 @@ function CreateGroups() {
         });
     };
 
+    const fetchRegisteredNames = async () => {
+        try {
+            const response = await axios.get(process.env.REACT_APP_API_URL+"/api/userData");
+            setUserNamesEmail(response.data);
+            setAllStaff(response.data);
+            const filteredDepartmentHeads = response.data.filter(
+                (user) => user.userRole === 1
+            );
+            setDepartmentHeads(filteredDepartmentHeads);
+            const filteredProjectlead = response.data.filter(
+                (user) => user.userRole === 2
+            );
+            setProjectLead(filteredProjectlead);
+            const filtermember = response.data.filter(
+                (user) => user.userRole === 3
+            );
+            setMembers(filtermember);
+            setLoading(false);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            setError("Internal Server Error");
+            setLoading(false);
+        }
+    }; 
     useEffect(() => {
-        const fetchRegisteredNames = async () => {
-            try {
-                const response = await axios.get(process.env.REACT_APP_API_URL+"/api/userData");
-                setUserNamesEmail(response.data);
-                const filteredDepartmentHeads = response.data.filter(
-                    (user) => user.userRole === 1
-                );
-                setDepartmentHeads(filteredDepartmentHeads);
-                const filteredProjectlead = response.data.filter(
-                    (user) => user.userRole === 2
-                );
-                setProjectLead(filteredProjectlead);
-                const filtermember = response.data.filter(
-                    (user) => user.userRole === 3
-                );
-                setMembers(filtermember);
-                setLoading(false);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-                setError("Internal Server Error");
-                setLoading(false);
-            }
-        }; 
+        
 
         fetchRegisteredNames();
     }, []);
 
-    console.log("userDa", userNamesEmail);
+    // console.log("userDa", userNamesEmail);
 
     return (
         <div>
@@ -141,7 +147,7 @@ function CreateGroups() {
                         required
                         type="text"
                         name="groupName"
-                        value={formData.groupName}
+                        value={formData?.groupName}
                         onChange={(e) => setFormData({ ...formData, groupName: e.target.value })}
                     />
                 </div>
@@ -152,7 +158,7 @@ function CreateGroups() {
                     <Autocomplete
                         id="department-head"
                         className="mb-3"
-                        options={departmentHeads.map((head) => head.name)}
+                        options={allStaff?.map((head) => head?.name)}
                         multiple
                         onChange={(e, value) => handleChange(e, value, 'deptHead')}
                         renderInput={(params) => <input {...params} className="flex w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm" />}
@@ -165,7 +171,7 @@ function CreateGroups() {
                     <Autocomplete
                         id="project-lead"
                         className="mb-3"
-                        options={selectProjectLead.map((lead) => lead.name)}
+                        options={allStaff?.map((lead) => lead?.name)}
                         multiple
                         onChange={(e, value) => handleChange(e, value, 'projectLead')}
                         renderInput={(params) => <input {...params} className="flex w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm" />}
@@ -178,7 +184,7 @@ function CreateGroups() {
                     <Autocomplete
                         placeholder="Search Members"
                         renderInput={(params) => <input {...params} className="flex w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm" />}
-                        options={selectmembers.map((member) => member.name)}
+                        options={allStaff?.map((member) => member?.name)}
                         onChange={(e, value) => handleChange(e, value, 'members')}
                         multiple
                     />

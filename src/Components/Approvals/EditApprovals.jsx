@@ -1,9 +1,11 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
+import { UserContext } from '../../global/UserContext';
 
 
 function EditApprovals({ taskId, task, onClose }) {
+    const {userData} = useContext(UserContext);
     const [status, setStatus] = useState('');
     const [remark, setRemark] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -35,6 +37,8 @@ function EditApprovals({ taskId, task, onClose }) {
                 throw new Error('Network response was not ok');
             }
             // Handle successful response
+            generateLog(taskId, 'approved')
+
             console.log('Task approved successfully');
             toast.dismiss()
 
@@ -50,6 +54,23 @@ function EditApprovals({ taskId, task, onClose }) {
         }
     };
 
+    const generateLog = (taskId, action)=>{
+        const data = {
+            userId:userData?.userId,
+            taskId,
+            action,
+            userName:userData?.name,
+            details:{
+            }
+        }
+        axios.post(`${process.env.REACT_APP_API_URL}/api/logs`,data )
+        .then(res=>{
+            console.log('res', res.data)
+        }).catch((err)=>{
+            toast.dismiss();
+            toast.error('Internal Server Error');
+        })
+    }
     const handleUnapprove = async () => {
         setIsLoading(true);
         try {
@@ -67,6 +88,7 @@ function EditApprovals({ taskId, task, onClose }) {
                 throw new Error('Network response was not ok');
             }
             // Handle successful response
+            generateLog(taskId, 'unapproved')
             console.log('Task unapproved successfully');
             toast.warn('Task unapproved successfully');
             onClose(true);
@@ -105,7 +127,7 @@ function EditApprovals({ taskId, task, onClose }) {
                 {/* {toast && <div className="absolute top-0 right-0 m-4 bg-white rounded shadow-lg px-6 py-4">{toast}</div>} */}
                 <div class="w-[600px] max-w-full  mt-5 bg-gradient-to-br from-[#f0f0f0] to-[#d0d0d0] lg:rounded-lg rounded-[3px] shadow-lg">
                     <div class="border-b px-6 py-4">
-                        <h3 class="text-lg font-semibold text-gray-800">Company Offsite</h3>
+                        <h3 class="text-lg font-semibold text-gray-800">{task?.taskName}</h3>
                     </div>
                     <div class="space-y-6 px-6 py-8 text-gray-800">
                         <div class="grid grid-cols-2 gap-4">
