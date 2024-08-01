@@ -1,9 +1,12 @@
 import axios from 'axios';
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { toast } from 'react-toastify';
+import { UserContext } from '../../global/UserContext';
 
 function AcceptApprovals({ taskId, task, onClose }) {
+    const { userData } = useContext(UserContext);
     const [isLoading, setIsLoading] = useState(false);
+    const [remarkForRejection, setRemarkForRejection] = useState('');
 
     const handleApprove = async () => {
         setIsLoading(true);
@@ -18,6 +21,7 @@ function AcceptApprovals({ taskId, task, onClose }) {
             }
 
             // Handle successful response
+            generateLog(taskId, 'approved_postponed');
             console.log('Task approved successfully');
             toast.dismiss()
             toast.success('Task approved successfully');
@@ -31,10 +35,44 @@ function AcceptApprovals({ taskId, task, onClose }) {
             setIsLoading(false);
         }
     };
+    const generateLog = (taskId, action)=>{
+        const data = {
+            userId:userData?.userId,
+            taskId,
+            action,
+            userName:userData?.name,
+            details:{
+            }
+        }
+        axios.post(`${process.env.REACT_APP_API_URL}/api/logs`,data )
+        .then(res=>{
+            console.log('res', res.data)
+        }).catch((err)=>{
+            toast.dismiss();
+            toast.error('Internal Server Error');
+        })
+    }
+
+
+    const handleReject = ()=>{
+        const data = {
+            remark: remarkForRejection
+        }
+        axios.put(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/reject_postponed`, data)
+        .then((res)=>{
+            generateLog(taskId, 'reject_postponed');
+            onClose(true);
+            toast.dismiss();
+            toast.success('Reject postponed');
+        }).catch((err)=>{
+            toast.dismiss();
+            toast.error('Internal server error');
+        })
+    }
 
     return (
         <div>
-            <div class=" max-w-full   bg-gray-200 ">
+            <div class=" max-w-full   ">
                 <div class="border-b px-6 py-4">
                     <h3 class="text-lg font-semibold text-gray-800">Task Date Approved</h3>
                 </div>
@@ -63,13 +101,23 @@ function AcceptApprovals({ taskId, task, onClose }) {
                     </div>
 
                 </div>
+                <div>
+                    <h3 className="text-lg font-semibold text-gray-800">Remarks for Rejection</h3>
+                    <textarea
+                        value={remarkForRejection}
+                        onChange={(e) => setRemarkForRejection(e.target.value)}
+                        className="w-full border border-gray-300 rounded-md p-2 mt-2"
+                        placeholder="Enter remarks for rejection"
+                        rows="4"
+                    ></textarea>
+                </div>
                 <div class="flex justify-between gap-2 border-t px-6 py-4">
                     <button
                         className="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-red-500 text-white hover:bg-red-600 disabled:bg-red-300"
                         disabled={isLoading}
-                        onClick={() => onClose(true)}
+                        onClick={() => handleReject()}
                     >
-                        Cancel
+                        Reject
                     </button>
                     <button
                         className="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-green-500 text-white hover:bg-green-600 disabled:bg-green-300"

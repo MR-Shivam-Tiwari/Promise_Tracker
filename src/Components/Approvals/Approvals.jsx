@@ -303,19 +303,12 @@ function Approvals() {
                       </button>
                     </IconButton>
                     <Modal
-                      aria-labelledby="modal-title"
-                      aria-describedby="modal-desc"
                       open={open}
                       onClose={() => {
                         setOpen(false);
                         setSelectedTask(null);
                       }}
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        bgcolor: "#f0f0f0",
-                      }}
+                     
                     >
                       <ModalDialog
                         maxWidth={600}

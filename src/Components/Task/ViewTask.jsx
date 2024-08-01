@@ -315,11 +315,20 @@ function ViewTask({ data, status,setOpen }) {
                             </p>
                         </div>
                     </div>
+                {data?.additionalDetails?.status==='rejected'&& data?.status==="Cancelled" &&   <div>
+                        <hr/>
+                        <div>
+                            <h2 className="text-lg font-bold text-gray-900  mb-2">Reason For Rejection </h2>
+                            <p className="text-gray-700 mb-2 ml-4 gap-2 flex  ">
+                                {data?.additionalDetails?.remarks}
+                            </p>
+                        </div>
+                    </div>}
                     <hr className='mt-4 mb-4 ' />
                     <div>
                         <div className='flex justify-between items-center mb-8'>
                             <div>
-                            <h3 className='text-xl font-bold'>Your Sub Tasks  <span className='text-white cursor-pointer px-2 py-1 text-sm bg-orange-500 rounded-full  font-bold'> {subTasks?.filter((subTask) => subTask.status === 'done').length}/{subTasks?.length}</span></h3>
+                            <h3 className='text-lg font-bold'>Your Sub Tasks  <span className='text-white cursor-pointer px-1 py-1 text-[10px] bg-orange-500 rounded-lg  font-bold'> {subTasks?.filter((subTask) => subTask.status === 'done').length}/{subTasks?.length}</span></h3>
                             <span className='text-gray-500 '>Below Subtasks are only visible to you</span>
                             </div>
                             <button
@@ -445,7 +454,7 @@ function ViewTask({ data, status,setOpen }) {
                     <hr className='font-bold text-gray-800'/>
                     <div className='mt-5 mb-5'>
                         <div>
-                            <h3 className='text-black text-xl mb-5 font-bold'>All logs <span className='text-gray-500 font-bold text-md'>({logs?.length})</span></h3>
+                            <h3 className='text-black text-lg mb-5 font-bold'>All logs <span className='text-gray-500 font-bold text-md'>({logs?.length})</span></h3>
                         </div>
                         <div className='ml-5'>
                             {

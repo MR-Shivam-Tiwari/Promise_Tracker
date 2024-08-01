@@ -319,7 +319,12 @@ const Card = ({ id, text, status, card }) => {
                         </svg>
                         {card?.taskGroup?.groupName}
                     </div>
-                    {card.status === 'Cancelled' && (
+                    {card.status === 'Cancelled' && card?.additionalDetails?.status === 'rejected' &&(
+                        <div className='text-xs border p-1 px-2 rounded font-bold bg-red-400 '>
+                            Rejected_Postponed
+                        </div>
+                    )}
+                    {card.status === 'Cancelled' && card?.additionalDetails?.status !== 'rejected' && (
                         <div className='text-xs border p-1 px-2 rounded font-bold bg-red-400 '>
                             {card?.status === 'Cancelled' ? 'Postponed' : 'Postponed'}
                         </div>
@@ -384,7 +389,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ status, ...body }), // Include additional data in the body
+            body: JSON.stringify({ status, ...body, additionalDetails:{}}), // Include additional data in the body
         });
         toast.dismiss()
         toast.success("Task Status Updated");
@@ -428,7 +433,6 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                 const cardToMove = newSections[fromSection].find((card) => card._id === id);
                 setCurrentCard({ ...cardToMove, fromSection });
                 setIsCancelModalOpen(true);
-                generateAddTaskLog(id,fromSection, toSection)
 
                 return;
             } else if (toSection === 'Completed') {
@@ -453,6 +457,23 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
             }
         }
     };
+    const generateLog = (taskId, action)=>{
+        const data = {
+            userId:userData?.userId,
+            taskId,
+            action,
+            userName:userData?.name,
+            details:{
+            }
+        }
+        axios.post(`${process.env.REACT_APP_API_URL}/api/logs`,data )
+        .then(res=>{
+            console.log('res', res.data)
+        }).catch((err)=>{
+            toast.dismiss();
+            toast.error('Internal Server Error');
+        })
+    }
 
     const handleCancelModalSubmit = async () => {
         if (!remarks || !selectedDate) {
@@ -468,13 +489,15 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        remark: { text: remarks, date: selectedDate.toISOString().split('T')[0] },
+                        remark: { text: remarks, date: selectedDate.toISOString().split('T')[0]},
+                        additionalDetails:{} 
                     }),
                 });
 
                 if (!response.ok) {
                     throw new Error('Failed to update task status');
                 }
+                generateLog(currentCard._id,"apply_postponed")
 
                 const updatedTask = await response.json();
                 toast.dismiss()

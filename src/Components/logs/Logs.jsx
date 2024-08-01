@@ -72,6 +72,33 @@ const Logs = ({ log }) => {
                 <hr/>
                </>
               );
+              case 'reject_postponed':
+                return (
+                 <>
+                     <div className='text-gray-600 mt-2 mb-2'>
+                    <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> <span className='text-gray-500 '><span className='font-bold text-red-500'>Reject</span>  Postponed </span>  on {moment(log?.timestamp).format('DD-MM-YYYY')}
+                  </div>
+                  <hr/>
+                 </>
+                );
+                case 'approved_postponed':
+                  return (
+                   <>
+                       <div className='text-gray-600 mt-2 mb-2'>
+                      <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> <span className='text-gray-500 '><span className='font-bold text-green-500'>Approve</span>  Postponed </span>  on {moment(log?.timestamp).format('DD-MM-YYYY')}
+                    </div>
+                    <hr/>
+                   </>
+                  );
+                  case 'apply_postponed':
+                  return (
+                   <>
+                       <div className='text-gray-600 mt-2 mb-2'>
+                      <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> <span className='text-gray-500 '><span className='font-bold text-green-500'>Apply </span>For Postponed </span>  on {moment(log?.timestamp).format('DD-MM-YYYY')}
+                    </div>
+                    <hr/>
+                   </>
+                  );
       default:
         return <p>Unknown action</p>;
     }
