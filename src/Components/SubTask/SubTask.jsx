@@ -20,7 +20,7 @@ const SubTask = () => {
         console.log('inside the option')
         if (selectedOption === 'pendingTask') {
             console.log('insdie the if condition')
-            setFilterUserTasks(userTasks?.filter(task => ['In Progress', 'To do', ""].includes(task.status)))
+            setFilterUserTasks(userTasks?.filter(task => ['In Progress', ""].includes(task.status)))
         } else {
             setFilterUserTasks(userTasks)
         }
