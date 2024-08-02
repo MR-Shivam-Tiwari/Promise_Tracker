@@ -155,7 +155,7 @@ function EditGroup({ Editid,  fetchpinnedGroup, fetchGroupData , setIseditModalO
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 htmlFor="department-head"
               >
-                Group Name
+                Group Name <span className="text-red-500 ">*</span>
               </label>
               <input
                 className="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-2xl font-semibold"
@@ -176,7 +176,7 @@ function EditGroup({ Editid,  fetchpinnedGroup, fetchGroupData , setIseditModalO
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   htmlFor="department-head"
                 >
-                  Department Head
+                  Department Head <span className="text-red-500 ">*</span>
                 </label>
                 <div>
                   {allStaff.length > 0 && (
@@ -215,7 +215,7 @@ function EditGroup({ Editid,  fetchpinnedGroup, fetchGroupData , setIseditModalO
                   htmlFor="project-lead"
                   className=" block text-sm font-medium"
                 >
-                  Project Lead
+                  Project Lead <span className="text-red-500 ">*</span>
                 </label>
                 {allStaff.length > 0 && (
                   <Autocomplete
@@ -253,7 +253,7 @@ function EditGroup({ Editid,  fetchpinnedGroup, fetchGroupData , setIseditModalO
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   htmlFor="members"
                 >
-                  Members
+                  Members <span className="text-red-500 ">*</span>
                 </label>
                 {allStaff.length > 0 && (
                   <Autocomplete

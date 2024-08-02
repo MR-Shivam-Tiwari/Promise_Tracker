@@ -406,7 +406,7 @@ function ViewTask({ data, status,setOpen }) {
                         </h2>
                         <form onSubmit={handleCreateOrUpdateSubTask}>
                             <div className="mb-4">
-                                <label className="block text-md font-medium text-gray-700">Subtask Name</label>
+                                <label className="block text-md font-medium text-gray-700">Subtask Name <span className="text-red-600 ">*</span></label>
                                 <input
                                     type="text"
                                     value={newSubTask?.subTaskName}
@@ -417,7 +417,7 @@ function ViewTask({ data, status,setOpen }) {
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="block text-md font-medium text-gray-700">Description</label>
+                                <label className="block text-md font-medium text-gray-700">Description <span className="text-red-600 ">*</span></label>
                                 <textarea
 
                                     value={newSubTask?.description}
