@@ -379,7 +379,7 @@ export default function MyProfile() {
           <div className="py-[32px] rounded-md shadow-lg lg:p-4 p-2  bg-white">
             <div className="flex flex-col lg:p-6 p-2 space-y-1">
               <h3 className="whitespace-nowrap text-2xl font-semibold leading-none tracking-tight">
-                Change Password
+                Change Password 
               </h3>
               <p className="text-sm text-muted-foreground">
                 Enter your current password and the new password you would like
@@ -392,7 +392,7 @@ export default function MyProfile() {
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block"
                   htmlFor="password"
                 >
-                  Current Password
+                  Current Password <span className="text-red-600 ">*</span>
                 </label>
                 <input
                   value={oldPassword}
@@ -408,7 +408,7 @@ export default function MyProfile() {
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block"
                   htmlFor="new-password"
                 >
-                  New Password
+                  New Password <span className="text-red-600 ">*</span>
                 </label>
                 <input
                   value={newPassword}
@@ -424,7 +424,7 @@ export default function MyProfile() {
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block"
                   htmlFor="confirm-password"
                 >
-                  Confirm New Password
+                  Confirm New Password <span className="text-red-600 ">*</span>
                 </label>
                 <input
                   value={confirmPassword}

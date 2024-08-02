@@ -14,7 +14,8 @@ function Role() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
-
+  const [filteredroleUserData, setFilteredroleUserData] = useState([]);
+  const [selectedRole, setSelectedRole] = useState("");
   const handleClickOutside = (event) => {
     if (event.target.id === "modal-background") {
       setIsBulkModalOpen(false);
@@ -22,7 +23,7 @@ function Role() {
   };
   const handleClickOutsidecreateuser = (event) => {
     if (event.target.id === "modal-background-user") {
-        setIsModalOpen(false);
+      setIsModalOpen(false);
     }
   };
   const [formData, setFormData] = useState({
@@ -40,7 +41,9 @@ function Role() {
       const response = await axios.get(
         process.env.REACT_APP_API_URL + "/api/userData"
       );
-      setUserData(Array.isArray(response.data) ? response.data : []);
+      setFilteredroleUserData(
+        Array.isArray(response.data) ? response.data : []
+      );
     } catch (error) {
       console.log("Error fetching User Data: ", error);
     }
@@ -97,6 +100,7 @@ function Role() {
       );
       toast.dismiss();
       toast.success("Role Changed Successfully");
+      fetchUserData();
     } catch (error) {
       console.log("Error updating User Role: ", error);
     }
@@ -233,56 +237,85 @@ function Role() {
     };
     reader.readAsArrayBuffer(file);
   };
+  const fetchUsersByRole = async (role) => {
+    try {
+      const response = await axios.get(
+        process.env.REACT_APP_API_URL + `/api/users-by-role/${role}`
+      );
+      setFilteredroleUserData(response.data);
+    } catch (error) {
+      console.error("Error fetching users by role:", error);
+    }
+  };
+  useEffect(() => {
+    if (selectedRole !== "") {
+      fetchUsersByRole(selectedRole);
+    }
+  }, [selectedRole]);
 
   return (
     <div>
       <div className=" text-black mx-auto">
-        <div className="flex items-center justify-between mb-3">
-          <div className="hidden lg:block">
-            <h1 className="text-[20px] font-bold text-gray-900">User Roles</h1>
-          </div>
-          <div className="grid lg:grid-cols-2 gap-3 ">
-            <div className="flex gap-3 ">
-              <div className="relative">
-                <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                  <svg
-                    className="w-4 h-4 text-gray-500 "
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="m19 19-4-4m2-7A7 7 0 1 1 3 10a7 7 0 0 1 14 0Z"
-                    />
-                  </svg>
-                </div>
-                <input
-                  type="search"
-                  id="default-search"
-                  className="lg:w-[260px]  w-[350px] p-2 ps-10 text-sm text-gray-900 h-10 border-gray-300 border-[3px]  lg:rounded-lg rounded-[3px]"
-                  placeholder="Search By Name, Email, Role"
-                  onChange={HandleSearch}
-                />
+        <div className=" mb-3">
+          
+
+          <div className="grid lg:grid-cols-2 grid-cols-1 gap-3">
+            <div className="relative ">
+              <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                <svg
+                  className="w-4 h-4 text-gray-500 "
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="m19 19-4-4m2-7A7 7 0 1 1 3 10a7 7 0 0 1 14 0Z"
+                  />
+                </svg>
               </div>
+              <input
+                type="search"
+                id="default-search"
+                className="lg:w-[300px]  w-full p-2 ps-10  text-sm text-gray-900 h-10 border-gray-300 border-[3px]   rounded-[5px]"
+                placeholder="Search By Name, Email, Role"
+                onChange={HandleSearch}
+              />
             </div>
-            <div className="flex justify-between lg:justify-end gap-3">
-              <button
-                className="flex items-center justify-center px-4 py-2 font-medium text-white bg-[#8BC940] rounded hover:bg-[#A1DF60] focus:outline-none"
-                onClick={() => setIsModalOpen(true)}
+            <div className="lg:flex gap-3 ">
+            <div className="">
+              <select
+                onChange={(e) => setSelectedRole(e.target.value)}
+                className=" p-2 border text-white h-10 w-full lg:w-[250px] bg-[#8BC940] rounded"
               >
-                Create Member
+                <option value="" >
+                  Filter By Role
+                </option>
+                <option value="0">Admin</option>
+                <option value="1">Department Head</option>
+                <option value="2">Project Lead</option>
+                <option value="3">Member</option>
+              </select>
+            </div>
+            <div className="flex lg:mt-0 mt-3  gap-3">
+
+              <button
+                className="flex items-center lg:w-[250px] w-full justify-center px-4  h-10 py-2 font-medium text-white bg-[#8BC940] rounded hover:bg-[#A1DF60] focus:outline-none"
+                onClick={() => setIsModalOpen(true)}
+                >
+                <span className="">Create Member</span>
               </button>
               <button
-                className="flex items-center justify-center px-4 py-2 font-medium text-white bg-[#8BC940] rounded hover:bg-[#A1DF60] focus:outline-none"
+                className="flex items-center w-full lg:w-[250px] justify-center h-10 px-4 py-2 font-medium text-white bg-[#8BC940] rounded hover:bg-[#A1DF60] focus:outline-none"
                 onClick={() => setIsBulkModalOpen(true)}
-              >
+                >
                 Bulk Upload
               </button>
+                </div>
             </div>
           </div>
         </div>
@@ -311,7 +344,7 @@ function Role() {
               </tr>
             </thead>
             <tbody>
-              {filteredUserData.map((user, index) => (
+              {filteredroleUserData.map((user, index) => (
                 <tr key={index} className="bg-white border-b">
                   <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">
                     {highlightText(user.name, searchTerm)}
@@ -345,7 +378,7 @@ function Role() {
                     <td className="px-4 py-3">
                       <Dropdown>
                         <MenuButton
-                          className="rounded-[5px] bg-gray-300 text-gray-600 font-bold"
+                          className="rounded-[5px] w-[140px] bg-gray-300 text-gray-600 font-bold"
                           slotProps={{
                             root: { variant: "outlined", color: "neutral" },
                           }}
@@ -368,16 +401,10 @@ function Role() {
                           >
                             PROJECT_LEAD
                           </MenuItem>
-                          {/* {user?.active ? (
-                    <MenuItem onClick={() => handleInactive(user, user.userId)}>INACTIVE</MenuItem>
-                ) : (
-                    <MenuItem onClick={() => handleActive(user, user.userId)}>ACTIVE</MenuItem>
-                )} */}
                         </Menu>
                       </Dropdown>
                     </td>
                   )}
-
                   {user.userRole !== 0 && (
                     <td className="px-4 py-3 text-gray-900">
                       <button
@@ -387,8 +414,10 @@ function Role() {
                             : handleActive(user, user.userId);
                         }}
                         className={`rounded-[5px] ${
-                          user.active ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
-                        }  text-white font-bold py-2 px-4 rounded`}
+                          user.active
+                            ? "bg-red-500 hover:bg-red-600"
+                            : "bg-green-500 hover:bg-green-600"
+                        } text-white font-bold py-2 px-4 rounded`}
                       >
                         {user.active ? "Deactivate" : "Activate"}
                       </button>
@@ -416,7 +445,7 @@ function Role() {
                   className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="name"
                 >
-                  Name
+                  Name <span className="text-red-600 ">*</span>
                 </label>
                 <input
                   id="name"
@@ -433,7 +462,7 @@ function Role() {
                   className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="mobilenumber"
                 >
-                  Mobile Number
+                  Mobile Number <span className="text-red-600 ">*</span>
                 </label>
                 <input
                   id="mobilenumber"
@@ -450,7 +479,7 @@ function Role() {
                   className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="email"
                 >
-                  Email
+                  Email <span className="text-red-600 ">*</span>
                 </label>
                 <input
                   id="email"
@@ -467,7 +496,7 @@ function Role() {
                   className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="password"
                 >
-                  Password
+                  Password <span className="text-red-600 ">*</span>
                 </label>
                 <input
                   id="password"
@@ -484,7 +513,7 @@ function Role() {
                   className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="userRole"
                 >
-                  User Role
+                  User Role <span className="text-red-600 ">*</span>
                 </label>
                 <select
                   id="userRole"

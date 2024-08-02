@@ -127,7 +127,7 @@ function CreateGroups() {
             <form className="space-y-6" onSubmit={handleSubmit}>
                 <div>
                     <label className="mb-2 block text-sm font-medium text-gray-900 " htmlFor="profile-pic">
-                        Profile Pic
+                        Profile Pic <span className="text-red-500 ">*</span>
                     </label>
                     <input
                         id="profile-pic"
@@ -138,7 +138,7 @@ function CreateGroups() {
                 </div>
                 <div>
                     <label htmlFor="group-name" className="mb-2 block text-sm font-medium text-gray-900 ">
-                        Group Name
+                        Group Name <span className="text-red-500 ">*</span>
                     </label>
                     <input
                         id="group-name"
@@ -153,7 +153,7 @@ function CreateGroups() {
                 </div>
                 <div>
                     <label htmlFor="department-head" className="mb-2 block text-sm font-medium text-gray-900 ">
-                        Department Head
+                        Department Head <span className="text-red-500 ">*</span>
                     </label>
                     <Autocomplete
                         id="department-head"
@@ -166,8 +166,8 @@ function CreateGroups() {
                 </div>
                 <div>
                     <label htmlFor="project-lead" className="mb-2 block text-sm font-medium text-gray-900 ">
-                        Project Lead
-                    </label>
+                        Project Lead <span className="text-red-500 ">*</span>
+                    </label> 
                     <Autocomplete
                         id="project-lead"
                         className="mb-3"
@@ -179,7 +179,7 @@ function CreateGroups() {
                 </div>
                 <div>
                     <label htmlFor="members" className="mb-2 block text-sm font-medium text-gray-900 ">
-                        Members
+                        Members <span className="text-red-500 ">*</span>
                     </label>
                     <Autocomplete
                         placeholder="Search Members"

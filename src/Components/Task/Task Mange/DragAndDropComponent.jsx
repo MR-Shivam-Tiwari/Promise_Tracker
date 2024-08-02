@@ -648,7 +648,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                         </Typography>
                         <div className="grid gap-4">
                             <div className="gap-2 grid">
-                                <label>Remarks</label>
+                                <label>Remarks <span className="text-red-600 ">*</span></label>
                                 <input
                                     type="text"
                                     name="remarks"
@@ -659,7 +659,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                                 />
                             </div>
                             <div className="gap-2 grid">
-                                <label>Select New Deadline Date</label>
+                                <label>Select New Deadline Date <span className="text-red-600 ">*</span></label>
                                 <input
                                     type="date"
                                     className='flex h-10 w-full bg-gray-300 text-black rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
@@ -707,7 +707,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                         </Typography>
                         <div className="grid gap-4">
                             <div className="gap-2 grid">
-                                <label>Proof of Work (Text)</label>
+                                <label>Proof of Work (Text) <span className="text-red-600 ">*</span></label>
                                 <textarea
                                     name="proofText"
                                     className='flex h-20 w-full bg-gray-300 text-black rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
@@ -717,7 +717,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                                 />
                             </div>
                             <div className="gap-2 grid">
-                                <label>Proof of Work (File)</label>
+                                <label>Proof of Work (File) <span className="text-red-600 ">*</span></label>
                                 <input
                                     type="file"
                                     name="proofFile"
