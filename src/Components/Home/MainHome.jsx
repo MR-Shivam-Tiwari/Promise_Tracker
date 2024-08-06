@@ -736,41 +736,7 @@ function MainHome() {
                                       View Group
                                     </button>
 
-                                    {iseditModalOpen && (
-                                      <div
-                                        id="modal-background"
-                                        className="fixed inset-0 z-10 bg-opacity-20 bg-gray-700  flex justify-center items-center"
-                                        onClick={handleeditOutsideClick}
-                                      >
-                                        <div></div>
-                                        <div className="bg-white p-4 lg:rounded-lg rounded-[3px]  relative ">
-                                          <div className="flex justify-end">
-                                            <button
-                                              onClick={() =>
-                                                setIseditModalOpen(false)
-                                              }
-                                              class="text-muted-foreground hover:text-muted"
-                                            >
-                                              ✖️
-                                            </button>
-                                          </div>
-                                          {editedgroup && (
-                                            <EditGroup
-                                              dpthead={dpthead}
-                                              prjtlead={prjtlead}
-                                              Editid={editedgroup?._id}
-                                              fetchGroupData={fetchGroupData}
-                                              setIseditModalOpen={
-                                                setIseditModalOpen
-                                              }
-                                              fetchpinnedGroup={
-                                                fetchpinnedGroup
-                                              }
-                                            />
-                                          )}
-                                        </div>
-                                      </div>
-                                    )}
+                                 
 
                                     {isModalOpen && (
                                       <div
@@ -902,6 +868,42 @@ function MainHome() {
                         ))
                       )}
                     </div>
+
+                    {iseditModalOpen && (
+                                      <div
+                                        id="modal-background"
+                                        className="fixed inset-0 z-10 bg-opacity-20 bg-gray-700  flex justify-center items-center"
+                                        onClick={handleeditOutsideClick}
+                                      >
+                                        <div></div>
+                                        <div className="bg-white p-4 lg:rounded-lg rounded-[3px]  relative ">
+                                          <div className="flex justify-end">
+                                            <button
+                                              onClick={() =>
+                                                setIseditModalOpen(false)
+                                              }
+                                              class="text-muted-foreground hover:text-muted"
+                                            >
+                                              ✖️
+                                            </button>
+                                          </div>
+                                          {editedgroup && (
+                                            <EditGroup
+                                              dpthead={dpthead}
+                                              prjtlead={prjtlead}
+                                              Editid={editedgroup?._id}
+                                              fetchGroupData={fetchGroupData}
+                                              setIseditModalOpen={
+                                                setIseditModalOpen
+                                              }
+                                              fetchpinnedGroup={
+                                                fetchpinnedGroup
+                                              }
+                                            />
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
                   </div>
                 </div>
               </div>

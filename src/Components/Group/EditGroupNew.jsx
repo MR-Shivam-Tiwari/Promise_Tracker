@@ -3,7 +3,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
-function CreateGroups() {
+function EditGroupNew({Editid, fetchpinnedGroup, fetchGroupData, setIseditModalOpen}) {
     const [departmentHeads, setDepartmentHeads] = useState([]);
     const [selectProjectLead, setProjectLead] = useState([]);
     const [selectmembers, setMembers] = useState([]);
@@ -11,6 +11,8 @@ function CreateGroups() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [allStaff, setAllStaff] = useState([]);
+  const [imageLink, setImageLink] = useState("aksdjflksadjfslakfjsdalkfjsfkl");
+
     const [formData, setFormData] = useState({
         groupName: '',
         deptHead: [],
@@ -44,43 +46,34 @@ function CreateGroups() {
     };
 
     const handleImageChange = async (e) => {
-        const file = e.target.files[0];
-        const data = new FormData();
-        data.append("image", file);
-    
-        try {
-          const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/upload-image`, data);
-          const imageUrl = res.data?.result;
-    
-          setFormData((prevData) => ({ ...prevData, profilePic: imageUrl }));
-        } catch (error) {
-          console.error("Error uploading image:", error);
-        }
-      };
+      const file = e.target.files[0];
+      const data = new FormData();
+      data.append("image", file);
+  
+      try {
+        const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/upload-image`, data);
+        const imageUrl = res.data?.result;
+  
+        setFormData((prevData) => ({ ...prevData, profilePic: imageUrl }));
+        setImageLink(imageUrl);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
+    };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        console.log("Submitting form data:", formData);
-
-        try {
-            const response = await axios.post(process.env.REACT_APP_API_URL+"/api/tgroups", formData);
-            console.log("Response data:", response.data);
-            resetForm();
-            toast.dismiss()
-
-            toast.success("Group created successfully!");
-            setInterval(() => {
-                window.location.reload();
-            }, 2000)
-        } catch (error) {
-            console.error("Error creating group:", error);
-            if (error.response && error.response.data && error.response.data.error) {
-                toast.error("Error: " + error.response.data.error);
-            } else {
-                toast.error("Failed to create group. Please try again later.");
-            }
-        }
+      e.preventDefault();
+      try {
+        await axios.put(`${process.env.REACT_APP_API_URL}/api/group/${Editid}`, formData);
+        toast.dismiss();
+        toast.success("Successfully updated Group");
+        fetchpinnedGroup();
+        fetchGroupData();
+        setIseditModalOpen(false);
+      } catch (error) {
+        console.error("Error updating group:", error);
+        toast.error("Error updating group:", error.message);
+      }
     };
 
     const resetForm = () => {
@@ -94,38 +87,59 @@ function CreateGroups() {
     };
 
     const fetchRegisteredNames = async () => {
-        try {
-            const response = await axios.get(process.env.REACT_APP_API_URL+"/api/userData");
-            setUserNamesEmail(response.data);
-            setAllStaff(response.data);
-            const filteredDepartmentHeads = response.data.filter(
-                (user) => user.userRole === 1
-            );
-            setDepartmentHeads(filteredDepartmentHeads);
-            const filteredProjectlead = response.data.filter(
-                (user) => user.userRole === 2
-            );
-            setProjectLead(filteredProjectlead);
-            const filtermember = response.data.filter(
-                (user) => user.userRole === 3
-            );
-            setMembers(filtermember);
-            setLoading(false);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            setError("Internal Server Error");
-            setLoading(false);
-        }
-    }; 
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/userData`);
+        const users = response.data;
+        setAllStaff(users);
+        setDepartmentHeads(users.filter((user) => user.userRole === 1));
+        setProjectLead(users.filter((user) => user.userRole === 2));
+        setMembers(users.filter((user) => user.userRole === 3));
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError("Internal Server Error");
+        setLoading(false);
+      }
+    };
     useEffect(() => {
         
 
         fetchRegisteredNames();
     }, []);
     const handleClickImageInput = () => {
-        console.log("clicked");
-        document.getElementById("profile-pic").click();
+      document.getElementById("profile-pic").click();
+    };
+
+    useEffect(() => {
+      const fetchGroupData = async () => {
+        console.log('inside fetchgroupdata')
+        try {
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/groups/${Editid}`);
+          const groupData = response.data;
+          setFormData({
+            groupName: groupData.groupName || "",
+            deptHead: groupData.deptHead || [],
+            projectLead: groupData.projectLead || [],
+            members: groupData.members || [],
+            profilePic: groupData.profilePic || "",
+          });
+        } catch (error) {
+          console.error("Error fetching group data:", error);
+          setError("Internal Server Error");
+        }
       };
+  
+      fetchRegisteredNames();
+      if (Editid) {
+        fetchGroupData();
+      }
+    }, []);
+
+    useEffect(() => {
+      console.log(formData);
+      console.log(imageLink);
+     
+    }, [formData]);
 
     // console.log("userDa", userNamesEmail);
 
@@ -142,7 +156,7 @@ function CreateGroups() {
                 />
                 {formData.profilePic ? (
                   <img
-                    src={formData.profilePic }
+                    src={formData.profilePic || imageLink}
                     alt="Profile"
                     className="h-[80px] w-[80px] object-cover rounded-full"
                   />
@@ -219,4 +233,4 @@ function CreateGroups() {
     );
 }
 
-export default CreateGroups;
+export default EditGroupNew;
