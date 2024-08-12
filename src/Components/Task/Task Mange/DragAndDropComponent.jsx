@@ -657,7 +657,7 @@ const DragAndDropComponent = ({ tasksToDo, tasksCancelled, loading, tasksComplet
                                     value={remarks}
                                     onChange={(e) => setRemarks(e.target.value)}
                                 />
-                            </div>
+                            </div>   
                             <div className="gap-2 grid">
                                 <label>Select New Deadline Date <span className="text-red-600 ">*</span></label>
                                 <input
