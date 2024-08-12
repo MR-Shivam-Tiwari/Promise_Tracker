@@ -412,24 +412,24 @@ function Task() {
               onClick={toggleModal}
               startDecorator={<Add />}
               variant="outlined"
-              className="font-bold bg-blue-400 text-black  border-blue-400 border-2"
+              className="font-bold  text-black bg-gray-200 shadow border-gray-400 border-0  "
             >
               Add Tasks
             </Button>
           </div>
           <div className="flex items-center gap-3 text-lg font-bold">
-            <Button
+            {/* <Button
               onClick={() => navigate("/unapproved-task")}
               variant="outlined"
-              className="font-bold bg-yellow-400 text-black bh-white border-yellow-400 border-2"
+              className="font-bold  text-black bg-gray-200 shadow border-gray-400 border-0"
             >
               {" "}
               Unapproved Task
-            </Button>
+            </Button> */}
             <Button
               onClick={() => navigate("/archive-task")}
               variant="outlined"
-              className="font-bold bg-red-400 text-black bh-white border-red-400 border-2"
+              className="font-bold  text-black bg-gray-200 shadow border-gray-400 border-0"
             >
               {" "}
               Archive Task
@@ -439,7 +439,7 @@ function Task() {
             {taskGroups.length > 0 && (
               <Select
                 value={selectedGroup}
-                className="font-bold"
+                className="font-bold bg-gray-200 border-0"
                 onChange={(event, newValue) => setSelectedGroup(newValue)}
               >
                 <Option value="" className="font-bold">

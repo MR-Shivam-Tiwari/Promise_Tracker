@@ -422,7 +422,7 @@ function Approvals() {
                 "All",
                 "Approved",
                 "Unapproved",
-                "Archive Task",
+                // "Archive Task",
                 "New Task Approval",
               ].map((status) => (
                 <button
