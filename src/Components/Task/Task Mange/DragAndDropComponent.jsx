@@ -520,6 +520,28 @@ const DragAndDropComponent = ({
   const [currentCard, setCurrentCard] = useState(null);
   const [remarks, setRemarks] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [fileLink, setFileLink] = useState(null);
+
+  const generateLInk = (file) => {
+    console.log('file', file);
+    
+    const formData = new FormData();
+    formData.append("file", file);
+  
+    console.log('formData', formData);
+  
+    axios.post(`${process.env.REACT_APP_API_URL}/api/upload-file`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    .then((res) => {
+      setFileLink(res?.data?.result);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }
 
   const handleSubmit = () => {
     if (!proofText) {
@@ -716,10 +738,10 @@ const DragAndDropComponent = ({
       return;
     }
 
-    let fileBase64 = null;
-    if (proofFile) {
-      fileBase64 = await convertFileToBase64(proofFile);
-    }
+    // let fileBase64 = null;
+    // if (proofFile) {
+    //   fileBase64 = await convertFileToBase64(proofFile);
+    // }
 
     try {
       const response = await fetch(
@@ -732,7 +754,8 @@ const DragAndDropComponent = ({
           },
           body: JSON.stringify({
             text: proofText,
-            file: fileBase64, // Sending base64 encoded file as a string
+            // file: fileBase64, // Sending base64 encoded file as a string
+            file: fileLink,
           }),
         }
       );
@@ -764,14 +787,6 @@ const DragAndDropComponent = ({
     }
   };
 
-  const convertFileToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result.split(",")[1]); // Extract base64 string without data URL prefix
-      reader.onerror = (error) => reject(error);
-      reader.readAsDataURL(file);
-    });
-  };
 
   const handleCompleteModalClose = () => {
     setIsCompleteModalOpen(false);
@@ -933,7 +948,10 @@ const DragAndDropComponent = ({
                   name="proofFile"
                   className="flex h-10 w-full bg-gray-300 text-black rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   id="proofFile"
-                  onChange={(e) => setProofFile(e.target.files[0])}
+                  onChange={(e) =>{
+                    // setProofFile(e.target.files[0])
+                    generateLInk(e.target.files[0])
+                  }}
                 />
               </div>
             </div>

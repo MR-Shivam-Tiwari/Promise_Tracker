@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
 import { UserContext } from '../../global/UserContext';
+import { PreviewOutlined } from '@mui/icons-material';
 
 
 function EditApprovals({ taskId, task, onClose }) {
@@ -105,21 +106,6 @@ function EditApprovals({ taskId, task, onClose }) {
     // Function to handle image download
 
 
-    const handleDownloadImage = () => {
-        // Assuming task.pow.file contains the base64 encoded image data
-        const contentType = 'image/png'; // Adjust accordingly if your image type is different
-        const blob = base64ToBlob(task.pow.file, contentType);
-        const url = URL.createObjectURL(blob);
-
-        // Create a temporary link element to trigger the download
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'image.png'; // File name as you want it to appear when downloaded
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    };
 
     return (
         <div>
@@ -164,22 +150,15 @@ function EditApprovals({ taskId, task, onClose }) {
                                     <h6 className='text-sm font-medium mb-2'>Screenshot</h6>
                                     <div className='flex items-end justify-between'>
 
-                                        {task?.pow?.file && (
-                                            <div className="mt-4">
-                                                <img
-                                                    src={`data:image/png;base64,${task.pow.file}`}
-                                                    alt="Preview"
-                                                    className="max-w-full h-[200px] lg:rounded-lg rounded-[3px]"
-                                                />
-                                            </div>
-                                        )}
-                                        <button
+                                       
+                                        <a
                                             className="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-blue-500 text-white hover:bg-blue-600"
-                                            onClick={handleDownloadImage}
+                                            // onClick={(e)=>e.preventDefault()}
                                             disabled={isLoading || !task?.pow?.file}
+                                            href={task?.pow?.file}
                                         >
                                             Download
-                                        </button>
+                                        </a>
                                     </div>
                                 </div>
 
