@@ -275,11 +275,11 @@ function EditTask({ data, setEdit, fetchTasks }) {
   };
 
   return (
-    <div>
+    <div >
       <div>
         <h1 className="text-2xl px-4 py-4 font-bold">Edit Task</h1>
       </div>
-      <div className="w-full max-w-3xl h-[80vh] overflow-scroll mx-auto p-6 md:p-8 lg:p-10 bg-white text-black lg:rounded-lg rounded-[3px] shadow-lg">
+      <div className="w-full max-w-3xl lg:h-[80vh] overflow-scroll mx-auto p-6 md:p-8 lg:p-10 bg-white text-black lg:rounded-lg rounded-[3px] shadow-lg">
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">

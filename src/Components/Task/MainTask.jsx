@@ -46,6 +46,37 @@ function MainTask() {
     }
   };
 
+  const handleStatusChange = async (task, newStatus) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/tasks/${task._id}/status`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update status");
+      }
+
+      const updatedTask = await response.json();
+
+      // Update the task status in the state
+      setAllTasks((prevTasks) =>
+        prevTasks.map((t) =>
+          t._id === task._id ? { ...t, status: updatedTask.status } : t
+        )
+      );
+
+      console.log("Task updated:", updatedTask);
+    } catch (error) {
+      console.error("Error updating task status:", error);
+    }
+  };
   useEffect(() => {
     fetchTasks();
   }, []);
@@ -161,19 +192,22 @@ function MainTask() {
             ? truncateText(task.taskGroup.groupName, 16)
             : "No Group"}
         </div>
-        <div className="">
+        <div>
           <select
             disabled={task.status === "Completed"}
-            id="countries"
-            class="bg-gray-50 text-[11px] border rounded-[3px] px-1 border-gray-300 text-gray-900  h-7  focus:ring-blue-500 focus:border-blue-500 block w-[130px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            id="task-status"
+            className="bg-gray-50 text-[11px] border rounded-[3px] px-1 border-gray-300 text-gray-900 h-7 focus:ring-blue-500 focus:border-blue-500 block w-[130px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            value={task.status || ""}
+            onChange={(e) => handleStatusChange(task, e.target.value)} // Pass task and new status
           >
-            <option className="" selected disabled>
+            <option value="" disabled>
               Change Status
             </option>
-            <option value="">Todo</option>
+            <option value="">To Do</option>
             <option value="In Progress">In Progress</option>
             <option value="Completed">Completed</option>
-            <option value="Cancelled">Postponed</option>
+            <option value="Cancelled">Cancelled</option>
+            <option value="Archive">Archive</option>
           </select>
         </div>
       </div>
@@ -189,7 +223,7 @@ function MainTask() {
         }}
       >
         <Sheet
-          className="overflow-auto bg-white "
+          className="overflow-auto  h-[620px] w-[340px] "
           sx={{
             borderRadius: "md",
             boxShadow: "lg",
@@ -220,7 +254,7 @@ function MainTask() {
           alignItems: "center",
         }}
       >
-        <div className=" bg-white rounded-lg h-[min-500px] overflow-x-hidden ">
+        <div className=" bg-white rounded-lg lg-[min-500px] h-[640px] w-[350px] overflow-x-hidden ">
           {/* <ModalClose variant="plain" sx={{ m: 1 }} onClick={() => setOpen(false)} /> */}
           {viewselectedTask && (
             <ViewTask data={viewselectedTask} setOpen={setviewSelectedTask} />

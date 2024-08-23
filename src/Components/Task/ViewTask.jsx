@@ -223,9 +223,14 @@ function ViewTask({ data, status, setOpen }) {
       .replace(/<i>/g, `<i style="font-style: italic;">`)
       .replace(/<em>/g, `<em style="font-style: italic;">`);
   };
+  function getRandomColor(index) {
+    const colors = ["#34D399", "#60A5FA", "#F87171", "#FBBF24", "#A78BFA"]; // Add more colors as needed
+    return colors[index % colors.length];
+  }
+
   return (
     <div className="lg:rounded-lg rounded-[3px] ">
-      <div class="flex px-5 pt-4 items-center justify-between mb-6 ">
+      <div class="flex lg:px-5 px-3 pt-2 lg:pt-4 items-center justify-between mb-6 ">
         <div className="flex items-center gap-4">
           <h1 class="text-2xl font-bold text-gray-900 ">
             {data?.taskGroup.groupName}
@@ -246,8 +251,8 @@ function ViewTask({ data, status, setOpen }) {
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="container mx-auto lg:rounded-lg rounded-[3px]  p-0 h-[80vh] md:w-[70vw] w-[80vw] overflow-scroll">
-        <div class=" lg:rounded-lg rounded-[3px]   lg:px-8">
+      <div class="container mx-auto lg:rounded-lg rounded-[3px]  p-0 h-[80vh] md:w-[75vw] w-[90vw] overflow-scroll overflow-x-hidden ">
+        <div class=" lg:rounded-lg rounded-[3px] px-2   lg:px-8">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
             <div>
               <h2 class="text-md font-medium text-gray-900  mb-2">Task Name</h2>
@@ -275,12 +280,12 @@ function ViewTask({ data, status, setOpen }) {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3 align-center">
             {data?.audioFile ? (
-              <div class="">
+              <div class=" ">
                 <div>
                   <h2 className="text-lg font-medium text-gray-900  mb-1">
                     Audio Player
                   </h2>
-                  <audio controls>
+                  <audio className="w-full" controls>
                     <source src={data?.audioFile} type="audio/mp4" />
                     Your browser does not support the audio element.
                   </audio>
@@ -313,12 +318,13 @@ function ViewTask({ data, status, setOpen }) {
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-            <div>
+            <div className="">
               <h2 className="text-lg font-medium text-gray-900  mb-2">
                 Assigned By
               </h2>
-              <p className="text-gray-700 mb-2 gap-2 flex  ">
-                <p class="font-bold  bg-yellow-500 px-2 rounded-lg text-white">
+
+              <p className="text-gray-700 bg-gray-200 rounded-lg p-2 mb-2 gap-2 flex  ">
+                <p class="font-bold  bg-yellow-500 px-2 rounded text-white">
                   {" "}
                   {data?.owner?.name}
                 </p>
@@ -328,20 +334,30 @@ function ViewTask({ data, status, setOpen }) {
               <h2 class="text-lg font-medium text-gray-900  mb-2">
                 Assigned To
               </h2>
-              <div className="flex ">
-                <p class="font-bold  bg-green-500 text-white  px-2 rounded-lg">
-                  {" "}
-                  {data?.people.map((person) => person.name).join(", ")}
-                </p>
+              <div className="flex flex-wrap gap-2 bg-gray-200 rounded-lg p-2 ">
+                {data?.people.map((person, index) => (
+                  <p
+                    key={index}
+                    className={`font-bold text-white  px-2 rounded`}
+                    style={{
+                      backgroundColor: getRandomColor(index),
+                      lineHeight: "1.5rem",
+                      whiteSpace: "nowrap",
+                      // height: "2.5rem",
+                    }}
+                  >
+                    {person.name}
+                  </p>
+                ))}
               </div>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+          <div class="flex justify-between items-center   ">
             <div>
               <h2 class="text-lg font-medium text-gray-900  mb-2">Reminder</h2>
-              <div class="flex items-center space-x-2">
-                <div className="flex items-center gap-2">
+              <div class="flex items-center  bg-gray-200 rounded">
+                <div className="flex items-center gap-2 w-full p-4  ">
                   <span className="text-black-900 flex text-black items-center gap-2 ">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -361,21 +377,25 @@ function ViewTask({ data, status, setOpen }) {
             </div>
             <div>
               <h2 className="text-lg font-medium text-gray-900  mb-2">Dates</h2>
-              <p className="text-gray-700 mb-2 gap-2 flex  ">
-                Start:
-                <p className="border px-2 font-bold  rounded bg-gray-200">
-                  {data?.startDate ? formatDate(data.startDate) : "N/A"}
+              <div className="bg-gray-200 p-2 lg:flex items-center rounded">
+                <p className="text-gray-700  text-xs lg:text-[15px] gap-2 flex  ">
+                  Start  :
+                  <p className="border px-2 font-bold text-xs  lg:text-[15px] rounded bg-gray-200">
+                    {data?.startDate ? formatDate(data.startDate) : "N/A"}
+                  </p>
                 </p>
-              </p>
-              <p className="text-gray-700 flex gap-2 ">
-                End :{" "}
-                <p
-                  style={{ marginLeft: "2px" }}
-                  className="border  px-2 font-bold rounded bg-gray-200"
-                >
-                  {data?.endDate ? formatDate(data.endDate) : "N/A"}
-                </p>
-              </p>
+                <div className="bg-gray-200 p-2 lg:flex items-center rounded">
+                  <p className="text-xs lg:text-[15px] text-start flex gap-2 ">
+                    End :{" "}
+                    <p
+                     
+                      className="border px-2 font-bold text-xs  lg:text-[15px] rounded bg-gray-200"
+                    >
+                      {data?.endDate ? formatDate(data.endDate) : "N/A"}
+                    </p>
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
           {data?.additionalDetails?.status === "rejected" &&
@@ -407,9 +427,9 @@ function ViewTask({ data, status, setOpen }) {
                     /{subTasks?.length}
                   </span>
                 </h3>
-                <span className="text-gray-500 ">
+                <p className="text-gray-500 w-[200px] ">
                   Below Subtasks are only visible to you
-                </span>
+                </p>
               </div>
               <button
                 className={`px-4 py-1 text-md rounded text-white hover:bg-green-700 active:bg-green-900 ${"bg-green-800"}`}
@@ -560,7 +580,7 @@ function ViewTask({ data, status, setOpen }) {
                 </span>
               </h3>
             </div>
-            <div className="ml-5">
+            <div className="">
               {logs?.map((log) => {
                 return (
                   <>
