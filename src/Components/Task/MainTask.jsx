@@ -206,7 +206,7 @@ function MainTask() {
             <option value="">To Do</option>
             <option value="In Progress">In Progress</option>
             <option value="Completed">Completed</option>
-            <option value="Cancelled">Cancelled</option>
+            <option value="Cancelled">Postponed</option>
             <option value="Archive">Archive</option>
           </select>
         </div>
@@ -265,7 +265,12 @@ function MainTask() {
   );
 
   const filteredTasks = filterTasksByStatus(allTasks, filter);
-
+  const statusMapping = {
+    "To Do": "To Do",
+    "In Progress": "In Progress",
+    Completed: "Completed",
+    Cancelled: "Postponed", // Display "Postponed" but keep "Cancelled" in the code
+  };
   return (
     <div className="container mx-auto bg-gray-50 p-1 min-h-screen">
       <div className="flex gap-2 mb-6 p-2 w-full overflow-x-auto overflow-y-hidden">
@@ -273,12 +278,12 @@ function MainTask() {
           <button
             key={status}
             className={`text-sm h-10 w-full px-3 py-2 rounded-[4px] 
-      ${
-        filter === status
-          ? "bg-blue-500 text-white"
-          : "bg-gray-300 text-black border"
-      } 
-      hover:bg-blue-500 transition-colors whitespace-nowrap`}
+          ${
+            filter === status
+              ? "bg-blue-500 text-white"
+              : "bg-gray-300 text-black border"
+          } 
+          hover:bg-blue-500 transition-colors whitespace-nowrap`}
             onClick={() => setFilter(status)}
             style={{
               lineHeight: "1.5rem",
@@ -286,7 +291,8 @@ function MainTask() {
               height: "2.5rem",
             }}
           >
-            <span>{status}</span>
+            <span>{statusMapping[status]}</span>{" "}
+            {/* Use the mapping for display */}
           </button>
         ))}
       </div>
