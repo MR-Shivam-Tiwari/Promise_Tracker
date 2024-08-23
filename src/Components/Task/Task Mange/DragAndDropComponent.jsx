@@ -27,7 +27,7 @@ import { UserContext } from "../../../global/UserContext";
 const ItemTypes = {
   CARD: "card",
 };
-const Section = ({ title, cards, moveCard, loading }) => {
+const Section = ({ title, cards, moveCard, loading ,fetchTasks }) => {
   const [, drop] = useDrop({
     accept: ItemTypes.CARD,
     drop(item, monitor) {
@@ -76,6 +76,7 @@ const Section = ({ title, cards, moveCard, loading }) => {
               id={card._id}
               text={card.taskName}
               status={card.status}
+              fetchTasks={fetchTasks}
             />
           ))
         ) : (
@@ -87,7 +88,7 @@ const Section = ({ title, cards, moveCard, loading }) => {
     </div>
   );
 };
-const Card = ({ id, text, status, card }) => {
+const Card = ({ id, text, status, card ,fetchTasks }) => {
   const { userData } = useContext(UserContext);
   const [showOptions, setShowOptions] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
@@ -387,7 +388,7 @@ const Card = ({ id, text, status, card }) => {
                   sx={{ m: 1 }}
                   onClick={() => setEdit(false)}
                 />
-                <EditTask data={card} setEdit={setEdit} />
+                <EditTask data={card} fetchTasks={fetchTasks} setEdit={setEdit} />
               </Sheet>
             </Modal>
             <Modal
@@ -507,6 +508,7 @@ const DragAndDropComponent = ({
   loading,
   tasksCompleted,
   tasksInProgress,
+  fetchTasks,
 }) => {
   const { userData } = useContext(UserContext);
   const [sections, setSections] = useState({
@@ -809,6 +811,7 @@ const DragAndDropComponent = ({
               title={title}
               cards={cards}
               loading={loading}
+              fetchTasks={fetchTasks}
               moveCard={moveCard}
             />
           ))

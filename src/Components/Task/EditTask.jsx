@@ -6,7 +6,7 @@ import { UserContext } from "../../global/UserContext";
 import ReactQuill from "react-quill";
 import { CircularProgress } from "@mui/material";
 
-function EditTask({ data, setEdit }) {
+function EditTask({ data, setEdit, fetchTasks }) {
   const Taskid = data?._id;
   const { userData } = useContext(UserContext);
   const [GroupData, setGrouptData] = useState([]);
@@ -126,15 +126,13 @@ function EditTask({ data, setEdit }) {
       setEdit(false);
       toast.dismiss();
       toast.success("Task updated successfully!");
-      setInterval(() => {
-        window.location.reload();
-      }, 1000);
+      fetchTasks();
     } catch (error) {
       console.error("Error updating task:", error);
       if (error.response && error.response.data && error.response.data.error) {
         toast.error("Error: " + error.response.data.error);
       } else {
-        toast.error("Failed to update task. Please try again later.");
+        // toast.error("Failed to update task. Please try again later.");
       }
     }
   };
