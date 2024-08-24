@@ -753,7 +753,6 @@ const DragAndDropComponent = ({
           },
           body: JSON.stringify({
             text: proofText,
-            // file: fileBase64, // Sending base64 encoded file as a string
             file: fileLink,
           }),
         }
