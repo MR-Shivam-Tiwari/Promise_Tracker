@@ -96,9 +96,9 @@ console.log("totalTask", tasks)
                                             <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
                                                 Task Group
                                             </th>
-                                            <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
+                                            {/* <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
                                                 Reminder
-                                            </th>
+                                            </th> */}
                                             <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
                                                 Status
                                             </th>
@@ -122,9 +122,9 @@ console.log("totalTask", tasks)
                                                     <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0 font-medium">
                                                         {task?.taskGroup.groupName}
                                                     </td>
-                                                    <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0 font-medium">
+                                                    {/* <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0 font-medium">
                                                         {task?.reminder}
-                                                    </td>
+                                                    </td> */}
                                                     <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">
                                                         {task.category === 'Approved' && (
                                                             <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-100 text-green-900  ">
