@@ -153,7 +153,6 @@ function Task() {
       // toast.success("Task created successfully!");
       await fetchTasks(); // Refetch tasks after creating a new one
       await fetchTasksmain();
-      
     } catch (error) {
       console.error("Error creating group:", error);
     }
@@ -324,7 +323,8 @@ function Task() {
     fetchRegisteredNames();
   };
 
-  const startRecording = async () => {
+  const startRecording = async (e) => {
+    // e.preventDefault();
     setIsRecording(true);
     audioChunksRef.current = [];
 
@@ -349,7 +349,8 @@ function Task() {
     }
   };
 
-  const stopRecording = () => {
+  const stopRecording = (e) => {
+    // e.preventDefault();
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
@@ -575,7 +576,7 @@ function Task() {
                         Record Audio
                       </label>
                       <div className="flex space-x-4 mb-4 items-center">
-                        <button
+                        <div
                           onClick={startRecording}
                           disabled={isRecording}
                           className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${
@@ -626,8 +627,8 @@ function Task() {
                                 : "Start Recording"}
                             </>
                           )}
-                        </button>
-                        <button
+                        </div>
+                        <div
                           onClick={stopRecording}
                           disabled={!isRecording}
                           className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${
@@ -647,7 +648,7 @@ function Task() {
                             <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.5 5A1.5 1.5 0 0 0 5 6.5v3A1.5 1.5 0 0 0 6.5 11h3A1.5 1.5 0 0 0 11 9.5v-3A1.5 1.5 0 0 0 9.5 5z" />
                           </svg>
                           Stop Recording
-                        </button>
+                        </div>
                       </div>
 
                       {audioLoader ? (

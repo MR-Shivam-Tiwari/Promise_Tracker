@@ -298,7 +298,7 @@ function MainHome() {
   const handlePinClick = async (_id) => {
     try {
       const response = await axios.post(
-        `https://ptapi.insideoutconsult.com/api/pin/${_id}`,
+        `${process.env.REACT_APP_API_URL}/api/pin/${_id}`,
         { userId }
       );
       if (response.status === 200) {
@@ -322,7 +322,7 @@ function MainHome() {
   const handleunPinClick = async (_id) => {
     try {
       const response = await axios.post(
-        `https://ptapi.insideoutconsult.com/api/unpin/${_id}/${userId}`
+        `${process.env.REACT_APP_API_URL}/api/unpin/${_id}/${userId}`
       );
       if (response.status === 200) {
         console.log("Group Unpinned successfully:", response.data.group);
