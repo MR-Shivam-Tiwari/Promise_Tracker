@@ -327,8 +327,9 @@ function Task() {
     // e.preventDefault();
     setIsRecording(true);
     audioChunksRef.current = [];
-
+    console.log("start ");
     try {
+      console.log("first try");
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorderRef.current = new MediaRecorder(stream);
       mediaRecorderRef.current.ondataavailable = (event) => {
@@ -341,6 +342,7 @@ function Task() {
         const audioUrl = URL.createObjectURL(audioBlob);
         setAudioUrl(audioUrl);
         await uploadAudio(audioBlob);
+        console.log("last try", audioBlob);
       };
       mediaRecorderRef.current.start();
     } catch (error) {
@@ -576,7 +578,8 @@ function Task() {
                         Record Audio
                       </label>
                       <div className="flex space-x-4 mb-4 items-center">
-                        <div
+                        {/* Start Recording Button */}
+                        <button
                           onClick={startRecording}
                           disabled={isRecording}
                           className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${
@@ -584,51 +587,13 @@ function Task() {
                               ? "bg-gray-400 cursor-not-allowed"
                               : "bg-blue-500 hover:bg-blue-600"
                           }`}
+                          aria-hidden={isRecording ? "true" : "false"}
                         >
-                          {isRecording ? (
-                            <>
-                              <svg
-                                className="animate-spin mr-2 h-5 w-5 text-white"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                              >
-                                <circle
-                                  className="opacity-25"
-                                  cx="12"
-                                  cy="12"
-                                  r="10"
-                                  stroke="currentColor"
-                                  strokeWidth="4"
-                                ></circle>
-                                <path
-                                  className="opacity-75"
-                                  fill="currentColor"
-                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291l1.414-1.414A5.987 5.987 0 016 12H4c0 2.21.895 4.21 2.291 5.291z"
-                                ></path>
-                              </svg>
-                              Recording...
-                            </>
-                          ) : (
-                            <>
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                fill="currentColor"
-                                class="bi bi-mic-fill mr-1"
-                                viewBox="0 0 16 16"
-                              >
-                                <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0z" />
-                                <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5" />
-                              </svg>
-                              {uploadResultVoice
-                                ? "Record Again"
-                                : "Start Recording"}
-                            </>
-                          )}
-                        </div>
-                        <div
+                          {isRecording ? "Recording..." : "Start Recording"}
+                        </button>
+
+                        {/* Stop Recording Button */}
+                        <button
                           onClick={stopRecording}
                           disabled={!isRecording}
                           className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${
@@ -642,13 +607,13 @@ function Task() {
                             width="16"
                             height="16"
                             fill="currentColor"
-                            class="bi bi-stop-circle-fill mr-1"
+                            className="bi bi-stop-circle-fill mr-1"
                             viewBox="0 0 16 16"
                           >
                             <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.5 5A1.5 1.5 0 0 0 5 6.5v3A1.5 1.5 0 0 0 6.5 11h3A1.5 1.5 0 0 0 11 9.5v-3A1.5 1.5 0 0 0 9.5 5z" />
                           </svg>
                           Stop Recording
-                        </div>
+                        </button>
                       </div>
 
                       {audioLoader ? (

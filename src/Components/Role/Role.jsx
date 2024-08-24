@@ -286,11 +286,11 @@ function Role() {
                 onChange={HandleSearch}
               />
             </div>
-            <div className="lg:flex gap-3 ">
+            <div className="lg:flex justify-end gap-3 ">
             <div className="">
               <select
                 onChange={(e) => setSelectedRole(e.target.value)}
-                className=" p-2 border text-white h-10 w-full lg:w-[250px] bg-[#8BC940] rounded"
+                className=" p-2 border text-white h-10 w-full lg:w-[150px] bg-[#8BC940] rounded"
               >
                 <option value="" >
                   Filter By Role
@@ -304,13 +304,13 @@ function Role() {
             <div className="flex lg:mt-0 mt-3  gap-3">
 
               <button
-                className="flex items-center lg:w-[250px] w-full justify-center px-4  h-10 py-2 font-medium text-white bg-[#8BC940] rounded hover:bg-[#A1DF60] focus:outline-none"
+                className="flex items-center whitespace-nowrap lg:w-[150px] w-full justify-center px-4  h-10 py-2 font-medium text-white bg-[#8BC940] rounded hover:bg-[#A1DF60] focus:outline-none"
                 onClick={() => setIsModalOpen(true)}
                 >
                 <span className="">Create Member</span>
               </button>
               <button
-                className="flex items-center w-full lg:w-[250px] justify-center h-10 px-4 py-2 font-medium text-white bg-[#8BC940] rounded hover:bg-[#A1DF60] focus:outline-none"
+                className="flex items-center w-full lg:w-[150px] whitespace-nowrap justify-center h-10 px-4 py-2 font-medium text-white bg-[#8BC940] rounded hover:bg-[#A1DF60] focus:outline-none"
                 onClick={() => setIsBulkModalOpen(true)}
                 >
                 Bulk Upload
