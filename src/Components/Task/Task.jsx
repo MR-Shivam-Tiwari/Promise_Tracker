@@ -153,6 +153,9 @@ function Task() {
       // toast.success("Task created successfully!");
       await fetchTasks(); // Refetch tasks after creating a new one
       await fetchTasksmain(); // Refetch tasks after creating a new one
+      setTimeout(() => {
+        window.location.reload(); // Reload the page after 1000ms
+      }, 1000);
     } catch (error) {
       console.error("Error creating group:", error);
     }
