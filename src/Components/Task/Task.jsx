@@ -324,7 +324,7 @@ function Task() {
   };
 
   const startRecording = async (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     setIsRecording(true);
     audioChunksRef.current = [];
     console.log("start ");
@@ -352,7 +352,7 @@ function Task() {
   };
 
   const stopRecording = (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
@@ -580,7 +580,7 @@ function Task() {
                       <div className="flex space-x-4 mb-4 items-center">
                         {/* Start Recording Button */}
                         <button
-                          onClick={startRecording}
+                          onClick={(e)=>startRecording(e)}
                           disabled={isRecording}
                           className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${
                             isRecording
@@ -594,7 +594,7 @@ function Task() {
 
                         {/* Stop Recording Button */}
                         <button
-                          onClick={stopRecording}
+                          onClick={(e)=>stopRecording(e)}
                           disabled={!isRecording}
                           className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${
                             !isRecording
