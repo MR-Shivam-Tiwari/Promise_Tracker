@@ -740,10 +740,7 @@ const DragAndDropComponent = ({
       return;
     }
 
-    // let fileBase64 = null;
-    // if (proofFile) {
-    //   fileBase64 = await convertFileToBase64(proofFile);
-    // }
+ 
 
     try {
       const response = await fetch(

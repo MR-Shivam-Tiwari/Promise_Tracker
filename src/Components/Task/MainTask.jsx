@@ -1,30 +1,27 @@
-import {
-
-  Modal,
-  ModalClose,
-  Sheet,
-} from "@mui/joy";
+import { Button, Modal, ModalClose, Sheet, Typography } from "@mui/joy";
 import axios from "axios";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import EditTask from "./EditTask";
 import ViewTask from "./ViewTask";
+import { toast } from "react-toastify";
 
-
-function MainTask() {
+function MainTask({ setFilter, filteredTasks, fetchTasksmain, filter }) {
   const [allTasks, setAllTasks] = useState([]);
-  const [filter, setFilter] = useState("To Do");
+  const textareaRef = useRef(null);
   const [edit, setEdit] = useState(false);
   const userDataString = localStorage.getItem("userData");
   const [userid, setUserid] = useState(
     JSON.parse(userDataString)?.userId || ""
   );
- 
 
   const [open, setOpen] = useState(false);
-
+  const [fileLink, setFileLink] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
-
+  const [currentCard, setCurrentCard] = useState(null);
   const [viewselectedTask, setviewSelectedTask] = useState(null);
+  const [proofText, setProofText] = useState("");
+  const [proofFile, setProofFile] = useState(null);
+  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
 
   useEffect(() => {
     const userDataString = localStorage.getItem("userData");
@@ -34,68 +31,158 @@ function MainTask() {
       setUserid(userId);
     }
   }, []);
-  const filterTasksByStatus = (tasks, status) =>
-    tasks.filter(
-      (task) => task.status === status || (status === "To Do" && !task.status)
-    );
 
+  
   useEffect(() => {
-    if (userid) {
-      fetchTasks();
+    if (isCompleteModalOpen && textareaRef.current) {
+      textareaRef.current.focus(); // Focus the textarea when the modal opens
     }
-  }, [userid]);
-
-  const fetchTasks = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/tasks`
-      );
-      const filteredTasks = response.data.filter((task) => {
-        const isOwner = task.owner.id === userid;
-        const isPerson = task.people.some((person) => person.userId === userid);
-        return isOwner || isPerson;
-      });
-
-      setAllTasks(filteredTasks);
-    } catch (error) {
-      console.error("Error fetching tasks:", error);
+  }, [isCompleteModalOpen]);
+  const handleCompleteModalSubmit = async () => {
+    if (!proofText) {
+      console.error("Proof text is required");
+      toast.error("Proof text is required");
+      return;
     }
-  };
 
-  const handleStatusChange = async (task, newStatus) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/tasks/${task._id}/status`,
+        `${process.env.REACT_APP_API_URL}/api/tasks/${currentCard._id}/complete`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ status: newStatus }),
+          body: JSON.stringify({
+            text: proofText,
+            // file: fileBase64, // Sending base64 encoded file as a string
+            file: fileLink,
+          }),
         }
       );
 
       if (!response.ok) {
-        throw new Error("Failed to update status");
+        throw new Error("Failed to update task status");
       }
 
       const updatedTask = await response.json();
 
-      // Update the task status in the state
       setAllTasks((prevTasks) =>
         prevTasks.map((t) =>
-          t._id === task._id ? { ...t, status: updatedTask.status } : t
+          t._id === currentCard._id ? { ...t, status: updatedTask.status } : t
         )
       );
-
-      console.log("Task updated:", updatedTask);
+      fetchTasksmain();
+      toast.dismiss();
+      toast.success("Task Status Updated");
+      handleCompleteModalClose();
+      setProofText("");
+      setProofFile(null);
     } catch (error) {
       console.error("Error updating task status:", error);
+      toast.error("Failed to update task status");
     }
   };
-//   useEffect(() => {
-//     fetchTasks();
-//   }, []);
+//   const handleCancelModalSubmit = async () => {
+//     if (!remarks || !selectedDate) {
+//       console.error("Remark text and date are required");
+//       return;
+//     }
+
+//     try {
+//       const response = await fetch(
+//         `${process.env.REACT_APP_API_URL}/api/tasks/${currentCard._id}/cancel`,
+//         {
+//           method: "PUT",
+//           headers: {
+//             "Content-Type": "application/json",
+//           },
+//           body: JSON.stringify({
+//             remark: {
+//               text: remarks,
+//               date: selectedDate.toISOString().split("T")[0],
+//             },
+//             additionalDetails: {},
+//           }),
+//         }
+//       );
+
+//       if (!response.ok) {
+//         throw new Error("Failed to update task status");
+//       }
+
+//       generateLog(currentCard._id, "apply_postponed");
+
+//       const updatedTask = await response.json();
+
+//       toast.dismiss();
+//       toast.success("Task Status Updated");
+
+//       const newSections = { ...sections };
+//       newSections[currentCard.fromSection] = newSections[
+//         currentCard.fromSection
+//       ].filter((card) => card._id !== currentCard._id);
+//       newSections["Postponed"] = [
+//         ...newSections["Postponed"],
+//         { ...currentCard, status: "Postponed" },
+//       ];
+//       setSections(newSections);
+//       handleCancelModalClose();
+//     } catch (error) {
+//       console.error("Error updating task status:", error);
+//       toast.error("Error updating task status");
+//     }
+//   };
+  const handleStatusChange = async (task, newStatus) => {
+    if (newStatus === "Completed") {
+      setCurrentCard(task);
+      setIsCompleteModalOpen(true);
+    } else if (newStatus === "Postponed") {
+      setCurrentCard(task);
+    //   setIsCancelModalOpen(true);
+    } else {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/tasks/${task._id}/status`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ status: newStatus }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to update status");
+        }
+
+        const updatedTask = await response.json();
+
+        setAllTasks((prevTasks) =>
+          prevTasks.map((t) =>
+            t._id === task._id ? { ...t, status: updatedTask.status } : t
+          )
+        );
+        fetchTasksmain();
+        console.log("Task updated:", updatedTask);
+      } catch (error) {
+        console.error("Error updating task status:", error);
+      }
+    }
+  };
+  const handleCompleteModalClose = () => {
+    setIsCompleteModalOpen(false);
+    setCurrentCard(null);
+    setProofText("");
+    setProofFile(null);
+  };
+//   const handleCancelModalClose = () => {
+//     setIsCancelModalOpen(false);
+//     setCurrentCard(null);
+//     setRemarks("");
+//     setSelectedDate(new Date());
+//   };
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -103,12 +190,37 @@ function MainTask() {
     return new Date(dateString).toLocaleDateString("en-US", options);
   };
 
-  // Utility function to truncate text
   const truncateText = (text, length) => {
     if (!text) return "";
     return text.length > length ? `${text.substring(0, length)}...` : text;
   };
+  const generateLInk = (file) => {
+    console.log("file", file);
 
+    const formData = new FormData();
+    formData.append("file", file);
+
+    console.log("formData", formData);
+
+    axios
+      .post(`${process.env.REACT_APP_API_URL}/api/upload-file`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        setFileLink(res?.data?.result);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  const statusMapping = {
+    "To Do": "To Do",
+    "In Progress": "In Progress",
+    Completed: "Completed",
+    Cancelled: "Postponed", // Display "Postponed" but keep "Cancelled" in the code
+  };
   const TaskCard = ({ task }) => (
     <div className="bg-gray-50 p-4 rounded-lg shadow border border-gray-200">
       <div className="flex justify-between items-center">
@@ -254,12 +366,86 @@ function MainTask() {
           {selectedTask && (
             <EditTask
               data={selectedTask}
-              fetchTasks={fetchTasks}
+              fetchTasks={fetchTasksmain}
               setEdit={setSelectedTask}
             />
           )}
         </Sheet>
       </Modal>
+      {isCompleteModalOpen && (
+        <Modal
+          aria-labelledby="complete-modal-title"
+          aria-describedby="complete-modal-desc"
+          open={isCompleteModalOpen}
+          onClose={handleCompleteModalClose}
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Sheet
+            variant="outlined"
+            sx={{
+              maxWidth: 1000,
+              borderRadius: "md",
+              p: 3,
+              boxShadow: "lg",
+              width: 400,
+            }}
+          >
+            <Typography
+              component="h2"
+              id="complete-modal-title"
+              level="h4"
+              textColor="inherit"
+              fontWeight="lg"
+              mb={1}
+            >
+              Complete Task
+            </Typography>
+            <div className="grid gap-4">
+              <div className="gap-2 grid">
+                <label>
+                  Proof of Work (Text) <span className="text-red-600">*</span>
+                </label>
+                <textarea
+                  ref={textareaRef} // Attach the ref to the textarea
+                  name="proofText"
+                  className="flex h-20 w-full bg-gray-300 text-black rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  id="proofText"
+                  value={proofText}
+                  onChange={(e) => setProofText(e.target.value)}
+                />
+              </div>
+              <div className="gap-2 grid">
+                <label>
+                  Proof of Work (File) <span className="text-red-600">*</span>
+                </label>
+                <input
+                  type="file"
+                  name="proofFile"
+                  className="flex h-10 w-full bg-gray-300 text-black rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  id="proofFile"
+                  onChange={(e) => {
+                    // setProofFile(e.target.files[0])
+                    generateLInk(e.target.files[0]);
+                  }}
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-4">
+              <Button onClick={handleCompleteModalClose} variant="plain">
+                Cancel
+              </Button>
+              <Button onClick={handleCompleteModalSubmit} disabled={!proofText}>
+                Submit
+              </Button>
+            </div>
+          </Sheet>
+        </Modal>
+      )}
+
       <Modal
         aria-labelledby="modal-title"
         aria-describedby="modal-desc"
@@ -280,14 +466,6 @@ function MainTask() {
       </Modal>
     </div>
   );
-
-  const filteredTasks = filterTasksByStatus(allTasks, filter);
-  const statusMapping = {
-    "To Do": "To Do",
-    "In Progress": "In Progress",
-    Completed: "Completed",
-    Cancelled: "Postponed", // Display "Postponed" but keep "Cancelled" in the code
-  };
 
   return (
     <div className="container mx-auto bg-gray-50 p-1 min-h-screen">

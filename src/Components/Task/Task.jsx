@@ -19,7 +19,7 @@ import MainTask from "./MainTask";
 const socket = io(process.env.REACT_APP_API_URL);
 
 function Task() {
-  const { userData, fetchTasksmain } = useContext(UserContext);
+  const { userData } = useContext(UserContext);
   const userDataString = localStorage.getItem("userData");
   const [tasks, setTasks] = useState([]);
   const [userid, setUserid] = useState(
@@ -152,10 +152,8 @@ function Task() {
       setModal(false);
       // toast.success("Task created successfully!");
       await fetchTasks(); // Refetch tasks after creating a new one
-      await fetchTasksmain(); // Refetch tasks after creating a new one
-      setTimeout(() => {
-        window.location.reload(); // Reload the page after 1000ms
-      }, 1000);
+      await fetchTasksmain();
+      
     } catch (error) {
       console.error("Error creating group:", error);
     }
@@ -419,25 +417,32 @@ function Task() {
     document.getElementById("image-upload").click();
   };
   const [allTasksmain, setAllTasksmain] = useState([]);
-  // const fetchTasksmain = async () => {
-  //       try {
-  //         const response = await axios.get(
-  //           `${process.env.REACT_APP_API_URL}/api/tasks`
-  //         );
-  //         const filteredTasks = response.data.filter((task) => {
-  //           const isOwner = task.owner.id === userid;
-  //           const isPerson = task.people.some((person) => person.userId === userid);
-  //           return isOwner || isPerson;
-  //         });
+  const [filter, setFilter] = useState("To Do");
+  const filteredTasks = filterTasksByStatus(allTasksmain, filter);
 
-  //         setAllTasksmain(filteredTasks);
-  //       } catch (error) {
-  //         console.error("Error fetching tasks:", error);
-  //       }
-  //     };
-  //     useEffect(() => {
-  //       fetchTasksmain();
-  //     }, []);
+  useEffect(() => {
+    if (userid) {
+      fetchTasks();
+    }
+  }, [userid]);
+
+  const fetchTasksmain = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/tasks`
+      );
+      const filteredTasks = response.data.filter((task) => {
+        const isOwner = task.owner.id === userid;
+        const isPerson = task.people.some((person) => person.userId === userid);
+        return isOwner || isPerson;
+      });
+
+      setAllTasksmain(filteredTasks);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  };
+
   return (
     <div>
       <div className=" lg:hidden ">
@@ -450,14 +455,10 @@ function Task() {
           Add Tasks
         </Button>
         <MainTask
-        // fetchTasks={fetchTasksmain}
-        // filteredTasks={filteredTasks}
-        // handleFileSelect={handleFileSelect}
-        // toggleModal={toggleModal}
-        // handleSubmit={handleSubmit}
-        // formData={formData}
-        // handleChange={handleChange}
-        // startRecording={startRecording}
+          filter={filter}
+          setFilter={setFilter}
+          filteredTasks={filteredTasks}
+          fetchTasksmain={fetchTasksmain}
         />
       </div>
       {modal && (
@@ -556,7 +557,7 @@ function Task() {
                         htmlFor="description"
                         className="block mb-2 text-sm font-medium text-gray-900 "
                       >
-                        Description
+                        Description <span className="text-red-500 ">*</span>
                       </label>
                       <ReactQuill
                         theme="snow"
