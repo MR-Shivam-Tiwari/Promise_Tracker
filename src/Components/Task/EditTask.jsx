@@ -178,7 +178,8 @@ function EditTask({ data, setEdit, fetchTasks }) {
 
     fetchRegisteredNames();
   }, []);
-  const startRecording = async () => {
+  const startRecording = async (e) => {
+    e.preventDefault();
     setIsRecording(true);
     audioChunksRef.current = [];
 
@@ -202,7 +203,8 @@ function EditTask({ data, setEdit, fetchTasks }) {
       setIsRecording(false);
     }
   };
-  const stopRecording = () => {
+  const stopRecording = (e) => {
+    e.preventDefault();
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
