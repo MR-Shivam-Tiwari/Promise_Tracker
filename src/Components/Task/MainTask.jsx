@@ -1,8 +1,14 @@
-import { Modal, ModalClose, Sheet } from "@mui/joy";
+import {
+
+  Modal,
+  ModalClose,
+  Sheet,
+} from "@mui/joy";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import EditTask from "./EditTask";
 import ViewTask from "./ViewTask";
+
 
 function MainTask() {
   const [allTasks, setAllTasks] = useState([]);
@@ -12,9 +18,14 @@ function MainTask() {
   const [userid, setUserid] = useState(
     JSON.parse(userDataString)?.userId || ""
   );
+ 
+
   const [open, setOpen] = useState(false);
+
   const [selectedTask, setSelectedTask] = useState(null);
+
   const [viewselectedTask, setviewSelectedTask] = useState(null);
+
   useEffect(() => {
     const userDataString = localStorage.getItem("userData");
     if (userDataString) {
@@ -23,11 +34,16 @@ function MainTask() {
       setUserid(userId);
     }
   }, []);
-
   const filterTasksByStatus = (tasks, status) =>
     tasks.filter(
       (task) => task.status === status || (status === "To Do" && !task.status)
     );
+
+  useEffect(() => {
+    if (userid) {
+      fetchTasks();
+    }
+  }, [userid]);
 
   const fetchTasks = async () => {
     try {
@@ -77,9 +93,9 @@ function MainTask() {
       console.error("Error updating task status:", error);
     }
   };
-  useEffect(() => {
-    fetchTasks();
-  }, []);
+//   useEffect(() => {
+//     fetchTasks();
+//   }, []);
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -92,6 +108,7 @@ function MainTask() {
     if (!text) return "";
     return text.length > length ? `${text.substring(0, length)}...` : text;
   };
+
   const TaskCard = ({ task }) => (
     <div className="bg-gray-50 p-4 rounded-lg shadow border border-gray-200">
       <div className="flex justify-between items-center">
@@ -271,6 +288,7 @@ function MainTask() {
     Completed: "Completed",
     Cancelled: "Postponed", // Display "Postponed" but keep "Cancelled" in the code
   };
+
   return (
     <div className="container mx-auto bg-gray-50 p-1 min-h-screen">
       <div className="flex gap-2 mb-6 p-2 w-full overflow-x-auto overflow-y-hidden">
