@@ -127,9 +127,9 @@ function Approvals() {
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
                       Task Group
                     </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
+                    {/* <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
                       Reminder
-                    </th>
+                    </th> */}
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
                       Status
                     </th>
@@ -153,9 +153,9 @@ function Approvals() {
                       <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
                         {task?.taskGroup?.groupName || "NIL"}
                       </td>
-                      <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
+                      {/* <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
                         {task?.reminder}
-                      </td>
+                      </td> */}
                       <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0">
                         {task?.category === "Approved" && (
                           <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-100 text-green-900">
@@ -255,9 +255,9 @@ function Approvals() {
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
                   Task Group
                 </th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
+                {/* <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
                   Reminder
-                </th>
+                </th> */}
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
                   Status
                 </th>
@@ -278,9 +278,9 @@ function Approvals() {
                   <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
                     {task?.taskGroup.groupName}
                   </td>
-                  <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
+                  {/* <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
                     {task?.reminder}
-                  </td>
+                  </td> */}
                   <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0">
                     {task.status === "Cancelled" && (
                       <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-red-100 text-red-90 ">
@@ -350,9 +350,9 @@ function Approvals() {
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
                   Task Group
                 </th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
+                {/* <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
                   Reminder
-                </th>
+                </th> */}
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
                   Status
                 </th>
@@ -373,9 +373,9 @@ function Approvals() {
                   <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
                     {task?.taskGroup.groupName}
                   </td>
-                  <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
+                  {/* <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
                     {task?.reminder}
-                  </td>
+                  </td> */}
                   <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0">
                     {task.status === "Archive" && (
                       <div className="inline-flex w-fit items-center whitespace-nowrap rounded-md  border px-3.5 py-0.5 text-sm font-bold bg-red-500 text-gray-900 ">

@@ -289,7 +289,7 @@ function AddTask({ setOpen }) {
                             />
                         </div>
                         <div className="col-span-1 md:col-span-2">
-                            <label
+                            {/* <label
                                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                 htmlFor="reminder"
                             >
@@ -303,7 +303,7 @@ function AddTask({ setOpen }) {
                                     value={formData.reminder}
                                     onChange={(e) => setFormData({ ...formData, reminder: e.target.value })}
                                 />
-                            </div>
+                            </div> */}
                         </div>
                         <div className="col-span-1 md:col-span-2">
                             <button

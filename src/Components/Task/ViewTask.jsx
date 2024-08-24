@@ -354,7 +354,7 @@ function ViewTask({ data, status, setOpen }) {
           </div>
 
           <div class="flex justify-between items-center   ">
-            <div>
+            {/* <div>
               <h2 class="text-lg font-medium text-gray-900  mb-2">Reminder</h2>
               <div class="flex items-center  bg-gray-200 rounded">
                 <div className="flex items-center gap-2 w-full p-4  ">
@@ -374,7 +374,7 @@ function ViewTask({ data, status, setOpen }) {
                   </span>
                 </div>
               </div>
-            </div>
+            </div> */}
             <div>
               <h2 className="text-lg font-medium text-gray-900  mb-2">Dates</h2>
               <div className="bg-gray-200 p-2 lg:flex items-center rounded">

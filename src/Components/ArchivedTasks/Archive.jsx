@@ -2,13 +2,16 @@ import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { UserContext } from "../../global/UserContext";
+import { Modal } from "@mui/joy";
+import ViewTask from "../Task/ViewTask";
 
 function Archive() {
   const { userData } = useContext(UserContext);
   const [userid, setUserId] = useState("");
   const [loading, setLoading] = useState(true);
   const [archiveTasks, setArchiveTasks] = useState([]);
-
+  const [viewselectedTask, setviewSelectedTask] = useState(null);
+  const [open, setOpen] = useState(false);
   const generateAddTaskLog = (taskId, to) => {
     const data = {
       userId: userData?.userId,
@@ -30,7 +33,7 @@ function Archive() {
         toast.error("Internal Server Error");
       });
   };
-  
+
   const updateTaskStatus = async (id, status, body) => {
     try {
       const response = await fetch(
@@ -159,13 +162,53 @@ function Archive() {
                       {task?.status}
                     </span>
                   </div>
-                  <div>
+                  <div className="flex items-center gap-2">
+                    <div
+                      onClick={() => {
+                        setviewSelectedTask(task);
+                        setOpen(true);
+                      }}
+                      className="border p-2 rounded hover:bg-gray-300"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        class="bi bi-eye"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
+                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
+                      </svg>
+                    </div>
                     <button
                       className="border text-sm p-2 bg-green-500 rounded-[3px] hover:bg-green-600 text-white"
                       onClick={() => handleUnArchive(task._id)}
                     >
                       Unarchive
                     </button>
+                    <Modal
+                      aria-labelledby="modal-title"
+                      aria-describedby="modal-desc"
+                      open={!!viewselectedTask}
+                      onClose={() => setviewSelectedTask(false)}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div className=" bg-white rounded-lg lg-[min-500px] h-[500px]  overflow-x-hidden ">
+                        {/* <ModalClose variant="plain" sx={{ m: 1 }} onClick={() => setOpen(false)} /> */}
+                        {viewselectedTask && (
+                          <ViewTask
+                            data={viewselectedTask}
+                            setOpen={setviewSelectedTask}
+                          />
+                        )}
+                      </div>
+                    </Modal>
                   </div>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900">

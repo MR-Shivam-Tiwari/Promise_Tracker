@@ -117,10 +117,10 @@ function EditApprovals({ taskId, task, onClose }) {
                     </div>
                     <div class="space-y-6 px-6 py-8 text-gray-800">
                         <div class="grid grid-cols-2 gap-4">
-                            <div> 
+                            {/* <div> 
                                 <h4 class="text-sm font-medium">Reminder Time</h4>
                                 <p class="text-gray-500 ">{task?.reminder}</p>
-                            </div>
+                            </div> */}
                             <div>
                                 <h4 class="text-sm font-medium">Task Member</h4>
                                 <p class="text-gray-500 ">{task?.people.map(person => person.name).join(', ')}</p>
