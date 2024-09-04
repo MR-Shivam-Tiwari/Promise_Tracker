@@ -95,6 +95,22 @@ const Card = ({ id, text, status, card ,fetchTasks }) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [edit, setEdit] = useState(false);
+  const [canEdit, setCanEdit] = useState(false)
+
+  const checkEdit = ()=>{
+
+    axios.get(`${process.env.REACT_APP_API_URL}/api/tasks/canEdit/${id}/${userData._id}/canEdit`)
+    .then((response) => {
+      // setEdit(response.data);
+      setCanEdit(response.data)
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  }
+  useEffect(() => {
+    checkEdit()
+  },[])
   const handleClick = (option) => {
     setSelectedOption(option);
     setShowOptions(false);
@@ -344,14 +360,14 @@ const Card = ({ id, text, status, card ,fetchTasks }) => {
                     >
                       View
                     </button>
-                    <button
+               { canEdit &&     <button
                       className="text-gray-700 block px-4 hover:bg-gray-200 py-2 text-sm w-full text-left"
                       role="menuitem"
                       tabIndex="-1"
                       onClick={() => setEdit(true)}
                     >
                       Edit
-                    </button>
+                    </button>}
                     <button
                       className="text-gray-700 hover:bg-gray-200 block px-4 py-2 text-sm w-full text-left"
                       role="menuitem"

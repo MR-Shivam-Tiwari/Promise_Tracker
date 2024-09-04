@@ -40,7 +40,7 @@ function Approvals() {
     axios.get(`${process.env.REACT_APP_API_URL}/api/tasks/deptHead_projectLead/${userData?.userId}/all_approval_task`)
     .then((res)=>{
       setLoading(false)
-      setTasks(res.data);
+      setTasks(res.data.result);
     }).catch((err)=>{
       setLoading(false)
       toast.dismiss()
@@ -139,9 +139,9 @@ function Approvals() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredTasks.map((task) => (
+                  {filteredTasks.map((task, index) => (
                     <tr
-                      key={task?._id}
+                      key={index}
                       className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
                     >
                       <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
