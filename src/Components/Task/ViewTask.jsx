@@ -5,6 +5,13 @@ import { toast } from "react-toastify";
 import { CircularProgress } from "@mui/material";
 import moment from "moment";
 import Logs from "../logs/Logs";
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Typography,
+} from "@mui/material";
+import CommentComponent from "../Comments/CommentComponent";
 
 function ViewTask({ data, status, setOpen }) {
   // console.log("status", status)
@@ -20,10 +27,22 @@ function ViewTask({ data, status, setOpen }) {
     subTaskName: "",
     description: "",
   });
-  const [selectedOption, setSelectedOption] = useState("all");
-  const [filterUserTasks, setFilterUserTasks] = useState([]);
   const [loader, setLoader] = useState(false);
   const [logs, setLogs] = useState([]);
+
+  const [selectedOption, setSelectedOption] = useState("all");
+  const [filterUserTasks, setFilterUserTasks] = useState([]);
+  const [isOpen, setIsOpen] = useState(false); // State to control accordion open/close
+
+
+
+
+
+
+  const toggleAccordion = () => {
+    setIsOpen(!isOpen); // Toggle open/close state
+  };
+
 
   const getAllUserSubTasks = () => {
     axios
@@ -144,38 +163,6 @@ function ViewTask({ data, status, setOpen }) {
         console.log(err);
       });
   };
-  const deleteSubTask = (id) => {
-    setLoader(true);
-    axios
-      .delete(`${process.env.REACT_APP_API_URL}/api/subtask/${id}`)
-      .then((res) => {
-        setLoader(false);
-        getAllUserSubTasks();
-      })
-      .catch((err) => {
-        setLoader(false);
-        console.log(err);
-        toast.dismiss();
-        toast.error("Something went wrong!");
-      });
-  };
-
-  const openEditModal = (task) => {
-    setNewSubTask({
-      subTaskName: task.subTaskName,
-      description: task.description,
-    });
-    setCurrentTaskId(task._id);
-    setIsEditing(true);
-    setShowModal(true);
-  };
-
-  const addWithTask = (parentTask) => {
-    setNewSubTask((prev) => {
-      return { ...prev, parentTask };
-    });
-    setShowModal(true);
-  };
 
   const handleCloseModal = () => {
     setShowModal(false);
@@ -198,31 +185,6 @@ function ViewTask({ data, status, setOpen }) {
     borderRadius: "0.5rem",
   };
 
-  const pStyle = {
-    margin: "0 0 1em",
-  };
-
-  const listStyle = {
-    margin: "0 0 1em 1.5em",
-    padding: "0",
-  };
-
-  const listItemStyle = {
-    margin: "0.5em 0",
-  };
-
-  const italicStyle = {
-    fontStyle: "italic",
-  };
-  const setInlineStyles = (html) => {
-    return html
-      .replace(/<p>/g, `<p style="margin: 0 0 1em;">`)
-      .replace(/<ol>/g, `<ol style="margin: 0 0 1em 1.5em; padding: 0;">`)
-      .replace(/<ul>/g, `<ul style="margin: 0 0 1em 1.5em; padding: 0;">`)
-      .replace(/<li>/g, `<li style="margin: 0.5em 0;">`)
-      .replace(/<i>/g, `<i style="font-style: italic;">`)
-      .replace(/<em>/g, `<em style="font-style: italic;">`);
-  };
   function getRandomColor(index) {
     const colors = ["#34D399", "#60A5FA", "#F87171", "#FBBF24", "#A78BFA"]; // Add more colors as needed
     return colors[index % colors.length];
@@ -388,7 +350,7 @@ function ViewTask({ data, status, setOpen }) {
                   <p className="text-xs lg:text-[15px] text-start flex gap-2 ">
                     End :{" "}
                     <p
-                     
+
                       className="border px-2 font-bold text-xs  lg:text-[15px] rounded bg-gray-200"
                     >
                       {data?.endDate ? formatDate(data.endDate) : "N/A"}
@@ -412,6 +374,16 @@ function ViewTask({ data, status, setOpen }) {
                 </div>
               </div>
             )}
+          <hr className="mt-4 mb-4 " />
+
+             {/* comment show here */}
+          <div className="mt-4 select-none">
+            <div>
+             
+                <CommentComponent data={data}/>
+
+            </div>
+          </div>
           <hr className="mt-4 mb-4 " />
           <div>
             <div className="flex justify-between items-center mb-8">
@@ -451,29 +423,26 @@ function ViewTask({ data, status, setOpen }) {
                     >
                       <div className="flex items-center">
                         <span
-                          className={`h-4 w-4 rounded-full mr-3 ${
-                            subTask.status === "done"
-                              ? "bg-green-600"
-                              : "bg-gray-300"
-                          }`}
+                          className={`h-4 w-4 rounded-full mr-3 ${subTask.status === "done"
+                            ? "bg-green-600"
+                            : "bg-gray-300"
+                            }`}
                         ></span>
                         <span
-                          className={`text-sm ${
-                            subTask.status === "done"
-                              ? "line-through text-gray-500"
-                              : ""
-                          } cursor-pointer select-none`}
+                          className={`text-sm ${subTask.status === "done"
+                            ? "line-through text-gray-500"
+                            : ""
+                            } cursor-pointer select-none`}
                         >
                           {subTask.subTaskName}
                         </span>
                       </div>
                       <div className="flex  items-center space-x-4">
                         <button
-                          className={`px-2 py-1 text-sm rounded text-white ${
-                            subTask.status === "done"
-                              ? "bg-red-500"
-                              : "bg-green-500"
-                          }`}
+                          className={`px-2 py-1 text-sm rounded text-white ${subTask.status === "done"
+                            ? "bg-red-500"
+                            : "bg-green-500"
+                            }`}
                           onClick={(e) => {
                             e.stopPropagation();
                             toggleCompletion(subTask._id);
@@ -571,27 +540,28 @@ function ViewTask({ data, status, setOpen }) {
             <div>{status}</div>
           </div>
           <hr className="font-bold text-gray-800" />
-          <div className="mt-5 mb-5">
-            <div>
-              <h3 className="text-black text-lg mb-5 font-bold">
-                All logs{" "}
-                <span className="text-gray-500 font-bold text-md">
-                  ({logs?.length})
-                </span>
-              </h3>
-            </div>
-            <div className="">
-              {logs?.map((log) => {
-                return (
-                  <>
-                    <div>
-                      <Logs log={log} />
-                    </div>
-                  </>
-                );
-              })}
-            </div>
+          <div>
+            <h3
+              className="text-black text-lg mb-5 font-bold cursor-pointer"
+              onClick={toggleAccordion} // Trigger accordion open/close on click
+            >
+              All logs{" "}
+              <span className="text-gray-500 font-bold text-md">({logs?.length})</span>
+              <span className="ml-2 text-sm text-gray-500">
+                {isOpen ? "▲" : "▼"}
+              </span>
+            </h3>
+            {isOpen && ( // Show logs only if accordion is open
+              <div className="space-y-2">
+                {logs?.map((log, index) => (
+                  <div key={index} className="">
+                    <Logs log={log} />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
+         
         </div>
       </div>
     </div>
