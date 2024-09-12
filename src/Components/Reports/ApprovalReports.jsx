@@ -197,7 +197,7 @@ function ApprovalReports() {
     <Sheet>
       <div className="flex justify-end p-2 lexend-bold   relative overflow-x-auto">
         <button
-          className={`inline-flex gap-2 text-gray-800 items-center justify-center bg-blue-200 text-black whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 rounded-md`}
+          className={`inline-flex gap-2 text-gray-800 items-center justify-center bg-blue-200  whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 rounded-md`}
           onClick={convertToCSV}
         >
           Download File
