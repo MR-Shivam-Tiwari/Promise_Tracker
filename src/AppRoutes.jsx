@@ -23,7 +23,7 @@ import UnApprovedTask from "./Components/Task/UnApprovedTask";
 import ChangePassword from "./Components/Profile/ChangePassword";
 import PrivateRoute from "./Components/PrivateRoute"; // Import PrivateRoute
 import { UserContext } from "./global/UserContext";
-import io from 'socket.io-client';
+import io from "socket.io-client";
 import SubTask from "./Components/SubTask/SubTask";
 
 const socket = io(process.env.REACT_APP_API_URL);
@@ -45,10 +45,10 @@ function AppRoutes() {
   const [newNotifications, setNewNotifications] = useState(0);
 
   const fetchNotifications = async () => {
-    console.log('alskdjflkasjfdskalfjsklj')
+    console.log("alskdjflkasjfdskalfjsklj");
     try {
       const response = await axios.get(
-        process.env.REACT_APP_API_URL+"/api/notifications"
+        process.env.REACT_APP_API_URL + "/api/notifications"
       );
       const allNotifications = response.data
         .filter((notification) => notification.userId === userid)
@@ -64,18 +64,16 @@ function AppRoutes() {
     }
   };
 
-  useEffect(()=>{
-    // socket.on('newTask', (data)=>{
-    socket.on('update_notification', (data)=>{
-
-      console.log('asdjfasjflaskjfaldskjfdsalkfjs')
-        fetchNotifications();
-    })
-
-    socket.off('update_notification');
-},[])
   useEffect(() => {
-    
+    // socket.on('newTask', (data)=>{
+    socket.on("update_notification", (data) => {
+      console.log("asdjfasjflaskjfaldskjfdsalkfjs");
+      fetchNotifications();
+    });
+
+    socket.off("update_notification");
+  }, []);
+  useEffect(() => {
     fetchNotifications();
   }, [userid]);
 
@@ -85,9 +83,12 @@ function AppRoutes() {
       const notificationIds = allNotifications.map(
         (notification) => notification._id
       );
-      await axios.put(process.env.REACT_APP_API_URL+"/api/notifications/mark-read", {
-        notificationIds,
-      });
+      await axios.put(
+        process.env.REACT_APP_API_URL + "/api/notifications/mark-read",
+        {
+          notificationIds,
+        }
+      );
       window.location.reload();
     } catch (error) {
       console.error("Error marking all notifications as read:", error);
@@ -106,7 +107,7 @@ function AppRoutes() {
   const fetchUserData = async (userId) => {
     try {
       const response = await axios.get(
-        process.env.REACT_APP_API_URL+`/api/user/${userId}`
+        process.env.REACT_APP_API_URL + `/api/user/${userId}`
       );
       const userData = response.data;
       //   setUserData(userData);
@@ -150,11 +151,10 @@ function AppRoutes() {
         <Box sx={{ display: "flex" }}>
           <Sidebar />
           <Box
-          
             component="main"
             className="MainContent m-1"
             sx={{
-              px: { xs: 1, },
+              px: { xs: 1 },
               overflow: "auto",
               pt: {
                 xs: "calc(12px + var(--Header-height))",
@@ -167,18 +167,17 @@ function AppRoutes() {
               flexDirection: "column",
               minWidth: 0,
               gap: 1,
-              p:1
+              p: 1,
             }}
           >
             <div className="grid col  border lg:rounded-lg rounded-[3px] p-2 mt-2 lg:mt-0 gap-3">
               <div className="flex lg:flex-row items-center lg:items-end justify-between ">
-                  <div>
-                    <Header />
-                  </div>
+                <div>
+                  <Header />
+                </div>
                 <div
                   className="cursor-pointer gap-2 px-2 rounded-lg flex items-center "
-                  style={{
-                  }}
+                  style={{}}
                 >
                   <div
                     className="cursor-pointer border gap-2 px-2 rounded-lg shadow-sm bg-gray-100"
@@ -188,7 +187,6 @@ function AppRoutes() {
                       justifyContent: "space-between",
                     }}
                   >
-
                     <div onClick={() => navigate("/profile")}>
                       <Avatar
                         variant="outlined"
@@ -216,11 +214,11 @@ function AppRoutes() {
                     </div>
                   </div>
                   <div>
-                    <div className="cursor-pointer border gap-2   p-1 py-1.5 rounded-lg shadow-sm bg-gray-100">
+                    <div className="cursor-pointer border gap-2 p-1 py-1.5 rounded-lg shadow-sm bg-gray-100 relative">
                       <IconButton
                         size="sm"
                         variant="plain"
-                        className="p-2 l-2"
+                        className="p-2"
                         color="neutral"
                         onClick={handleOpen}
                       >
@@ -234,13 +232,12 @@ function AppRoutes() {
                         >
                           <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901" />
                         </svg>
-                        <div class="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900">
-                          {newNotifications > 0 && (
-                            <span className="bg-red-500 text-white rounded-full ">
-                              {newNotifications}
-                            </span>
-                          )}
-                        </div>
+                        {/* Show badge only if there are new notifications */}
+                        {newNotifications > 0 && (
+                          <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -right-2 dark:border-gray-900">
+                            <span>{newNotifications}</span>
+                          </div>
+                        )}
                       </IconButton>
                       <Modal open={opennoti} onClose={handleClose}>
                         <Notification handleClose={handleClose} />
@@ -250,12 +247,8 @@ function AppRoutes() {
                 </div>
               </div>
             </div>
-            <Box
-             
-            >
-           
-            </Box>
-            <div >
+            <Box></Box>
+            <div>
               <Routes onChange={handleRouteChange}>
                 <Route
                   path="/profile"
