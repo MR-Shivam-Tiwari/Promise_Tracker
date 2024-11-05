@@ -288,7 +288,7 @@ const Card = ({ id, text, status, card ,fetchTasks }) => {
     }
   };
   const truncateText = (text, maxLength) => {
-    if (text.length > maxLength) {
+    if (text?.length > maxLength) {
       return text.substring(0, maxLength) + "...";
     }
     return text;
@@ -321,7 +321,7 @@ const Card = ({ id, text, status, card ,fetchTasks }) => {
     <div ref={drag} style={{ opacity }}>
       <div className="flex-1 shadow-md flex flex-col gap-1  border bg-blue-50 p-2 rounded">
         <div className="mb-1 flex justify-between items-center font-bold text-xs">
-          <p> {truncateText(card?.taskName, 26)}</p>
+      { card?.pendingSubTask?<p className="text-center font-semibold text-gray-800"> (Subtask)</p>: <p> {truncateText(card?.taskName, 26)}</p>}
           <div>
             <div className="relative inline-block text-left" ref={dropdownRef}>
               <div>
@@ -452,7 +452,7 @@ const Card = ({ id, text, status, card ,fetchTasks }) => {
               <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
             </svg>
             {truncateText(
-              card?.people.map((person) => person.name).join(", "),
+              card?.people?.map((person) => person.name).join(", "),
               8
             )}
           </div>
@@ -522,6 +522,7 @@ const DragAndDropComponent = ({
   tasksToDo,
   tasksCancelled,
   loading,
+  setTasksToDo,
   tasksCompleted,
   tasksInProgress,
   fetchTasks,
@@ -539,7 +540,7 @@ const DragAndDropComponent = ({
   const [remarks, setRemarks] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [fileLink, setFileLink] = useState(null);
-
+  const [pendingSubTasks, setPendingSubTasks] = useState([]);
   const generateLInk = (file) => {
     console.log('file', file);
     
@@ -568,14 +569,23 @@ const DragAndDropComponent = ({
     }
     handleCompleteModalSubmit(); // Call the submit handler if validation passes
   };
+  const fetchPendingSubTask = ()=>{
+    axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/alreadyAssigned/${userData?.userId}`).then((res)=>{
+      console.log('dafasfdsafdsaflkasdjflasdkfjlasdfjasdklfjasdkfjasdkfjasdkfjasdkfjlasdfj', [...tasksToDo,...res?.data])
+      setPendingSubTasks(res?.data)
+    })
+  }
+  useEffect(() => {
+    fetchPendingSubTask()
+  },[])
   useEffect(() => {
     setSections({
-      Todo: tasksToDo,
+      Todo: [...tasksToDo, ...pendingSubTasks],
       "In Progress": tasksInProgress,
       Completed: tasksCompleted,
       Postponed: tasksCancelled,
     });
-  }, [tasksToDo, tasksInProgress, tasksCompleted, tasksCancelled]);
+  }, [tasksToDo, tasksInProgress, tasksCompleted, tasksCancelled, pendingSubTasks]);
 
   const updateTaskStatus = async (id, status, body) => {
     const response = await fetch(

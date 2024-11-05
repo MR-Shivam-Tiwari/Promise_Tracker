@@ -19,14 +19,62 @@ function ViewTask({ data, status, setOpen }) {
   const [subTasks, setSubTasks] = useState([]);
   const { userData } = useContext(UserContext);
   const [userTasks, setUserTasks] = useState([]);
+  const [departmentHeads, setDepartmentHeads] = useState([]);
   const [expandedTasks, setExpandedTasks] = useState(new Set()); // Track expanded tasks
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [selectmembers, setMembers] = useState([]);
+  const [selectProjectLead, setProjectLead] = useState([]);
   const [currentTaskId, setCurrentTaskId] = useState(null);
   const [newSubTask, setNewSubTask] = useState({
     subTaskName: "",
     description: "",
   });
+  const [selectedNames, setSelectedNames] = useState([]);
+
+  const names = ['Alice', 'Bob', 'Charlie', 'David', 'Emma'];
+
+  const handleSelectChange = (selectedMember) => {
+    // Check if the member is already in the selected array
+    const isAlreadySelected = selectedNames.some(member => member.userId === selectedMember.userId);
+
+    if (!isAlreadySelected) {
+      // Add the new member object to the selectedNames array
+      setSelectedNames([...selectedNames, selectedMember]);
+      console.log([...selectedNames, selectedMember]);
+    }
+  };
+
+  const handleRemoveName = (id) => {
+    setSelectedNames(selectedNames.filter((n) => n.userId !== id));
+  };
+
+  useEffect(() => {
+    const fetchRegisteredNames = async () => {
+      try {
+        const response = await axios.get(
+          process.env.REACT_APP_API_URL + "/api/userData"
+        );
+        const filteredDepartmentHeads = response.data.filter(
+          (user) => user.userRole === 1
+        );
+        setDepartmentHeads(filteredDepartmentHeads);
+        const filteredProjectLead = response.data.filter(
+          (user) => user.userRole === 2
+        );
+        setProjectLead(filteredProjectLead);
+        const filterMember = response.data.filter(
+          (user) => user.userRole === 3
+        );
+        setMembers(filterMember);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchRegisteredNames();
+  }, []);
+
   const [loader, setLoader] = useState(false);
   const [logs, setLogs] = useState([]);
 
@@ -36,7 +84,18 @@ function ViewTask({ data, status, setOpen }) {
 
 
 
+  const handleEditModal = (subTaskId) => {
+    const currentSubTask = subTasks.find((subTask) => subTask._id === subTaskId);
+    setNewSubTask({
+      subTaskName: currentSubTask?.subTaskName,
+      description: currentSubTask?.description,
+    });
 
+    setIsEditing(true);
+    setCurrentTaskId(subTaskId);
+    setShowModal(true);
+    setSelectedNames(currentSubTask?.assignedTo || []);
+  }
 
 
   const toggleAccordion = () => {
@@ -51,6 +110,7 @@ function ViewTask({ data, status, setOpen }) {
       )
       .then((res) => {
         setSubTasks(res.data);
+        // setSelectedNames(res.data?.assignedTo || []);
       })
       .catch((err) => {
         console.log(err);
@@ -141,6 +201,7 @@ function ViewTask({ data, status, setOpen }) {
       userId: userData?.userId,
       parentTask: data?._id,
       ...newSubTask,
+      assignedTo: selectedNames,
     })
       .then((res) => {
         setLoader(false);
@@ -189,6 +250,31 @@ function ViewTask({ data, status, setOpen }) {
     const colors = ["#34D399", "#60A5FA", "#F87171", "#FBBF24", "#A78BFA"]; // Add more colors as needed
     return colors[index % colors.length];
   }
+
+  const authorizedPersonForEdit = (subTask)=>{
+    if(userData?.userId === data?.owner?.id ){
+      return true
+    }
+    if(userData?.userId === subTask?.userId){
+      return true
+    }
+ 
+    return false
+  }
+
+  const authorizedPersonForDone = (subTask)=>{
+    if(userData?.userId === data?.owner?.id ){
+      return true
+    }
+    if(userData?.userId === subTask?.userId){
+      return true
+    }
+    if(subTask?.assignedTo?.find((i) =>i.userId === userData?.userId)){
+      return true
+    }
+    return false
+  }
+
 
   return (
     <div className="lg:rounded-lg rounded-[3px] ">
@@ -376,11 +462,11 @@ function ViewTask({ data, status, setOpen }) {
             )}
           <hr className="mt-4 mb-4 " />
 
-             {/* comment show here */}
+          {/* comment show here */}
           <div className="mt-4 select-none">
             <div>
-             
-                <CommentComponent data={data}/>
+
+              <CommentComponent data={data} />
 
             </div>
           </div>
@@ -389,7 +475,7 @@ function ViewTask({ data, status, setOpen }) {
             <div className="flex justify-between items-center mb-8">
               <div>
                 <h3 className="text-lg font-bold">
-                  Your Sub Tasks{" "}
+                   Sub Tasks{" "}
                   <span className="text-white cursor-pointer px-1 py-1 text-[10px] bg-orange-500 rounded-lg  font-bold">
                     {" "}
                     {
@@ -399,9 +485,9 @@ function ViewTask({ data, status, setOpen }) {
                     /{subTasks?.length}
                   </span>
                 </h3>
-                <p className="text-gray-500 w-[200px] ">
+                {/* <p className="text-gray-500 w-[200px] ">
                   Below Subtasks are only visible to you
-                </p>
+                </p> */}
               </div>
               <button
                 className={`px-4 py-1 text-md rounded text-white hover:bg-green-700 active:bg-green-900 ${"bg-green-800"}`}
@@ -421,7 +507,8 @@ function ViewTask({ data, status, setOpen }) {
                       className="flex justify-between items-center px-2 py-1 bg-white rounded shadow cursor-pointer"
                       onClick={() => toggleTask(subTask._id)}
                     >
-                      <div className="flex items-center">
+                     <div className="flex gap-6">
+                     <div className="flex items-center">
                         <span
                           className={`h-4 w-4 rounded-full mr-3 ${subTask.status === "done"
                             ? "bg-green-600"
@@ -429,7 +516,7 @@ function ViewTask({ data, status, setOpen }) {
                             }`}
                         ></span>
                         <span
-                          className={`text-sm ${subTask.status === "done"
+                          className={`text-md font-semibold ${subTask.status === "done"
                             ? "line-through text-gray-500"
                             : ""
                             } cursor-pointer select-none`}
@@ -437,8 +524,25 @@ function ViewTask({ data, status, setOpen }) {
                           {subTask.subTaskName}
                         </span>
                       </div>
+                      <div className="flex justify-start items-center gap-2">
+                      {subTask?.assignedTo?.map((name) => (
+                          <span
+                            key={name.userId}
+                            className=" px-3 py-1 bg-blue-500 text-white rounded-full text-xs"
+                          >
+                            {name.name}
+                           
+                          </span>
+                        ))}
+                      </div>
+                     </div>
                       <div className="flex  items-center space-x-4">
-                        <button
+                      { authorizedPersonForEdit(subTask) &&  <button onClick={() => {
+                          handleEditModal(subTask._id)
+                        }} className=" px-2 py-1 text-sm bg-yellow-500 text-white rounded">
+                          Edit
+                        </button>}
+                    {authorizedPersonForDone(subTask) &&    <button
                           className={`px-2 py-1 text-sm rounded text-white ${subTask.status === "done"
                             ? "bg-red-500"
                             : "bg-green-500"
@@ -449,23 +553,11 @@ function ViewTask({ data, status, setOpen }) {
                           }}
                         >
                           {subTask.status === "done" ? "Undo" : "Done"}
-                        </button>
-                        {/* <button
-                                                            className=" px-2 py-1 text-sm bg-yellow-500 text-white rounded"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                // openEditModal(subTask);
-                                                            }}
-                                                        >
-                                                            Edit
-                                                        </button> */}
+                        </button>}
+                
                       </div>
                     </div>
-                    {/* {expandedTasks.has(subTask._id) && (
-                                                    <div className="p-1 mx-[40px] bg-red-100 rounded shadow mt-2">
-                                                        {subTask?.description?<p className='font-normal text-sm'><span className='font-bold text-md'>Description :</span>{subTask.description}</p>:'No description provided'}
-                                                    </div>
-                                                )} */}
+               
                   </div>
                 </>
               );
@@ -484,53 +576,95 @@ function ViewTask({ data, status, setOpen }) {
                   {isEditing ? "Edit Subtask" : "Create Subtask"}
                 </h2>
                 <form onSubmit={handleCreateOrUpdateSubTask}>
-                  <div className="mb-4">
-                    <label className="block text-md font-medium text-gray-700">
-                      Subtask Name <span className="text-red-600 ">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={newSubTask?.subTaskName}
-                      onChange={(e) =>
-                        setNewSubTask({
-                          ...newSubTask,
-                          subTaskName: e.target.value,
-                        })
-                      }
-                      className="mt-1 block w-full border  border-gray-300 rounded px-3 py-2"
-                      required
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-md font-medium text-gray-700">
-                      Description <span className="text-red-600 ">*</span>
-                    </label>
-                    <textarea
-                      value={newSubTask?.description}
-                      onChange={(e) =>
-                        setNewSubTask({
-                          ...newSubTask,
-                          description: e.target.value,
-                        })
-                      }
-                      className="mt-1 block w-full  border border-gray-300 rounded px-3 py-2"
-                    />
-                  </div>
+                  <div>
+                    <div className="mb-4">
+                      <label className="block text-md font-medium text-gray-700">
+                        Subtask Name <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={newSubTask.subTaskName}
+                        onChange={(e) =>
+                          setNewSubTask({
+                            ...newSubTask,
+                            subTaskName: e.target.value,
+                          })
+                        }
+                        className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+                        required
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-md font-medium text-gray-700">
+                        Description <span className="text-red-600">*</span>
+                      </label>
+                      <textarea
+                        value={newSubTask.description}
+                        onChange={(e) =>
+                          setNewSubTask({
+                            ...newSubTask,
+                            description: e.target.value,
+                          })
+                        }
+                        className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+                      />
+                    </div>
+                    {/* select assignee */}
+                    <div className="mb-4">
+                      <label className="block text-md font-medium text-gray-700">
+                        Assign to <span className="text-red-600">*</span>
+                      </label>
+                       {/* Selected names display */}
+                       <div className="mt-3 flex flex-wrap gap-2">
+                        {selectedNames.map((name) => (
+                          <span
+                            key={name.userId}
+                            className="flex items-center px-3 py-1 bg-blue-500 text-white rounded-full text-sm"
+                          >
+                            {name.name}
+                            <button
+                              type="button"
+                              className="ml-2 text-white hover:text-gray-200"
+                              onClick={() => handleRemoveName(name.userId)}
+                            >
+                              &times;
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                      <select
+                        onChange={(e) => {
+                          const selectedMember = selectmembers.find(member => member.userId === e.target.value);
+                          handleSelectChange(selectedMember); // Pass the whole member object
+                        }}
+                        className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+                      >
+                        <option value="" disabled>Select names</option>
+                        {selectmembers.map((member) => (
+                          <option key={member.userId} value={member.userId}>
+                            {member.name}
+                          </option>
+                        ))}
+                      </select>
 
-                  <div className="flex justify-end space-x-4">
-                    <button
-                      type="button"
-                      className="px-2 py-1 text-md font-normal bg-gray-500 text-white rounded"
-                      onClick={() => setShowModal(false)}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-2 py-1 text-md font-normal bg-blue-500 text-white rounded"
-                    >
-                      {isEditing ? "Update" : "Create"}
-                    </button>
+                     
+                    </div>
+
+                    <div className="flex justify-end space-x-4">
+                      <button
+                        type="button"
+                        className="px-2 py-1 text-md font-normal bg-gray-500 text-white rounded"
+                        onClick={() => setShowModal(false)}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-2 py-1 text-md font-normal bg-blue-500 text-white rounded"
+                      >
+                        {isEditing ? "Update" : "Create"}
+                      </button>
+                    </div>
                   </div>
                 </form>
               </div>
@@ -561,7 +695,7 @@ function ViewTask({ data, status, setOpen }) {
               </div>
             )}
           </div>
-         
+
         </div>
       </div>
     </div>
