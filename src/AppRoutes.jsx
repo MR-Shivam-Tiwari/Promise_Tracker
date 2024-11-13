@@ -45,7 +45,6 @@ function AppRoutes() {
   const [newNotifications, setNewNotifications] = useState(0);
 
   const fetchNotifications = async () => {
-    console.log("alskdjflkasjfdskalfjsklj");
     try {
       const response = await axios.get(
         process.env.REACT_APP_API_URL + "/api/notifications"

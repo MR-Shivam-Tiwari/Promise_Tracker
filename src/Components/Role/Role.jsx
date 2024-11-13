@@ -41,9 +41,10 @@ function Role() {
       const response = await axios.get(
         process.env.REACT_APP_API_URL + "/api/userData"
       );
+      setUserData(Array.isArray(response.data) ? response.data : []);
       setFilteredroleUserData(
         Array.isArray(response.data) ? response.data : []
-      );
+      ); // Added this line to ensure filteredroleUserData is initialized
     } catch (error) {
       console.log("Error fetching User Data: ", error);
     }
@@ -113,6 +114,7 @@ function Role() {
       }
     });
   };
+  // console.log("roleProtected" , roleProtected)
 
   useEffect(() => {
     callProtectedRole();
@@ -159,6 +161,16 @@ function Role() {
 
   const HandleSearch = (e) => {
     setSearchTerm(e.target.value);
+    setFilteredroleUserData(
+      userData.filter((user) => {
+        const role = getRole(user.userRole, user.active).toLowerCase();
+        return (
+          user.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
+          user.email.toLowerCase().includes(e.target.value.toLowerCase()) ||
+          role.includes(e.target.value.toLowerCase())
+        );
+      })
+    );
   };
 
   const filteredUserData = userData.filter((user) => {
@@ -252,13 +264,35 @@ function Role() {
       fetchUsersByRole(selectedRole);
     }
   }, [selectedRole]);
+  // Function to get user role from localStorage
+  function getUserRole() {
+    // Get the user data from localStorage
+    const userData = localStorage.getItem("userData");
+
+    // Check if user data exists
+    if (userData) {
+      // Parse the user data JSON to an object
+      const user = JSON.parse(userData);
+
+      // Return the userRole if it exists in the user data
+      return user.userRole || null;
+    }
+
+    // Return null if no user data is found
+    return null;
+  }
+
+  // Example usage
+  const userRole = getUserRole();
+  console.log("User Role:", userRole);
+
+  const showButton = ![1, 2, 3].includes(userRole);
+
 
   return (
     <div>
       <div className=" text-black mx-auto">
         <div className=" mb-3">
-          
-
           <div className="grid lg:grid-cols-2 grid-cols-1 gap-3">
             <div className="relative ">
               <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -287,35 +321,32 @@ function Role() {
               />
             </div>
             <div className="lg:flex justify-end gap-3 ">
-            <div className="">
-              <select
-                onChange={(e) => setSelectedRole(e.target.value)}
-                className=" p-2 border text-white h-10 w-full lg:w-[150px] bg-[#8BC940] rounded"
-              >
-                <option value="" >
-                  Filter By Role
-                </option>
-                <option value="0">Admin</option>
-                <option value="1">Department Head</option>
-                <option value="2">Project Lead</option>
-                <option value="3">Member</option>
-              </select>
-            </div>
-            <div className="flex lg:mt-0 mt-3  gap-3">
-
-              <button
-                className="flex items-center whitespace-nowrap lg:w-[150px] w-full justify-center px-4  h-10 py-2 font-medium text-white bg-[#8BC940] rounded hover:bg-[#A1DF60] focus:outline-none"
-                onClick={() => setIsModalOpen(true)}
+              <div className="">
+                <select
+                  onChange={(e) => setSelectedRole(e.target.value)}
+                  className=" p-2 border text-white h-10 w-full lg:w-[150px] bg-[#8BC940] rounded"
                 >
-                <span className="">Create Member</span>
-              </button>
-              <button
-                className="flex items-center w-full lg:w-[150px] whitespace-nowrap justify-center h-10 px-4 py-2 font-medium text-white bg-[#8BC940] rounded hover:bg-[#A1DF60] focus:outline-none"
-                onClick={() => setIsBulkModalOpen(true)}
+                  <option value="">Filter By Role</option>
+                  <option value="0">Admin</option>
+                  <option value="1">Department Head</option>
+                  <option value="2">Project Lead</option>
+                  <option value="3">Member</option>
+                </select>
+              </div>
+              <div className="flex lg:mt-0 mt-3  gap-3">
+                <button
+                  className="flex items-center whitespace-nowrap lg:w-[150px] w-full justify-center px-4  h-10 py-2 font-medium text-white bg-[#8BC940] rounded hover:bg-[#A1DF60] focus:outline-none"
+                  onClick={() => setIsModalOpen(true)}
                 >
-                Bulk Upload
-              </button>
-                </div>
+                  <span className="">Create Member</span>
+                </button>
+                <button
+                  className="flex items-center w-full lg:w-[150px] whitespace-nowrap justify-center h-10 px-4 py-2 font-medium text-white bg-[#8BC940] rounded hover:bg-[#A1DF60] focus:outline-none"
+                  onClick={() => setIsBulkModalOpen(true)}
+                >
+                  Bulk Upload
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -407,20 +438,22 @@ function Role() {
                   )}
                   {user.userRole !== 0 && (
                     <td className="px-4 py-3 text-gray-900">
-                      <button
-                        onClick={() => {
-                          user.active
-                            ? handleInactive(user, user.userId)
-                            : handleActive(user, user.userId);
-                        }}
-                        className={`rounded-[5px] ${
-                          user.active
-                            ? "bg-red-500 hover:bg-red-600"
-                            : "bg-green-500 hover:bg-green-600"
-                        } text-white font-bold py-2 px-4 rounded`}
-                      >
-                        {user.active ? "Deactivate" : "Activate"}
-                      </button>
+                      {showButton && (
+                        <button
+                          onClick={() => {
+                            user.active
+                              ? handleInactive(user, user.userId)
+                              : handleActive(user, user.userId);
+                          }}
+                          className={`rounded-[5px] ${
+                            user.active
+                              ? "bg-red-500 hover:bg-red-600"
+                              : "bg-green-500 hover:bg-green-600"
+                          } text-white font-bold py-2 px-4 rounded`}
+                        >
+                          {user.active ? "Deactivate" : "Activate"}
+                        </button>
+                      )}
                     </td>
                   )}
                 </tr>
@@ -524,7 +557,7 @@ function Role() {
                   required
                 >
                   <option value="">Select Role</option>
-                  <option value="0">SUPER_ADMIN</option>
+                  {/* <option value="0">SUPER_ADMIN</option> */}
                   <option value="1">DEPARTMENT_HEAD</option>
                   <option value="2">PROJECT_LEAD</option>
                   <option value="3">MEMBER</option>
