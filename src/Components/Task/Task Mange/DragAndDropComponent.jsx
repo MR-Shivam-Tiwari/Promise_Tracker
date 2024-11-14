@@ -27,7 +27,7 @@ import { UserContext } from "../../../global/UserContext";
 const ItemTypes = {
   CARD: "card",
 };
-const Section = ({ title, cards, moveCard, loading ,fetchTasks }) => {
+const Section = ({ title, cards, moveCard, loading, fetchTasks }) => {
   const [, drop] = useDrop({
     accept: ItemTypes.CARD,
     drop(item, monitor) {
@@ -88,29 +88,31 @@ const Section = ({ title, cards, moveCard, loading ,fetchTasks }) => {
     </div>
   );
 };
-const Card = ({ id, text, status, card ,fetchTasks }) => {
+const Card = ({ id, text, status, card, fetchTasks }) => {
   const { userData } = useContext(UserContext);
   const [showOptions, setShowOptions] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [edit, setEdit] = useState(false);
-  const [canEdit, setCanEdit] = useState(false)
+  const [canEdit, setCanEdit] = useState(false);
 
-  const checkEdit = ()=>{
-
-    axios.get(`${process.env.REACT_APP_API_URL}/api/tasks/canEdit/${id}/${userData._id}/canEdit`)
-    .then((response) => {
-      // setEdit(response.data);
-      setCanEdit(response.data)
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-  }
+  const checkEdit = () => {
+    axios
+      .get(
+        `${process.env.REACT_APP_API_URL}/api/tasks/canEdit/${id}/${userData._id}/canEdit`
+      )
+      .then((response) => {
+        // setEdit(response.data);
+        setCanEdit(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
   useEffect(() => {
-    checkEdit()
-  },[])
+    checkEdit();
+  }, []);
   const handleClick = (option) => {
     setSelectedOption(option);
     setShowOptions(false);
@@ -280,9 +282,9 @@ const Card = ({ id, text, status, card ,fetchTasks }) => {
       toast.dismiss();
       generateAddTaskLog(id, card?.status);
       toast.success("Task archived successfully");
-    //   setInterval(() => {
-    //     window.location.reload();
-    //   }, 1000);
+      //   setInterval(() => {
+      //     window.location.reload();
+      //   }, 1000);
     } catch (error) {
       console.error("Error archiving task:", error);
     }
@@ -321,7 +323,14 @@ const Card = ({ id, text, status, card ,fetchTasks }) => {
     <div ref={drag} style={{ opacity }}>
       <div className="flex-1 shadow-md flex flex-col gap-1  border bg-blue-50 p-2 rounded">
         <div className="mb-1 flex justify-between items-center font-bold text-xs">
-      { card?.pendingSubTask?<p className="text-center font-semibold text-gray-800"> (Subtask)</p>: <p> {truncateText(card?.taskName, 26)}</p>}
+          {card?.pendingSubTask ? (
+            <p className="text-center font-semibold text-gray-800">
+              {" "}
+              (Subtask)
+            </p>
+          ) : (
+            <p> {truncateText(card?.taskName, 26)}</p>
+          )}
           <div>
             <div className="relative inline-block text-left" ref={dropdownRef}>
               <div>
@@ -360,14 +369,16 @@ const Card = ({ id, text, status, card ,fetchTasks }) => {
                     >
                       View
                     </button>
-               { canEdit &&     <button
-                      className="text-gray-700 block px-4 hover:bg-gray-200 py-2 text-sm w-full text-left"
-                      role="menuitem"
-                      tabIndex="-1"
-                      onClick={() => setEdit(true)}
-                    >
-                      Edit
-                    </button>}
+                    {canEdit && (
+                      <button
+                        className="text-gray-700 block px-4 hover:bg-gray-200 py-2 text-sm w-full text-left"
+                        role="menuitem"
+                        tabIndex="-1"
+                        onClick={() => setEdit(true)}
+                      >
+                        Edit
+                      </button>
+                    )}
                     <button
                       className="text-gray-700 hover:bg-gray-200 block px-4 py-2 text-sm w-full text-left"
                       role="menuitem"
@@ -404,7 +415,11 @@ const Card = ({ id, text, status, card ,fetchTasks }) => {
                   sx={{ m: 1 }}
                   onClick={() => setEdit(false)}
                 />
-                <EditTask data={card} fetchTasks={fetchTasks} setEdit={setEdit} />
+                <EditTask
+                  data={card}
+                  fetchTasks={fetchTasks}
+                  setEdit={setEdit}
+                />
               </Sheet>
             </Modal>
             <Modal
@@ -542,25 +557,26 @@ const DragAndDropComponent = ({
   const [fileLink, setFileLink] = useState(null);
   const [pendingSubTasks, setPendingSubTasks] = useState([]);
   const generateLInk = (file) => {
-    console.log('file', file);
-    
+    console.log("file", file);
+
     const formData = new FormData();
     formData.append("file", file);
-  
-    console.log('formData', formData);
-  
-    axios.post(`${process.env.REACT_APP_API_URL}/api/upload-file`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
-    .then((res) => {
-      setFileLink(res?.data?.result);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  }
+
+    console.log("formData", formData);
+
+    axios
+      .post(`${process.env.REACT_APP_API_URL}/api/upload-file`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        setFileLink(res?.data?.result);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const handleSubmit = () => {
     if (!proofText) {
@@ -569,15 +585,22 @@ const DragAndDropComponent = ({
     }
     handleCompleteModalSubmit(); // Call the submit handler if validation passes
   };
-  const fetchPendingSubTask = ()=>{
-    axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/alreadyAssigned/${userData?.userId}`).then((res)=>{
-      console.log('dafasfdsafdsaflkasdjflasdkfjlasdfjasdklfjasdkfjasdkfjasdkfjasdkfjlasdfj', [...tasksToDo,...res?.data])
-      setPendingSubTasks(res?.data)
-    })
-  }
+  const fetchPendingSubTask = () => {
+    axios
+      .get(
+        `${process.env.REACT_APP_API_URL}/api/subtask/alreadyAssigned/${userData?.userId}`
+      )
+      .then((res) => {
+        console.log(
+          "dafasfdsafdsaflkasdjflasdkfjlasdfjasdklfjasdkfjasdkfjasdkfjasdkfjlasdfj",
+          [...tasksToDo, ...res?.data]
+        );
+        setPendingSubTasks(res?.data);
+      });
+  };
   useEffect(() => {
-    fetchPendingSubTask()
-  },[])
+    fetchPendingSubTask();
+  }, []);
   useEffect(() => {
     setSections({
       Todo: [...tasksToDo, ...pendingSubTasks],
@@ -585,7 +608,13 @@ const DragAndDropComponent = ({
       Completed: tasksCompleted,
       Postponed: tasksCancelled,
     });
-  }, [tasksToDo, tasksInProgress, tasksCompleted, tasksCancelled, pendingSubTasks]);
+  }, [
+    tasksToDo,
+    tasksInProgress,
+    tasksCompleted,
+    tasksCancelled,
+    pendingSubTasks,
+  ]);
 
   const updateTaskStatus = async (id, status, body) => {
     const response = await fetch(
@@ -766,12 +795,17 @@ const DragAndDropComponent = ({
       return;
     }
 
- 
-
     try {
+      // Use the helper function to get userId
+      const userId = userData?.userId;
+      if (!userId) {
+        console.error("User ID is required");
+        toast.error("User ID is required");
+        return;
+      }
+
       const response = await fetch(
-        process.env.REACT_APP_API_URL +
-          `/api/tasks/${currentCard._id}/complete`,
+        `${process.env.REACT_APP_API_URL}/api/tasks/${currentCard._id}/complete`,
         {
           method: "PUT",
           headers: {
@@ -780,6 +814,7 @@ const DragAndDropComponent = ({
           body: JSON.stringify({
             text: proofText,
             file: fileLink,
+            userId: userId, // Include userId in the request body
           }),
         }
       );
@@ -810,7 +845,6 @@ const DragAndDropComponent = ({
       toast.error("Failed to update task status");
     }
   };
-
 
   const handleCompleteModalClose = () => {
     setIsCompleteModalOpen(false);
@@ -973,9 +1007,9 @@ const DragAndDropComponent = ({
                   name="proofFile"
                   className="flex h-10 w-full bg-gray-300 text-black rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   id="proofFile"
-                  onChange={(e) =>{
+                  onChange={(e) => {
                     // setProofFile(e.target.files[0])
-                    generateLInk(e.target.files[0])
+                    generateLInk(e.target.files[0]);
                   }}
                 />
               </div>

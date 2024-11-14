@@ -66,7 +66,12 @@ function MainTask({ setFilter, filteredTasks, fetchTasksmain, filter }) {
   };
   const handleCompleteModalSubmit = async () => {
     const proofTextValue = textareaRef.current.value; // Access the value from textarea using ref
-
+    const userId = userData?.userId;
+    if (!userId) {
+      console.error("User ID is required");
+      toast.error("User ID is required");
+      return;
+    }
     if (!proofTextValue) {
       console.error("Proof text is required");
       toast.error("Proof text is required");
@@ -84,6 +89,7 @@ function MainTask({ setFilter, filteredTasks, fetchTasksmain, filter }) {
           body: JSON.stringify({
             text: proofTextValue, // Use the value from ref
             file: fileLink,
+            userId: userId,
           }),
         }
       );

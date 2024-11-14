@@ -448,7 +448,7 @@ function MainHome() {
                                     Group
                                   </div>
                                   <div className="text-xs mt-1.5">
-                                    {task?.taskGroup.groupName}
+                                    {task?.taskGroup?.groupName}
                                   </div>
                                 </div>
                               </div>
@@ -618,7 +618,7 @@ function MainHome() {
                                 <div className="text-sm text-muted-foreground flex lg:justify-end justify-between gap-3 items-center">
                                   <button
                                     onClick={() =>
-                                      handleTaskView(task._id, task.groupName)
+                                      handleTaskView(task._id, task?.groupName)
                                     }
                                     className="inline-flex bg-white hover:bg-gray-300 items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-7 rounded-[3px] px-3"
                                   >
@@ -719,7 +719,7 @@ function MainHome() {
                                   <div class="text-sm text-muted-foreground flex lg:justify-end justify-center gap-3 items-center ">
                                     <button
                                       onClick={() =>
-                                        handleTaskView(task._id, task.groupName)
+                                        handleTaskView(task._id, task?.groupName)
                                       }
                                       class="inline-flex bg-white hover:bg-gray-300  items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-7 rounded-[3px] px-3"
                                     >
