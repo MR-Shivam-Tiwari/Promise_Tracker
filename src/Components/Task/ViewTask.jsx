@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../global/UserContext";
 import { toast } from "react-toastify";
-import { CircularProgress } from "@mui/material";
+// import { Autocomplete, CircularProgress, TextField } from "@mui/material";
 import moment from "moment";
 import Logs from "../logs/Logs";
 import {
@@ -12,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import CommentComponent from "../Comments/CommentComponent";
+import { Autocomplete, TextField } from "@mui/joy";
 
 function ViewTask({ data, status, setOpen }) {
   // console.log("status", status)
@@ -71,13 +72,13 @@ function ViewTask({ data, status, setOpen }) {
         console.error("Error fetching data:", error);
       }
     };
-    const getMember = ()=>{
-      axios.get(`${ process.env.REACT_APP_API_URL}/api/subtask/${data?.taskGroup?.groupId}/members`)
-      .then((res)=>{
-        setMembers(res.data?.members)
-      }).catch(err=>{
-        console.log(err)
-      })
+    const getMember = () => {
+      axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/${data?.taskGroup?.groupId}/members`)
+        .then((res) => {
+          setMembers(res.data?.members)
+        }).catch(err => {
+          console.log(err)
+        })
     }
 
     fetchRegisteredNames();
@@ -90,7 +91,7 @@ function ViewTask({ data, status, setOpen }) {
   const [selectedOption, setSelectedOption] = useState("all");
   const [filterUserTasks, setFilterUserTasks] = useState([]);
   const [isOpen, setIsOpen] = useState(false); // State to control accordion open/close
-
+  const [inputValue, setInputValue] = useState('');
 
 
   const handleEditModal = (subTaskId) => {
@@ -260,25 +261,25 @@ function ViewTask({ data, status, setOpen }) {
     return colors[index % colors.length];
   }
 
-  const authorizedPersonForEdit = (subTask)=>{
-    if(userData?.userId === data?.owner?.id ){
+  const authorizedPersonForEdit = (subTask) => {
+    if (userData?.userId === data?.owner?.id) {
       return true
     }
-    if(userData?.userId === subTask?.userId){
+    if (userData?.userId === subTask?.userId) {
       return true
     }
- 
+
     return false
   }
 
-  const authorizedPersonForDone = (subTask)=>{
-    if(userData?.userId === data?.owner?.id ){
+  const authorizedPersonForDone = (subTask) => {
+    if (userData?.userId === data?.owner?.id) {
       return true
     }
-    if(userData?.userId === subTask?.userId){
+    if (userData?.userId === subTask?.userId) {
       return true
     }
-    if(subTask?.assignedTo?.find((i) =>i.userId === userData?.userId)){
+    if (subTask?.assignedTo?.find((i) => i.userId === userData?.userId)) {
       return true
     }
     return false
@@ -484,7 +485,7 @@ function ViewTask({ data, status, setOpen }) {
             <div className="flex justify-between items-center mb-8">
               <div>
                 <h3 className="text-lg font-bold">
-                   Sub Tasks{" "}
+                  Sub Tasks{" "}
                   <span className="text-white cursor-pointer px-1 py-1 text-[10px] bg-orange-500 rounded-lg  font-bold">
                     {" "}
                     {
@@ -516,42 +517,42 @@ function ViewTask({ data, status, setOpen }) {
                       className="flex justify-between items-center px-2 py-1 bg-white rounded shadow cursor-pointer"
                       onClick={() => toggleTask(subTask._id)}
                     >
-                     <div className="flex gap-6">
-                     <div className="flex items-center">
-                        <span
-                          className={`h-4 w-4 rounded-full mr-3 ${subTask.status === "done"
-                            ? "bg-green-600"
-                            : "bg-gray-300"
-                            }`}
-                        ></span>
-                        <span
-                          className={`text-md font-semibold ${subTask.status === "done"
-                            ? "line-through text-gray-500"
-                            : ""
-                            } cursor-pointer select-none`}
-                        >
-                          {subTask.subTaskName}
-                        </span>
-                      </div>
-                      <div className="flex justify-start items-center gap-2">
-                      {subTask?.assignedTo?.map((name) => (
+                      <div className="flex gap-6">
+                        <div className="flex items-center">
                           <span
-                            key={name.userId}
-                            className=" px-3 py-1 bg-blue-500 text-white rounded-full text-xs"
+                            className={`h-4 w-4 rounded-full mr-3 ${subTask.status === "done"
+                              ? "bg-green-600"
+                              : "bg-gray-300"
+                              }`}
+                          ></span>
+                          <span
+                            className={`text-md font-semibold ${subTask.status === "done"
+                              ? "line-through text-gray-500"
+                              : ""
+                              } cursor-pointer select-none`}
                           >
-                            {name.name}
-                           
+                            {subTask.subTaskName}
                           </span>
-                        ))}
+                        </div>
+                        <div className="flex justify-start items-center gap-2">
+                          {subTask?.assignedTo?.map((name) => (
+                            <span
+                              key={name.userId}
+                              className=" px-3 py-1 bg-blue-500 text-white rounded-full text-xs"
+                            >
+                              {name.name}
+
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                     </div>
                       <div className="flex  items-center space-x-4">
-                      { authorizedPersonForEdit(subTask) &&  <button onClick={() => {
+                        {authorizedPersonForEdit(subTask) && <button onClick={() => {
                           handleEditModal(subTask._id)
                         }} className=" px-2 py-1 text-sm bg-yellow-500 text-white rounded">
                           Edit
                         </button>}
-                    {authorizedPersonForDone(subTask) &&    <button
+                        {authorizedPersonForDone(subTask) && <button
                           className={`px-2 py-1 text-sm rounded text-white ${subTask.status === "done"
                             ? "bg-red-500"
                             : "bg-green-500"
@@ -563,10 +564,10 @@ function ViewTask({ data, status, setOpen }) {
                         >
                           {subTask.status === "done" ? "Undo" : "Done"}
                         </button>}
-                
+
                       </div>
                     </div>
-               
+
                   </div>
                 </>
               );
@@ -623,8 +624,8 @@ function ViewTask({ data, status, setOpen }) {
                       <label className="block text-md font-medium text-gray-700">
                         Assign to <span className="text-red-600">*</span>
                       </label>
-                       {/* Selected names display */}
-                       <div className="mt-3 flex flex-wrap gap-2">
+                      {/* Selected names display */}
+                      <div className="mt-3 flex flex-wrap gap-2">
                         {selectedNames.map((name) => (
                           <span
                             key={name.userId}
@@ -641,22 +642,30 @@ function ViewTask({ data, status, setOpen }) {
                           </span>
                         ))}
                       </div>
-                      <select
-                        onChange={(e) => {
-                          const selectedMember = selectmembers.find(member => member.userId === e.target.value);
-                          handleSelectChange(selectedMember); // Pass the whole member object
-                        }}
-                        className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
-                      >
-                        <option value="" disabled>Select names</option>
-                        {selectmembers.map((member) => (
-                          <option key={member.userId} value={member.userId}>
-                            {member.name}
-                          </option>
-                        ))}
-                      </select>
+                      <Autocomplete
+                        options={selectmembers}
+                        getOptionLabel={(option) => option.name}
+                        onChange={(event, newValue) => handleSelectChange(newValue)}
+                        inputValue={inputValue}
+                        onInputChange={(event, newInputValue) => setInputValue(newInputValue)}
+                        isOptionEqualToValue={(option, value) => option.userId === value?.userId}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Select names"
+                            placeholder="Type to search..."
+                            className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+                          />
+                        )}
+                        renderOption={(props, option, { selected }) => (
+                          <li {...props} className={`px-4 py-2 ${selected ? 'bg-blue-500 text-white' : 'text-gray-900'}`}>
+                            {option.name}
+                          </li>
+                        )}
+                        className="w-full"
+                      />
 
-                     
+
                     </div>
 
                     <div className="flex justify-end space-x-4">
