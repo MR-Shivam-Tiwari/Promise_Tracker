@@ -66,13 +66,22 @@ function ViewTask({ data, status, setOpen }) {
         const filterMember = response.data.filter(
           (user) => user.userRole === 3
         );
-        setMembers(filterMember);
+        // setMembers(filterMember);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
+    const getMember = ()=>{
+      axios.get(`${ process.env.REACT_APP_API_URL}/api/subtask/${data?.taskGroup?.groupId}/members`)
+      .then((res)=>{
+        setMembers(res.data?.members)
+      }).catch(err=>{
+        console.log(err)
+      })
+    }
 
     fetchRegisteredNames();
+    getMember()
   }, []);
 
   const [loader, setLoader] = useState(false);
