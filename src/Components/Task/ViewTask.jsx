@@ -37,9 +37,9 @@ function ViewTask({ data, status, setOpen }) {
 
   const handleSelectChange = (selectedMember) => {
     // Check if the member is already in the selected array
-    const isAlreadySelected = selectedNames.some(member => member.userId === selectedMember.userId);
+    const isAlreadySelected = selectedNames.some(member => member?.userId === selectedMember?.userId);
 
-    if (!isAlreadySelected) {
+    if (!isAlreadySelected && selectedMember!=null) {
       // Add the new member object to the selectedNames array
       setSelectedNames([...selectedNames, selectedMember]);
       console.log([...selectedNames, selectedMember]);
@@ -585,7 +585,7 @@ function ViewTask({ data, status, setOpen }) {
                 <h2 className="text-2xl font-semibold mb-4">
                   {isEditing ? "Edit Subtask" : "Create Subtask"}
                 </h2>
-                <form onSubmit={handleCreateOrUpdateSubTask}>
+                <form >
                   <div>
                     <div className="mb-4">
                       <label className="block text-md font-medium text-gray-700">
@@ -628,14 +628,14 @@ function ViewTask({ data, status, setOpen }) {
                       <div className="mt-3 flex flex-wrap gap-2">
                         {selectedNames.map((name) => (
                           <span
-                            key={name.userId}
+                            key={name?.userId}
                             className="flex items-center px-3 py-1 bg-blue-500 text-white rounded-full text-sm"
                           >
-                            {name.name}
+                            {name?.name}
                             <button
                               type="button"
                               className="ml-2 text-white hover:text-gray-200"
-                              onClick={() => handleRemoveName(name.userId)}
+                              onClick={() => handleRemoveName(name?.userId)}
                             >
                               &times;
                             </button>
@@ -643,27 +643,30 @@ function ViewTask({ data, status, setOpen }) {
                         ))}
                       </div>
                       <Autocomplete
-                        options={selectmembers}
-                        getOptionLabel={(option) => option.name}
-                        onChange={(event, newValue) => handleSelectChange(newValue)}
-                        inputValue={inputValue}
-                        onInputChange={(event, newInputValue) => setInputValue(newInputValue)}
-                        isOptionEqualToValue={(option, value) => option.userId === value?.userId}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            label="Select names"
-                            placeholder="Type to search..."
-                            className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
-                          />
-                        )}
-                        renderOption={(props, option, { selected }) => (
-                          <li {...props} className={`px-4 py-2 ${selected ? 'bg-blue-500 text-white' : 'text-gray-900'}`}>
-                            {option.name}
-                          </li>
-                        )}
-                        className="w-full"
-                      />
+  options={selectmembers?.filter((option) => option !== null && option !== undefined) || []}
+  getOptionLabel={(option) => option?.name || ''}
+  onChange={(event, newValue) => handleSelectChange(newValue)}
+  inputValue={inputValue}
+  onInputChange={(event, newInputValue) => setInputValue(newInputValue)}
+  isOptionEqualToValue={(option, value) => option?.userId === value?.userId}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Select names"
+      placeholder="Type to search..."
+      className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+    />
+  )}
+  renderOption={(props, option, { selected }) => (
+    option ? (
+      <li {...props} className={`px-4 py-2 ${selected ? 'bg-blue-500 text-white' : 'text-gray-900'}`}>
+        {option.name}
+      </li>
+    ) : null // Render nothing if option is null or undefined
+  )}
+  className="w-full"
+/>
+
 
 
                     </div>
@@ -677,7 +680,7 @@ function ViewTask({ data, status, setOpen }) {
                         Cancel
                       </button>
                       <button
-                        type="submit"
+                        onClick={handleCreateOrUpdateSubTask}
                         className="px-2 py-1 text-md font-normal bg-blue-500 text-white rounded"
                       >
                         {isEditing ? "Update" : "Create"}
