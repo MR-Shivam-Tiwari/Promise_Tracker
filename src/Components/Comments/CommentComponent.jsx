@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { UserContext } from '../../global/UserContext';
 
-const CommentComponent = ({ data }) => {
+const CommentComponent = ({ data, getAllLogs }) => {
     const { userData } = useContext(UserContext);
     const [isOpenComment, setIsOpenComment] = useState(false); // State to control accordion open/close
     const [comments, setComments] = useState([]);
@@ -27,12 +27,13 @@ const CommentComponent = ({ data }) => {
             });
     };
 
-    const handleAddComment = (e) => {
+    const handleAddComment = async(e) => {
         e.preventDefault();
         axios.post(`${process.env.REACT_APP_API_URL}/api/comments/add`, commentForm)
             .then((res) => {
                 toast.dismiss();
                 toast.success('Comment added successfully');
+                generateLog(data?._id, "create_comment");
                 setShowModal(false); // Close modal after successful submission
                 setCommentForm(prev => ({ ...prev, text: "", file: null })); // Reset the form
                 getAllComments(); // Refresh comments list
@@ -41,6 +42,29 @@ const CommentComponent = ({ data }) => {
                 console.log(err);
             });
     };
+ 
+    const generateLog = (taskId, action) => {
+        const data = {
+          userId: userData?.userId,
+          taskId,
+          action,
+          userName: userData?.name,
+          details: {
+            text: commentForm.text,
+          },
+        };
+      axios
+          .post(`${process.env.REACT_APP_API_URL}/api/logs`, data)
+          .then((res) => {
+            console.log("res", res.data);
+            getAllLogs();
+          })
+          .catch((err) => {
+            toast.dismiss();
+            toast.error("Internal Server Error");
+            throw err; // Throw error to handle it properly in the calling function
+          });
+      };
 
     const generateImageLink = (file)=>{
         const formData = new FormData();

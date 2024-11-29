@@ -39,7 +39,7 @@ function ViewTask({ data, status, setOpen }) {
     // Check if the member is already in the selected array
     const isAlreadySelected = selectedNames.some(member => member?.userId === selectedMember?.userId);
 
-    if (!isAlreadySelected && selectedMember!=null) {
+    if (!isAlreadySelected && selectedMember != null) {
       // Add the new member object to the selectedNames array
       setSelectedNames([...selectedNames, selectedMember]);
       console.log([...selectedNames, selectedMember]);
@@ -175,65 +175,67 @@ function ViewTask({ data, status, setOpen }) {
     });
   };
 
-  const toggleCompletion = (id) => {
+  const toggleCompletion = async(id) => {
     setLoader(true);
     const taskToUpdate = subTasks.find((task) => task._id === id);
     const newStatus = taskToUpdate.status === "pending" ? "done" : "pending";
-
-    axios
-      .put(`${process.env.REACT_APP_API_URL}/api/subtask/${id}`, {
-        status: newStatus,
-      })
-      .then((res) => {
-        setLoader(false);
-        setSubTasks(
-          subTasks.map((task) =>
-            task._id === id ? { ...task, status: newStatus } : task
-          )
-        );
-      })
-      .catch((err) => {
-        setLoader(false);
-        console.log(err);
-      });
+    try{
+      
+    const res = await axios
+    .put(`${process.env.REACT_APP_API_URL}/api/subtask/${id}`, {
+      status: newStatus,
+    })
+      setLoader(false);
+      const details = {
+        subTaskName: taskToUpdate?.subTaskName,
+      }
+     await generateLog(data?._id, `${newStatus}_subtask`, details);
+      setSubTasks(
+        subTasks.map((task) =>
+          task._id === id ? { ...task, status: newStatus } : task
+        )
+      );
+    }
+    catch(err){
+      console.log(err)
+    }
+     
   };
 
-  const handleCreateOrUpdateSubTask = (e) => {
+  const handleCreateOrUpdateSubTask = async (e) => {
     setLoader(true);
     e.preventDefault();
+    
     const apiUrl = isEditing
       ? `${process.env.REACT_APP_API_URL}/api/subtask/${currentTaskId}`
       : `${process.env.REACT_APP_API_URL}/api/subtask`;
-
+  
     const method = isEditing ? "put" : "post";
-
-    axios[method](apiUrl, {
-      userId: userData?.userId,
-      parentTask: data?._id,
-      ...newSubTask,
-      assignedTo: selectedNames,
-    })
-      .then((res) => {
-        setLoader(false);
-        // if (isEditing) {
-        //     setSubTasks(subTasks.map(task =>
-        //         task._id === currentTaskId ? res.data : task
-        //     ));
-        // } else {
-        //     setSubTasks([...subTasks, res.data]);
-        // }
-        getAllUserSubTasks();
-
-        setShowModal(false);
-        setNewSubTask({ subTaskName: "", description: "" });
-        setIsEditing(false);
-        setCurrentTaskId(null);
-      })
-      .catch((err) => {
-        setLoader(false);
-        console.log(err);
+  
+    try {
+      const res = await axios[method](apiUrl, {
+        userId: userData?.userId,
+        parentTask: data?._id,
+        ...newSubTask,
+        assignedTo: selectedNames,
       });
+  
+      // Log creation action
+      await generateLog(data._id, isEditing?"edit_subtask":"create_subtask");
+  
+      // Perform actions after log creation
+      getAllUserSubTasks();
+      setShowModal(false);
+      setNewSubTask({ subTaskName: "", description: "" });
+      setIsEditing(false);
+      setCurrentTaskId(null);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoader(false);
+    }
   };
+  
 
   const handleCloseModal = () => {
     setShowModal(false);
@@ -284,6 +286,31 @@ function ViewTask({ data, status, setOpen }) {
     }
     return false
   }
+
+  const generateLog = (taskId, action, customDetails) => {
+    const data = {
+      userId: userData?.userId,
+      taskId,
+      action,
+      userName: userData?.name,
+      details: customDetails || {
+        subTaskName: newSubTask.subTaskName,
+        assign_to: selectedNames,
+      },
+    };
+    return axios
+      .post(`${process.env.REACT_APP_API_URL}/api/logs`, data)
+      .then((res) => {
+        console.log("res", res.data);
+        getAllLogs();
+      })
+      .catch((err) => {
+        toast.dismiss();
+        toast.error("Internal Server Error");
+        throw err; // Throw error to handle it properly in the calling function
+      });
+  };
+  
 
 
   return (
@@ -476,7 +503,7 @@ function ViewTask({ data, status, setOpen }) {
           <div className="mt-4 select-none">
             <div>
 
-              <CommentComponent data={data} />
+              <CommentComponent getAllLogs={getAllLogs} data={data} />
 
             </div>
           </div>
@@ -643,29 +670,29 @@ function ViewTask({ data, status, setOpen }) {
                         ))}
                       </div>
                       <Autocomplete
-  options={selectmembers?.filter((option) => option !== null && option !== undefined) || []}
-  getOptionLabel={(option) => option?.name || ''}
-  onChange={(event, newValue) => handleSelectChange(newValue)}
-  inputValue={inputValue}
-  onInputChange={(event, newInputValue) => setInputValue(newInputValue)}
-  isOptionEqualToValue={(option, value) => option?.userId === value?.userId}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      label="Select names"
-      placeholder="Type to search..."
-      className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
-    />
-  )}
-  renderOption={(props, option, { selected }) => (
-    option ? (
-      <li {...props} className={`px-4 py-2 ${selected ? 'bg-blue-500 text-white' : 'text-gray-900'}`}>
-        {option.name}
-      </li>
-    ) : null // Render nothing if option is null or undefined
-  )}
-  className="w-full"
-/>
+                        options={selectmembers?.filter((option) => option !== null && option !== undefined) || []}
+                        getOptionLabel={(option) => option?.name || ''}
+                        onChange={(event, newValue) => handleSelectChange(newValue)}
+                        inputValue={inputValue}
+                        onInputChange={(event, newInputValue) => setInputValue(newInputValue)}
+                        isOptionEqualToValue={(option, value) => option?.userId === value?.userId}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Select names"
+                            placeholder="Type to search..."
+                            className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+                          />
+                        )}
+                        renderOption={(props, option, { selected }) => (
+                          option ? (
+                            <li {...props} className={`px-4 py-2 ${selected ? 'bg-blue-500 text-white' : 'text-gray-900'}`}>
+                              {option.name}
+                            </li>
+                          ) : null // Render nothing if option is null or undefined
+                        )}
+                        className="w-full"
+                      />
 
 
 
