@@ -292,7 +292,7 @@ function ViewTask({ data, status, setOpen }) {
       userId: userData?.userId,
       taskId,
       action,
-      userName: userData?.name,
+      userName: userData?.name,   
       details: customDetails || {
         subTaskName: newSubTask.subTaskName,
         assign_to: selectedNames,
