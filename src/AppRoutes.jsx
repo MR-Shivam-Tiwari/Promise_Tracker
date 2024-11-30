@@ -273,10 +273,10 @@ function AppRoutes() {
                   path="/task"
                   element={<PrivateRoute element={<Task />} />}
                 />
-                <Route
+                {/* <Route
                   path="/sub-tasks"
                   element={<PrivateRoute element={<SubTask />} />}
-                />
+                /> */}
                 <Route
                   path="/reports"
                   element={<PrivateRoute element={<Reports />} />}

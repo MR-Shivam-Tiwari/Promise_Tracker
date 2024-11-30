@@ -364,7 +364,7 @@ export default function Sidebar({ onSidebarItemClick }) {
               )}
             ></Toggler>
           </ListItem>
-          <ListItem
+          {/* <ListItem
             nested
             onClick={() => {
               navigate("/sub-tasks");
@@ -423,7 +423,7 @@ export default function Sidebar({ onSidebarItemClick }) {
                 </ListItemButton>
               )}
             ></Toggler>
-          </ListItem>
+          </ListItem> */}
           <ListItem
             nested
             onClick={() => {
