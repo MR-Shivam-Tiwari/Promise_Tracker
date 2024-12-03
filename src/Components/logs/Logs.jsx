@@ -55,10 +55,41 @@ const Logs = ({ log }) => {
       case 'edit':
         return (
           <>
-            <div className='text-gray-600 mt-2 mb-2'>
-              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> edit task
+         {log?.details?.changes?.taskName  && <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to 
               <span className='font-bold text-orange-500'> "{log?.taskId?.taskName}"</span> on {moment(log?.timestamp).format('DD-MM-YYYY')}
-            </div>
+            </div>}
+            <hr />
+            {log?.details?.changes?.description  && <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to 
+              <span className='font-bold text-orange-500'> "{log?.taskId?.taskName}"</span> on {moment(log?.timestamp).format('DD-MM-YYYY')}
+            </div>}
+            <hr />
+            {log?.details?.changes?.audioFile  && <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to 
+              <span className='font-bold text-orange-500'> "{log?.taskId?.taskName}"</span> on {moment(log?.timestamp).format('DD-MM-YYYY')}
+            </div>}
+            <hr />
+            {log?.details?.changes?.startDate  && <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to 
+              <span className='font-bold text-orange-500'> "{log?.taskId?.taskName}"</span> on {moment(log?.timestamp).format('DD-MM-YYYY')}
+            </div>}
+            <hr />
+            {log?.details?.changes?.endDate  && <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to 
+              <span className='font-bold text-orange-500'> "{log?.taskId?.taskName}"</span> on {moment(log?.timestamp).format('DD-MM-YYYY')}
+            </div>}
+            <hr />
+
+            {log?.details?.changes?.people  && <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to 
+              <span className='font-bold text-orange-500'> "{log?.taskId?.taskName}"</span> on {moment(log?.timestamp).format('DD-MM-YYYY')}
+            </div>}
+            <hr />
+            {log?.details?.changes?.pdfFile  && <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to 
+              <span className='font-bold text-orange-500'> "{log?.taskId?.taskName}"</span> on {moment(log?.timestamp).format('DD-MM-YYYY')}
+            </div>}
             <hr />
           </>
         );
@@ -188,10 +219,110 @@ const Logs = ({ log }) => {
     }
   };
 
+  const EditLogs = () => {
+    return (
+      <>
+        {log?.details?.changes?.taskName && (
+          <div className='px-2 py-1 bg-purple-100 rounded-lg mb-4'>
+            <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> updated Task Name from <span className='font-bold text-orange-500'>{log?.details?.changes?.taskName?.oldValue}</span> to 
+              <span className='font-bold text-green-500'> "{log?.details?.changes?.taskName?.newValue}"</span> on {moment(log?.timestamp).format('DD-MM-YYYY')}
+            </div>
+            <hr />
+          </div>
+        )}
+        
+        {log?.details?.changes?.description && (
+          <div className='px-2 py-1 bg-purple-100 rounded-lg mb-4'>
+            <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> updated Description to 
+              <span className='font-bold text-orange-500' dangerouslySetInnerHTML={{ __html: `${log?.details?.changes?.description}` }}></span> on {moment(log?.timestamp).format('DD-MM-YYYY')}
+            </div>
+            <hr />
+          </div>
+        )}
+  
+        {log?.details?.changes?.audioFile && (
+          <div className='px-2 py-1 bg-purple-100 rounded-lg mb-4'>
+            <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> <span className='text-black font-bold capitalize'>{log?.details?.changes?.audioFile?.status}</span> Audio File  on {moment(log?.timestamp).format('DD-MM-YYYY')}
+            </div>
+            <hr />
+          </div>
+        )}
+  
+        {log?.details?.changes?.startDate && (
+          <div className='px-2 py-1 bg-purple-100 rounded-lg mb-4'>
+            <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> change Start Date to <span className='text-black font-bold '>{log?.details?.changes?.startDate}</span> on {moment(log?.timestamp).format('DD-MM-YYYY')}
+            </div>
+            <hr />
+          </div>
+        )}
+  
+        {log?.details?.changes?.endDate && (
+          <div className='px-2 py-1 bg-purple-100 rounded-lg mb-4'>
+            <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> change End Date to <span className='text-black font-bold '>{log?.details?.changes?.endDate}</span> on {moment(log?.timestamp).format('DD-MM-YYYY')}
+
+            </div>
+            <hr />
+          </div>
+        )}
+  
+        {log?.details?.changes?.people?.added && (
+          <div className='px-2 py-1 bg-purple-100 rounded-lg mb-4'>
+            <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> added  
+              {
+                log?.details?.changes?.people?.added?.map((i)=>(
+                  <>
+                    <span className='font-semibold text-green-600 py-1  bg-green-300 mx-1 rounded-xl '> {i.name} </span> 
+                  </>
+                ))
+              } on task assignment
+              on {moment(log?.timestamp).format('DD-MM-YYYY')}
+            </div>
+            <hr />
+          </div>
+        )}
+
+        {log?.details?.changes?.people?.removed && (
+          <div className='px-2 py-1 bg-purple-100 rounded-lg mb-4'>
+            <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> removed 
+              {
+                log?.details?.changes?.people?.removed?.map((i)=>(
+                  <>
+                    <span className='font-semibold text-red-600 py-1  bg-red-300 mx-1 rounded-xl '> {i.name} </span> 
+                  </>
+                ))
+              } on task assignment
+              on {moment(log?.timestamp).format('DD-MM-YYYY')}
+            </div>
+            <hr />
+          </div>
+        )}
+  
+        {log?.details?.changes?.pdfFile && (
+          <div className='px-2 py-1 bg-purple-100 rounded-lg mb-4'>
+            <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> <span className='font-bold text-black capitalize'>{log?.details?.changes?.pdfFile?.status}</span>  File on {moment(log?.timestamp).format('DD-MM-YYYY')}
+            </div>
+            <hr />
+          </div>
+        )}
+      </>
+    );
+  };
+  
+
   return (
-    <div className='px-2 py-1  bg-purple-100 rounded-lg mb-4'>
+   <>
+    {log?.action=="edit"? <EditLogs/>: <div className='px-2 py-1  bg-purple-100 rounded-lg mb-4'>
       {renderLogMessage()}
-    </div>
+    </div>}
+   </>
   );
 };
 

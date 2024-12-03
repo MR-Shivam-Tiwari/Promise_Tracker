@@ -32,19 +32,31 @@ function EditTask({ data, setEdit, fetchTasks }) {
     people: data?.people,
     pdfFile: data?.pdfFile,
   });
+  const [initialFormData, setInitialData] = useState({
+    owner: data?.owner,
+    taskGroup: data?.taskGroup,
+    taskName: data?.taskName,
+    description: data?.description,
+    audioFile: data?.audioFile,
+    startDate: data?.startDate,
+    endDate: data?.endDate,
+    reminder: data?.reminder,
+    people: data?.people,
+    pdfFile: data?.pdfFile,
+  });
   const [userNamesEmail, setUserNamesEmail] = useState([]);
   const [uploadResultVoice, setuploadResultVoice] = useState(
     formData?.audioFile
   );
   const [singleFile, setSingleFile] = useState(formData?.pdfFile);
 
-  console.log("taskID", Taskid);
+  // // console.log("taskID", Taskid);
   useEffect(() => {
     const userDataString = localStorage.getItem("userData");
     if (userDataString) {
       const userDataObj = JSON.parse(userDataString);
       const userId = userDataObj.userId;
-      console.log("userid:", userId);
+      // // console.log("userid:", userId);
       setuserid(userId);
     }
   }, []);
@@ -66,9 +78,10 @@ function EditTask({ data, setEdit, fetchTasks }) {
             process.env.REACT_APP_API_URL + `/api/tasks/${Taskid}`
           );
           setFormData(response.data);
-          console.log(response.data);
+          setInitialData(response.data);
+          // console.log(response.data);
         } catch (error) {
-          console.error("Error fetching task data:", error);
+          // console.error("Error fetching task data:", error);
         }
       }
     };
@@ -92,7 +105,7 @@ function EditTask({ data, setEdit, fetchTasks }) {
       }));
     }
   };
-  const generateAddTaskLog = (taskId, formData) => {
+  const generateAddTaskLog = (taskId, formData, changes) => {
     const data = {
       userId: userData?.userId,
       taskId,
@@ -100,12 +113,13 @@ function EditTask({ data, setEdit, fetchTasks }) {
       userName: userData?.name,
       details: {
         member: [...formData.people],
+        changes,
       },
     };
     axios
       .post(`${process.env.REACT_APP_API_URL}/api/logs`, data)
       .then((res) => {
-        console.log("res", res.data);
+        // console.log("res", res.data);
       })
       .catch((err) => {
         toast.dismiss();
@@ -115,20 +129,21 @@ function EditTask({ data, setEdit, fetchTasks }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    const changes = getChanges(initialFormData, formData); // Compare the initial and updated data
+  console.log("Changes:", changes);
     try {
       const response = await axios.put(
         process.env.REACT_APP_API_URL + `/api/tasksedit/${Taskid}`,
         { ...formData, audioFile: uploadResultVoice, pdfFile: singleFile }
       );
-      console.log(response.data);
-      generateAddTaskLog(response.data._id, formData);
+      // console.log(response.data);
+      generateAddTaskLog(response.data._id, formData, changes);
       setEdit(false);
       toast.dismiss();
       toast.success("Task updated successfully!");
       fetchTasks();
     } catch (error) {
-      console.error("Error updating task:", error);
+      // console.error("Error updating task:", error);
       if (error.response && error.response.data && error.response.data.error) {
         toast.error("Error: " + error.response.data.error);
       } else {
@@ -136,6 +151,98 @@ function EditTask({ data, setEdit, fetchTasks }) {
       }
     }
   };
+
+  // detect the changes here 
+  const getChanges = (initialData, updatedData) => {
+    console.log("initialData", initialData)
+    console.log("updatedData", updatedData)
+    const changes = {};
+    
+    for (const key in initialData) {
+      if (
+        typeof initialData[key] === "object" &&
+        initialData[key] !== null &&
+        !Array.isArray(initialData[key])
+      ) {
+        // Recursively check nested objects
+        const nestedChanges = getChanges(initialData[key], updatedData[key]);
+        if (Object.keys(nestedChanges).length > 0) {
+          changes[key] = nestedChanges;
+        }
+      } else if (Array.isArray(initialData[key])) {
+        // Handle array changes (e.g., for 'people')
+        const initialArray = initialData[key];
+        const updatedArray = updatedData[key] || [];
+        
+        const added = [];
+        const removed = [];
+        const updated = [];
+  
+        const initialMap = new Map(initialArray.map((item) => [item.userId, item]));
+        const updatedMap = new Map(updatedArray.map((item) => [item.userId, item]));
+  
+        // Find added and updated items
+        updatedArray.forEach((item) => {
+          if (!initialMap.has(item.userId)) {
+            added.push(item); // Added item
+          } else {
+            const diff = getChanges(initialMap.get(item.userId), item);
+            if (Object.keys(diff).length > 0) {
+              updated.push({ userId: item.userId, changes: diff }); // Updated item
+            }
+          }
+        });
+  
+        // Find removed items
+        initialArray.forEach((item) => {
+          if (!updatedMap.has(item.userId)) {
+            removed.push(item); // Removed item
+          }
+        });
+  
+        if (added.length > 0 || removed.length > 0 || updated.length > 0) {
+          changes[key] = {};
+          if (added.length > 0) changes[key].added = added;
+          if (removed.length > 0) changes[key].removed = removed;
+          if (updated.length > 0) changes[key].updated = updated;
+        }
+      } else if (initialData[key] !== updatedData[key]) {
+        // Track changes in non-object keys
+        if (key === "pdfFile" || key === "audioFile" || key === "taskName") {
+          changes[key] = {
+            status: updatedData[key] ? (initialData[key] ? "updated" : "added") : "removed",
+            value: updatedData[key],
+          };
+
+          if (key === "taskName" ) {
+            changes[key] = {
+              oldValue: initialData[key],
+              newValue: updatedData[key],
+            };
+          }
+          if ( key == "description") {
+            changes[key] = {
+              oldValue: initialData[key],
+              newValue: updatedData[key],
+            };
+          }
+        } else {
+          changes[key] = updatedData[key];
+        }
+      }
+    }
+  
+    // Check for keys in updatedData that are not in initialData (new additions)
+    for (const key in updatedData) {
+      if (!(key in initialData)) {
+        changes[key] = updatedData[key];
+      }
+    }
+  
+    return changes;
+  };
+  
+
 
   useEffect(() => {
     const fetchGroupData = async () => {
@@ -145,7 +252,7 @@ function EditTask({ data, setEdit, fetchTasks }) {
         );
         setGrouptData(response.data);
       } catch (error) {
-        console.log("Error fetching group data: ", error);
+        // console.log("Error fetching group data: ", error);
       }
     };
 
@@ -172,7 +279,7 @@ function EditTask({ data, setEdit, fetchTasks }) {
         );
         setMembers(filterMember);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        // console.error("Error fetching data:", error);
       }
     };
 
@@ -199,7 +306,7 @@ function EditTask({ data, setEdit, fetchTasks }) {
       };
       mediaRecorderRef.current.start();
     } catch (error) {
-      console.error("Error starting recording:", error);
+      // console.error("Error starting recording:", error);
       setIsRecording(false);
     }
   };
@@ -232,10 +339,14 @@ function EditTask({ data, setEdit, fetchTasks }) {
         }
       );
       setSingleFile(response.data.result);
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        pdfFile: response.data.result,
+      }));
       toast.dismiss();
       toast.success(response.data.message);
     } catch (error) {
-      console.error(error);
+      // console.error(error);
       toast.dismiss();
       toast.error(error.response?.data?.error || error.message);
     }
@@ -254,7 +365,7 @@ function EditTask({ data, setEdit, fetchTasks }) {
 
   const uploadAudio = async (audioBlob) => {
     setAudioLoader(true);
-    console.log("alsjdfklsajfdlkafjdslkaf", audioBlob);
+    // // console.log("alsjdfklsajfdlkafjdslkaf", audioBlob);
     const formData = new FormData();
     formData.append("voice", audioBlob, "recording.wav");
 
@@ -271,6 +382,10 @@ function EditTask({ data, setEdit, fetchTasks }) {
       setAudioLoader(false);
 
       setuploadResultVoice(response.data.result);
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        audioFile: response.data.result,
+      }))
     } catch (error) {
       setAudioLoader(false);
     }
@@ -461,6 +576,10 @@ function EditTask({ data, setEdit, fetchTasks }) {
                   onClick={(e) => {
                     e.preventDefault();
                     setuploadResultVoice(null);
+                    setFormData((prevFormData) => ({
+                      ...prevFormData,
+                      audioFile: null,
+                    }))
                   }}
                   className="px-4 py-2 flex items-center gap-2 bg-red-500 text-white font-medium  rounded-[4px] hover:bg-red-600 focus:outline-none"
                 >
@@ -618,8 +737,8 @@ function EditTask({ data, setEdit, fetchTasks }) {
             <Autocomplete
               multiple
               id="people"
-              options={selectmembers.map((member) => member.name)}
-              value={formData.people.map((person) => person.name)}
+              options={selectmembers?.map((member) => member?.name)}
+              value={formData?.people?.map((person) => person?.name)}
               onChange={(event, newValue) => {
                 handleChange("people", newValue);
               }}
