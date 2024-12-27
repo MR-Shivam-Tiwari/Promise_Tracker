@@ -42,6 +42,7 @@ function Task() {
   const [selectProjectLead, setProjectLead] = useState([]);
   const [selectMembers, setMembers] = useState([]);
   const [audioLoader, setAudioLoader] = useState(false);
+  const [allMemberOfGroup, setAllMemberOfGroup] = useState([]);
   const [formData, setFormData] = useState({
     owner: { id: "" },
     taskGroup: { groupName: "", groupId: "" },
@@ -206,10 +207,27 @@ function Task() {
       console.error("Error fetching data:", error);
     }
   };
+  
   const filterTasksByStatus = (tasks, status) =>
     tasks.filter(
       (task) => task.status === status || (status === "To Do" && !task.status)
     );
+
+    const getAllMemberByGroup = ()=>{
+      axios.get(`${process.env.REACT_APP_API_URL}/api/members/${formData?.taskGroup?.groupId}`)
+      .then((res) => {
+        // console.log("res",res.data);
+        const apiData = res.data;
+        setAllMemberOfGroup([...apiData.members, ...apiData.deptHead, ...apiData.projectLead]);
+      })
+    }
+    useEffect(() => {
+      // fetchRegisteredNames();
+      // fetchGroupData();
+    if(formData?.taskGroup?.groupId){
+      getAllMemberByGroup();
+    }
+    }, [formData?.taskGroup?.groupId]);
 
   const fetchTasks = async () => {
     try {
@@ -521,6 +539,7 @@ function Task() {
                           required
                         />
                       </div>
+                      {/*task group selector*/}
                       <div>
                         <label
                           htmlFor="taskGroup"
@@ -611,6 +630,7 @@ function Task() {
                         />
                       </div>
                     </div>
+                  {/* peoples */}
                     <div>
                       <label
                         htmlFor="people"
@@ -621,7 +641,7 @@ function Task() {
                       <Autocomplete
                         placeholder="Assign to"
                         multiple
-                        options={selectMembers.map((option) => option.name)}
+                        options={allMemberOfGroup?.map((option) => option.name)}
                         onChange={(event, newValue) =>
                           handleChange("people", newValue)
                         }

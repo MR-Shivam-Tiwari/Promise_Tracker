@@ -17,6 +17,7 @@ function EditTask({ data, setEdit, fetchTasks }) {
   const [isRecording, setIsRecording] = useState(false);
   const [audioLoader, setAudioLoader] = useState(false);
   const mediaRecorderRef = useRef(null);
+  const [allMemberOfGroup, setAllMemberOfGroup] = useState([]);
   const audioChunksRef = useRef([]);
   const [audioUrl, setAudioUrl] = useState("");
 
@@ -49,6 +50,23 @@ function EditTask({ data, setEdit, fetchTasks }) {
     formData?.audioFile
   );
   const [singleFile, setSingleFile] = useState(formData?.pdfFile);
+
+
+  const getAllMemberByGroup = () => {
+    axios.get(`${process.env.REACT_APP_API_URL}/api/members/${formData?.taskGroup?.groupId}`)
+      .then((res) => {
+        // console.log("res",res.data);
+        const apiData = res.data;
+        setAllMemberOfGroup([...apiData.members, ...apiData.deptHead, ...apiData.projectLead]);
+      })
+  }
+  useEffect(() => {
+    // fetchRegisteredNames();
+    // fetchGroupData();
+    if (formData?.taskGroup?.groupId) {
+      getAllMemberByGroup();
+    }
+  }, [formData?.taskGroup?.groupId]);
 
   // // console.log("taskID", Taskid);
   useEffect(() => {
@@ -130,7 +148,7 @@ function EditTask({ data, setEdit, fetchTasks }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const changes = getChanges(initialFormData, formData); // Compare the initial and updated data
-  console.log("Changes:", changes);
+    console.log("Changes:", changes);
     try {
       const response = await axios.put(
         process.env.REACT_APP_API_URL + `/api/tasksedit/${Taskid}`,
@@ -157,7 +175,7 @@ function EditTask({ data, setEdit, fetchTasks }) {
     console.log("initialData", initialData)
     console.log("updatedData", updatedData)
     const changes = {};
-    
+
     for (const key in initialData) {
       if (
         typeof initialData[key] === "object" &&
@@ -173,14 +191,14 @@ function EditTask({ data, setEdit, fetchTasks }) {
         // Handle array changes (e.g., for 'people')
         const initialArray = initialData[key];
         const updatedArray = updatedData[key] || [];
-        
+
         const added = [];
         const removed = [];
         const updated = [];
-  
+
         const initialMap = new Map(initialArray.map((item) => [item.userId, item]));
         const updatedMap = new Map(updatedArray.map((item) => [item.userId, item]));
-  
+
         // Find added and updated items
         updatedArray.forEach((item) => {
           if (!initialMap.has(item.userId)) {
@@ -192,14 +210,14 @@ function EditTask({ data, setEdit, fetchTasks }) {
             }
           }
         });
-  
+
         // Find removed items
         initialArray.forEach((item) => {
           if (!updatedMap.has(item.userId)) {
             removed.push(item); // Removed item
           }
         });
-  
+
         if (added.length > 0 || removed.length > 0 || updated.length > 0) {
           changes[key] = {};
           if (added.length > 0) changes[key].added = added;
@@ -214,13 +232,13 @@ function EditTask({ data, setEdit, fetchTasks }) {
             value: updatedData[key],
           };
 
-          if (key === "taskName" ) {
+          if (key === "taskName") {
             changes[key] = {
               oldValue: initialData[key],
               newValue: updatedData[key],
             };
           }
-          if ( key == "description") {
+          if (key == "description") {
             changes[key] = {
               oldValue: initialData[key],
               newValue: updatedData[key],
@@ -231,17 +249,17 @@ function EditTask({ data, setEdit, fetchTasks }) {
         }
       }
     }
-  
+
     // Check for keys in updatedData that are not in initialData (new additions)
     for (const key in updatedData) {
       if (!(key in initialData)) {
         changes[key] = updatedData[key];
       }
     }
-  
+
     return changes;
   };
-  
+
 
 
   useEffect(() => {
@@ -407,27 +425,26 @@ function EditTask({ data, setEdit, fetchTasks }) {
                 Group Name
               </label>
               <select
-                className="flex bg-gray-50 h-10 w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm "
-                value={JSON.stringify(
-                  formData?.taskGroup || { groupId: "", groupName: "" }
-                )}
+                className="flex bg-gray-50 h-10 w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm"
+                value={formData?.taskGroup?.groupId || ""}  // Bind the select value to groupId
                 onChange={(e) => {
-                  const selectedGroup = JSON.parse(e.target.value);
-                  handleChange("taskGroup", selectedGroup);
+                  const selectedGroupId = e.target.value;
+                  const selectedGroup = GroupData.find(group => group._id === selectedGroupId);
+                  const data = {
+                    groupName: selectedGroup?.groupName,
+                    groupId: selectedGroup?._id
+                  }
+
+                  console.log("Selected Group:", data); // Log the selected group
+                  if (selectedGroup) {
+                    handleChange("taskGroup", data);
+                  }
                 }}
               >
-                <option value={JSON.stringify({ groupId: "", groupName: "" })}>
-                  Select a Group
-                </option>
+                <option value="">Select a Group</option>
                 {GroupData.map((group) => (
-                  <option
-                    key={group?._id}
-                    value={JSON.stringify({
-                      groupId: group?._id,
-                      groupName: group.groupName,
-                    })}
-                  >
-                    {group.groupName}
+                  <option key={group?._id} value={group?._id}>  {/* Use groupId as value */}
+                    {group?.groupName}  {/* Display groupName */}
                   </option>
                 ))}
               </select>
@@ -487,11 +504,10 @@ function EditTask({ data, setEdit, fetchTasks }) {
               <button
                 onClick={startRecording}
                 disabled={isRecording}
-                className={`flex items-center px-4 py-2 text-white font-medium  rounded-[4px] focus:outline-none ${
-                  isRecording
+                className={`flex items-center px-4 py-2 text-white font-medium  rounded-[4px] focus:outline-none ${isRecording
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-blue-500 hover:bg-blue-600"
-                }`}
+                  }`}
               >
                 {isRecording ? (
                   <>
@@ -537,11 +553,10 @@ function EditTask({ data, setEdit, fetchTasks }) {
               <button
                 onClick={stopRecording}
                 disabled={!isRecording}
-                className={`flex items-center px-4 py-2 text-white font-medium  rounded-[4px] focus:outline-none ${
-                  !isRecording
+                className={`flex items-center px-4 py-2 text-white font-medium  rounded-[4px] focus:outline-none ${!isRecording
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-red-500 hover:bg-red-600"
-                }`}
+                  }`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -737,7 +752,7 @@ function EditTask({ data, setEdit, fetchTasks }) {
             <Autocomplete
               multiple
               id="people"
-              options={selectmembers?.map((member) => member?.name)}
+              options={allMemberOfGroup?.map((member) => member?.name)}
               value={formData?.people?.map((person) => person?.name)}
               onChange={(event, newValue) => {
                 handleChange("people", newValue);
