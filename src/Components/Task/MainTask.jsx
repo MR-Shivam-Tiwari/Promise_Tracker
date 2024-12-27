@@ -596,7 +596,7 @@ function MainTask({ setFilter, filteredTasks, fetchTasksmain, filter }) {
           filteredTasks.map((task) => <TaskCard key={task.id} task={task} />)
         ) : (
           <p className="text-center text-blue-600 mt-4">
-            No tasks found for the selected status.
+            No tasks found for the selected status. 
           </p>
         )}
       </div>

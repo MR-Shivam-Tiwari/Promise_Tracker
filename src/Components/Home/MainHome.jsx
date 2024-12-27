@@ -247,12 +247,23 @@ function MainHome() {
       const response = await axios.get(
         process.env.REACT_APP_API_URL + `/api/groups`
       );
-
-      // Filter groups based on userId mismatch in pinnedBy array
+  
+      // Filter groups based on userId match in deptHead, projectLead, or members
       const filteredGroups = response.data.filter((group) => {
-        return group.pinnedBy.every((pinned) => pinned.userId !== userid);
+        // Check if userId matches in deptHead, projectLead, or members
+        const isUserInDeptHead = group.deptHead.some(
+          (head) => head.userId === userid
+        );
+        const isUserInProjectLead = group.projectLead.some(
+          (lead) => lead.userId === userid
+        );
+        const isUserInMembers = group.members.some(
+          (member) => member.userId === userid
+        );
+  
+        return isUserInDeptHead || isUserInProjectLead || isUserInMembers;
       });
-
+  
       setGroupData(filteredGroups);
     } catch (error) {
       console.log("Error fetching Group Data: ", error);
@@ -260,6 +271,7 @@ function MainHome() {
       setpingroupLoading(false);
     }
   };
+  
   useEffect(() => {
     if (userid) {
       fetchGroupData();

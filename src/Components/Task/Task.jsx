@@ -73,7 +73,6 @@ function Task() {
     }
   }, []);
 
-
   const handleChange = (fieldName, value) => {
     if (fieldName === "people") {
       const selectedUsers = value.map((name) => {
@@ -471,7 +470,7 @@ function Task() {
             id="default-modal"
             tabIndex="-1"
             aria-hidden="true"
-            className="fixed inset-0 flex items-center justify-center z-50 w-full p-4 overflow-x-hidden overflow-y-auto max-h-full"
+            className="fixed inset-0 flex items-center justify-center z-50 w-full p-2 overflow-x-hidden overflow-y-auto max-h-full"
           >
             <div className="relative w-full max-w-4xl max-h-full">
               <div className="relative bg-white lg:rounded-lg rounded-[3px] shadow ">
@@ -500,7 +499,7 @@ function Task() {
                   <h3 className="mb-4 text-xl font-medium text-gray-900 ">
                     Add Task
                   </h3>
-                  <form className="space-y-6" onSubmit={handleSubmit}>
+                  <form className="space-y-3" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label
@@ -570,144 +569,6 @@ function Task() {
                         required
                       />
                     </div>
-
-                    <div className="p-4 bg-white lg:rounded-lg rounded-[3px] shadow-md">
-                      <label
-                        htmlFor="taskname"
-                        className="block mb-4 text-lg font-semibold text-gray-900"
-                      >
-                        Record Audio
-                      </label>
-                      <div className="flex space-x-4 mb-4 items-center">
-                        {/* Start Recording Button */}
-                        <button
-                          onClick={(e)=>startRecording(e)}
-                          disabled={isRecording}
-                          className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${
-                            isRecording
-                              ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-blue-500 hover:bg-blue-600"
-                          }`}
-                          aria-hidden={isRecording ? "true" : "false"}
-                        >
-                          {isRecording ? "Recording..." : "Start Recording"}
-                        </button>
-
-                        {/* Stop Recording Button */}
-                        <button
-                          onClick={(e)=>stopRecording(e)}
-                          disabled={!isRecording}
-                          className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${
-                            !isRecording
-                              ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-red-500 hover:bg-red-600"
-                          }`}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            className="bi bi-stop-circle-fill mr-1"
-                            viewBox="0 0 16 16"
-                          >
-                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.5 5A1.5 1.5 0 0 0 5 6.5v3A1.5 1.5 0 0 0 6.5 11h3A1.5 1.5 0 0 0 11 9.5v-3A1.5 1.5 0 0 0 9.5 5z" />
-                          </svg>
-                          Stop Recording
-                        </button>
-                      </div>
-
-                      {audioLoader ? (
-                        <div className="flex justify-start">
-                          <CircularProgress />
-                        </div>
-                      ) : uploadResultVoice ? (
-                        <div className="mb-4">
-                          <h3 className="text-lg font-medium text-gray-800 mb-2">
-                            Playback:
-                          </h3>
-                          <audio
-                            controls
-                            src={uploadResultVoice}
-                            className="w-full mb-2"
-                          ></audio>
-                          <button
-                            // onClick={removeRecording}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setuploadResultVoice(null);
-                            }}
-                            className="px-4 py-2 bg-red-600 flex items-center gap-2  text-white font-medium lg:rounded-md rounded-[3px] hover:bg-red-700 focus:outline-none"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="18"
-                              height="18"
-                              fill="currentColor"
-                              class="bi bi-x-circle-fill"
-                              viewBox="0 0 16 16"
-                            >
-                              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z" />
-                            </svg>{" "}
-                            Remove
-                          </button>
-                        </div>
-                      ) : null}
-                    </div>
-                    <div className="p-4">
-                      <label
-                        htmlFor="description"
-                        className="block mb-2 text-lg font-medium text-gray-900"
-                      >
-                        Upload File
-                      </label>
-                      <input
-                        accept="file/*"
-                        id="image-upload"
-                        type="file"
-                        style={{ display: "none" }}
-                        onChange={handleFileSelect}
-                      />
-                      <button
-                        onClick={handleUploadClick}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="20"
-                          height="20"
-                          fill="currentColor"
-                          class="bi bi-cloud-arrow-up-fill"
-                          viewBox="0 0 16 16"
-                        >
-                          <path d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2m2.354 5.146a.5.5 0 0 1-.708.708L8.5 6.707V10.5a.5.5 0 0 1-1 0V6.707L6.354 7.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0z" />
-                        </svg>
-                        Upload
-                      </button>
-                      {singleFile && (
-                        <div className="mt-4">
-                          <h3 className="text-lg font-medium text-gray-800 mb-2">
-                            Uploaded File:
-                          </h3>
-                          <div className="flex items-center">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              fill="currentColor"
-                              className="bi bi-file-earmark"
-                              viewBox="0 0 16 16"
-                            >
-                              <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h4.5L14 4.5zM10 4a1 1 0 0 1-1-1V1.5L14 5h-3.5A1.5 1.5 0 0 1 9 3.5V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5H10z" />
-                            </svg>
-                            <a href={singleFile} className="ml-2 text-gray-700">
-                              File
-                            </a>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label
@@ -774,6 +635,152 @@ function Task() {
                         )}
                       />
                     </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-4 bg-white lg:rounded-lg rounded-[3px] shadow-md">
+                        <label
+                          htmlFor="taskname"
+                          className="block mb-4 text-lg font-semibold text-gray-900"
+                        >
+                          Record Audio
+                        </label>
+                        <div className="flex space-x-4 mb-4 items-center">
+                          {/* Start Recording Button */}
+                          <button
+                            onClick={(e) => startRecording(e)}
+                            disabled={isRecording}
+                            className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${
+                              isRecording
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-blue-500 hover:bg-blue-600"
+                            }`}
+                            aria-hidden={isRecording ? "true" : "false"}
+                          >
+                            {isRecording ? "Recording..." : "Start Recording"}
+                          </button>
+
+                          {/* Stop Recording Button */}
+                          <button
+                            onClick={(e) => stopRecording(e)}
+                            disabled={!isRecording}
+                            className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${
+                              !isRecording
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-red-500 hover:bg-red-600"
+                            }`}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              fill="currentColor"
+                              className="bi bi-stop-circle-fill mr-1"
+                              viewBox="0 0 16 16"
+                            >
+                              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.5 5A1.5 1.5 0 0 0 5 6.5v3A1.5 1.5 0 0 0 6.5 11h3A1.5 1.5 0 0 0 11 9.5v-3A1.5 1.5 0 0 0 9.5 5z" />
+                            </svg>
+                            Stop Recording
+                          </button>
+                        </div>
+
+                        {audioLoader ? (
+                          <div className="flex justify-start">
+                            <CircularProgress />
+                          </div>
+                        ) : uploadResultVoice ? (
+                          <div className="mb-4">
+                            <h3 className="text-lg font-medium text-gray-800 mb-2">
+                              Playback:
+                            </h3>
+                            <audio
+                              controls
+                              src={uploadResultVoice}
+                              className="w-full mb-2"
+                            ></audio>
+                            <button
+                              // onClick={removeRecording}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setuploadResultVoice(null);
+                              }}
+                              className="px-4 py-2 bg-red-600 flex items-center gap-2  text-white font-medium lg:rounded-md rounded-[3px] hover:bg-red-700 focus:outline-none"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                fill="currentColor"
+                                class="bi bi-x-circle-fill"
+                                viewBox="0 0 16 16"
+                              >
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z" />
+                              </svg>{" "}
+                              Remove
+                            </button>
+                          </div>
+                        ) : null}
+                      </div>
+                      <div className="p-4 bg-white lg:rounded-lg rounded-[3px] shadow-md">
+                        <label
+                          htmlFor="description"
+                          className="block mb-2 text-lg font-medium text-gray-900"
+                        >
+                          Upload File
+                        </label>
+                        <input
+                          accept="file/*"
+                          id="image-upload"
+                          type="file"
+                          style={{ display: "none" }}
+                          onChange={handleFileSelect}
+                        />
+                        <div className="flex justify-center">
+
+                        
+                        <button
+                          onClick={handleUploadClick}
+                          className=" items-center w-[200px] flex justify-center gap-3 px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            fill="currentColor"
+                            class="bi bi-cloud-arrow-up-fill"
+                            viewBox="0 0 16 16"
+                          >
+                            <path d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2m2.354 5.146a.5.5 0 0 1-.708.708L8.5 6.707V10.5a.5.5 0 0 1-1 0V6.707L6.354 7.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0z" />
+                          </svg>
+                          Upload
+                        </button>
+                        </div>
+                        {singleFile && (
+                          <div className="mt-4">
+                            <h3 className="text-lg font-medium text-gray-800 mb-2">
+                              Uploaded File:
+                            </h3>
+                            <div className="flex items-center">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                fill="currentColor"
+                                className="bi bi-file-earmark"
+                                viewBox="0 0 16 16"
+                              >
+                                <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h4.5L14 4.5zM10 4a1 1 0 0 1-1-1V1.5L14 5h-3.5A1.5 1.5 0 0 1 9 3.5V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5H10z" />
+                              </svg>
+                              <a
+                                href={singleFile}
+                                className="ml-2 text-gray-700"
+                              >
+                                File
+                              </a>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
                     <button
                       type="submit"
                       className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium lg:rounded-lg rounded-[3px] text-sm px-5 py-2.5 text-center"
@@ -798,7 +805,7 @@ function Task() {
                 variant="outlined"
                 className="font-bold  text-black bg-gray-200 shadow border-gray-400 border-0  "
               >
-                Add Tasks
+                Add Task
               </Button>
             </div>
             <div className="flex items-center gap-3 text-lg font-bold">

@@ -12,15 +12,18 @@ import EditApprovals from "./EditApprovals";
 import AcceptApprovals from "./AcceptApprovals";
 import { toast } from "react-toastify";
 import { UserContext } from "../../global/UserContext";
+import ViewTask from "../Task/ViewTask";
 
 function Approvals() {
-  const {userData} = useContext(UserContext)
+  const { userData } = useContext(UserContext);
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [tasks, setTasks] = useState([]);
-  const [open, setOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [userid, setUserid] = useState("");
   const [loading, setLoading] = useState(true);
+  const [viewselectedTask, setviewSelectedTask] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -30,50 +33,48 @@ function Approvals() {
       setTasks(response.data);
       setLoading(false);
     } catch (error) {
-      // console.error("Error fetching tasks:", error); 
       setLoading(false);
     }
   };
 
-  const getAllReleventTask = ()=>{
-    setLoading(true)
-    axios.get(`${process.env.REACT_APP_API_URL}/api/tasks/deptHead_projectLead/${userData?.userId}/all_approval_task`)
-    .then((res)=>{
-      setLoading(false)
-      setTasks(res.data.result);
-    }).catch((err)=>{
-      setLoading(false)
-      toast.dismiss()
-      toast.error('Internal Server Error')
-    })
-  }
-  
-
-  useEffect(() => {
-    // fetchData();
-    if([0].includes(userData?.userRole)){
-      fetchData();
-    }
-    else{
-      getAllReleventTask();
-    }
-    
-  }, []);
-
-  const handleCloseModal = () => {
-    setOpen(false);
-    setSelectedTask(null);
-    getAllReleventTask()
-    // fetchData(); // Call fetchData function when modal is closed
+  const getAllReleventTask = () => {
+    setLoading(true);
+    axios
+      .get(
+        `${process.env.REACT_APP_API_URL}/api/tasks/deptHead_projectLead/${userData?.userId}/all_approval_task`
+      )
+      .then((res) => {
+        setLoading(false);
+        setTasks(res.data.result);
+      })
+      .catch((err) => {
+        setLoading(false);
+        toast.dismiss();
+        toast.error("Internal Server Error");
+      });
   };
 
   useEffect(() => {
-    // Retrieve userData from localStorage
+    if ([0].includes(userData?.userRole)) {
+      fetchData();
+    } else {
+      getAllReleventTask();
+    }
+  }, []);
+
+  const handleCloseModal = () => {
+    setEditModalOpen(false);
+    setViewModalOpen(false);
+    setSelectedTask(null);
+    setviewSelectedTask(null);
+    getAllReleventTask();
+  };
+
+  useEffect(() => {
     const userDataString = localStorage.getItem("userData");
     if (userDataString) {
       const userDataObj = JSON.parse(userDataString);
       const userId = userDataObj.userId;
-      // console.log(userId);
       setUserid(userId);
     }
   }, []);
@@ -99,8 +100,9 @@ function Approvals() {
 
   const handleEditClick = (task) => {
     setSelectedTask(task);
-    setOpen(true);
+    setEditModalOpen(true);
   };
+
   const renderTable = () => {
     if (selectedStatus === "Archive Task") {
       return renderArchiveTask();
@@ -127,9 +129,6 @@ function Approvals() {
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
                       Task Group
                     </th>
-                    {/* <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
-                      Reminder
-                    </th> */}
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
                       Status
                     </th>
@@ -153,9 +152,6 @@ function Approvals() {
                       <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
                         {task?.taskGroup?.groupName || "NIL"}
                       </td>
-                      {/* <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
-                        {task?.reminder}
-                      </td> */}
                       <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0">
                         {task?.category === "Approved" && (
                           <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-100 text-green-900">
@@ -173,7 +169,29 @@ function Approvals() {
                           </div>
                         )}
                       </td>
-                      <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 text-right">
+                      <td className="p-4 flex align-middle [&_:has([role=checkbox])]:pr-0 text-right">
+                        <IconButton
+                          onClick={() => {
+                            setviewSelectedTask(task);
+                            setViewModalOpen(true);
+                          }}
+                          aria-label="View"
+                        >
+                          <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="20"
+                              height="20"
+                              fill="currentColor"
+                              className="bi bi-eye"
+                              viewBox="0 0 16 16"
+                            >
+                              <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
+                              <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
+                            </svg>
+                            <span className="sr-only">View</span>
+                          </button>
+                        </IconButton>
                         <IconButton
                           onClick={() => handleEditClick(task)}
                           aria-label="Edit"
@@ -198,35 +216,6 @@ function Approvals() {
                             <span className="sr-only">Edit</span>
                           </button>
                         </IconButton>
-                        <Modal
-                          aria-labelledby="modal-title"
-                          aria-describedby="modal-desc"
-                          open={open}
-                          onClose={() => {
-                            setOpen(false);
-                            setSelectedTask(null);
-                          }}
-                          sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                          }}
-                        >
-                          <ModalDialog
-                            maxWidth={600}
-                            minWidth={300}
-                            style={{ height: "520px", overflow: "auto" }}
-                          >
-                            <ModalClose variant="plain" />
-                            {selectedTask && (
-                              <EditApprovals
-                                task={selectedTask}
-                                taskId={selectedTask?._id}
-                                onClose={handleCloseModal}
-                              />
-                            )}
-                          </ModalDialog>
-                        </Modal>
                       </td>
                     </tr>
                   ))}
@@ -255,9 +244,6 @@ function Approvals() {
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
                   Task Group
                 </th>
-                {/* <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
-                  Reminder
-                </th> */}
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
                   Status
                 </th>
@@ -278,9 +264,6 @@ function Approvals() {
                   <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
                     {task?.taskGroup.groupName}
                   </td>
-                  {/* <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
-                    {task?.reminder}
-                  </td> */}
                   <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0">
                     {task.status === "Cancelled" && (
                       <div className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-red-100 text-red-90 ">
@@ -296,35 +279,12 @@ function Approvals() {
                   <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 text-right">
                     <IconButton
                       onClick={() => handleEditClick(task)}
-                      aria-label="Edit"
+                      aria-label="Approve"
                     >
                       <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 bg-green-300 px-3">
                         Approve
                       </button>
                     </IconButton>
-                    <Modal
-                      open={open}
-                      onClose={() => {
-                        setOpen(false);
-                        setSelectedTask(null);
-                      }}
-                     
-                    >
-                      <ModalDialog
-                        maxWidth={600}
-                        minWidth={300}
-                        className="bg-gray-200"
-                      >
-                        <ModalClose variant="plain" />
-                        {selectedTask && (
-                          <AcceptApprovals
-                            task={selectedTask}
-                            taskId={selectedTask?._id}
-                            onClose={handleCloseModal}
-                          />
-                        )}
-                      </ModalDialog>
-                    </Modal>
                   </td>
                 </tr>
               </tbody>
@@ -334,6 +294,7 @@ function Approvals() {
       </div>
     );
   };
+
   const renderArchiveTask = () => {
     return (
       <div className="border lg:rounded-lg rounded-[3px] overflow-hidden">
@@ -350,15 +311,9 @@ function Approvals() {
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
                   Task Group
                 </th>
-                {/* <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
-                  Reminder
-                </th> */}
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0">
                   Status
                 </th>
-                {/* <th className="h-12 px-4 align-middle font-medium text-muted-foreground [&_:has([role=checkbox])]:pr-0 text-right">
-                                    Actions
-                                </th> */}
               </tr>
             </thead>
             {filteredTasks.map((task) => (
@@ -373,9 +328,6 @@ function Approvals() {
                   <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
                     {task?.taskGroup.groupName}
                   </td>
-                  {/* <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 font-medium">
-                    {task?.reminder}
-                  </td> */}
                   <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0">
                     {task.status === "Archive" && (
                       <div className="inline-flex w-fit items-center whitespace-nowrap rounded-md  border px-3.5 py-0.5 text-sm font-bold bg-red-500 text-gray-900 ">
@@ -383,26 +335,6 @@ function Approvals() {
                       </div>
                     )}
                   </td>
-                  {/* <td className="p-4 align-middle [&_:has([role=checkbox])]:pr-0 text-right">
-                                        <IconButton onClick={() => handleEditClick(task)} aria-label="Edit">
-                                            <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 bg-green-300 px-3">
-
-                                                Approve
-                                            </button>
-                                        </IconButton>
-                                        <Modal
-                                            aria-labelledby="modal-title"
-                                            aria-describedby="modal-desc"
-                                            open={open}
-                                            onClose={() => { setOpen(false); setSelectedTask(null); }}
-                                            sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: "#f0f0f0" }}
-                                        >
-                                            <ModalDialog maxWidth={600} minWidth={300} className='bg-gray-200'>
-                                                <ModalClose variant="plain" />
-                                                {selectedTask && <AcceptApprovals task={selectedTask} taskId={selectedTask?._id} onClose={handleCloseModal} />}
-                                            </ModalDialog>
-                                        </Modal>
-                                    </td> */}
                 </tr>
               </tbody>
             ))}
@@ -422,8 +354,8 @@ function Approvals() {
                 "All",
                 "Approved",
                 "Unapproved",
-                // "Archive Task",
                 "New Task Approval",
+                "Archive Task",
               ].map((status) => (
                 <button
                   key={status}
@@ -442,14 +374,68 @@ function Approvals() {
         </div>
       </header>
 
-      {/* Render only the selected table */}
       {selectedStatus === "Archive Task" && renderArchiveTask()}
       {selectedStatus === "New Task Approval" && renderNewTaskApprovalTable()}
       {selectedStatus !== "Archive Task" &&
         selectedStatus !== "New Task Approval" &&
         renderTable()}
+
+      <Modal
+        aria-labelledby="modal-title"
+        aria-describedby="modal-desc"
+        open={editModalOpen}
+        onClose={() => {
+          setEditModalOpen(false);
+          setSelectedTask(null);
+        }}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ModalDialog
+          maxWidth={600}
+          minWidth={300}
+          style={{ height: "520px", overflow: "auto" }}
+        >
+          <ModalClose variant="plain" />
+          {selectedTask && (
+            <EditApprovals
+              task={selectedTask}
+              taskId={selectedTask?._id}
+              onClose={handleCloseModal}
+            />
+          )}
+        </ModalDialog>
+      </Modal>
+
+      <Modal
+        aria-labelledby="modal-title"
+        aria-describedby="modal-desc"
+        open={viewModalOpen}
+        onClose={() => {
+          setViewModalOpen(false);
+          setviewSelectedTask(null);
+        }}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <div className="bg-white rounded-lg  overflow-x-hidden">
+          {viewselectedTask && (
+            <ViewTask
+              data={viewselectedTask}
+              setOpen={setViewModalOpen}
+            />
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }
 
 export default Approvals;
+

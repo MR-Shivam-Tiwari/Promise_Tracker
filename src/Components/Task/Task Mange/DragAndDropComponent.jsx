@@ -307,7 +307,17 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
       setIsOpen(false);
     }
   };
-
+  const closeAllModals = () => {
+    setEdit(false); // Close the Edit modal
+    setOpen(false); // Close the View modal
+  };
+  const handleEditModalClose = () => {
+    setEdit(false); // Close Edit Modal
+    // Wait for the Edit modal state to update before closing the View modal
+    setTimeout(() => {
+      setOpen(false); // Close View Modal
+    }, 200);
+  };
   useEffect(() => {
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
@@ -320,216 +330,214 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
     };
   }, [isOpen]);
   return (
-    <div ref={drag} style={{ opacity }}>
-      <div className="flex-1 shadow-md flex flex-col gap-1  border bg-blue-50 p-2 rounded">
-        <div className="mb-1 flex justify-between items-center font-bold text-xs">
-          {card?.pendingSubTask ? (
-            <p className="text-center font-semibold text-gray-800">
-              {" "}
-              (Subtask)
-            </p>
-          ) : (
-            <p> {truncateText(card?.taskName, 26)}</p>
-          )}
-          <div>
-            <div className="relative inline-block text-left" ref={dropdownRef}>
-              <div>
-                <button
-                  type="button"
-                  className="inline-flex justify-center  rounded-[100%] border border-gray-300 shadow-sm  p-1.5 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  onClick={toggleDropdown}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    fill="currentColor"
-                    class="bi bi-three-dots-vertical"
-                    viewBox="0 0 16 16"
+    <div>
+      <div
+        ref={drag}
+        style={{ opacity }}
+        onClick={() => setOpen(true)}
+        className="cursor-pointer"
+      >
+        <div className="flex-1 shadow-md flex flex-col gap-1 border bg-blue-50 p-2 rounded">
+          <div className="mb-1 flex justify-between items-center font-bold text-xs">
+            {card?.pendingSubTask ? (
+              <p className="text-center font-semibold text-gray-800">
+                {" "}
+                (Subtask){" "}
+              </p>
+            ) : (
+              <p>{truncateText(card?.taskName, 26)}</p>
+            )}
+            <div>
+              <div
+                className="relative inline-block text-left"
+                ref={dropdownRef}
+              >
+                <div>
+                  <button
+                    type="button"
+                    className="inline-flex justify-center rounded-[100%] border border-gray-300 shadow-sm p-1.5 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent "View" modal from opening
+                      toggleDropdown(); // Show dropdown menu
+                    }}
                   >
-                    <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
-                  </svg>
-                </button>
-              </div>
-
-              {isOpen && (
-                <div
-                  className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
-                  role="menu"
-                  aria-orientation="vertical"
-                  aria-labelledby="menu-button"
-                  tabIndex="-1"
-                >
-                  <div className="py-1" role="none">
-                    <button
-                      className="text-gray-700 block px-4 hover:bg-gray-200 py-2 text-sm w-full text-left"
-                      role="menuitem"
-                      tabIndex="-1"
-                      onClick={() => setOpen(true)}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      fill="currentColor"
+                      className="bi bi-three-dots-vertical"
+                      viewBox="0 0 16 16"
                     >
-                      View
-                    </button>
-                    {canEdit && (
+                      <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                    </svg>
+                  </button>
+                </div>
+
+                {isOpen && (
+                  <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                    <div className="py-1">
                       <button
                         className="text-gray-700 block px-4 hover:bg-gray-200 py-2 text-sm w-full text-left"
-                        role="menuitem"
-                        tabIndex="-1"
-                        onClick={() => setEdit(true)}
+                        onClick={() => setOpen(true)} // Open View Modal
                       >
-                        Edit
+                        View
                       </button>
-                    )}
-                    <button
-                      className="text-gray-700 hover:bg-gray-200 block px-4 py-2 text-sm w-full text-left"
-                      role="menuitem"
-                      tabIndex="-1"
-                      onClick={archiveTask}
-                    >
-                      Archive
-                    </button>
+                      {canEdit && (
+                        <button
+                          className="text-gray-700 block px-4 hover:bg-gray-200 py-2 text-sm w-full text-left"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent "View" modal from opening
+                            setEdit(true); // Open Edit Modal
+                          }}
+                        >
+                          Edit
+                        </button>
+                      )}
+                      <button
+                        className="text-gray-700 hover:bg-gray-200 block px-4 py-2 text-sm w-full text-left"
+                        onClick={archiveTask}
+                      >
+                        Archive
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-
-            <Modal
-              aria-labelledby="modal-title"
-              aria-describedby="modal-desc"
-              open={edit}
-              onClose={() => setEdit(false)}
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Sheet
-                className="overflow-auto bg-white "
-                sx={{
-                  borderRadius: "md",
-                  boxShadow: "lg",
-                }}
-              >
-                <ModalClose
-                  variant="plain"
-                  sx={{ m: 1 }}
-                  onClick={() => setEdit(false)}
-                />
-                <EditTask
-                  data={card}
-                  fetchTasks={fetchTasks}
-                  setEdit={setEdit}
-                />
-              </Sheet>
-            </Modal>
-            <Modal
-              aria-labelledby="modal-title"
-              aria-describedby="modal-desc"
-              open={open}
-              onClose={() => setOpen(false)}
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <div className=" bg-white rounded-lg h-[min-500px] overflow-x-hidden ">
-                {/* <ModalClose variant="plain" sx={{ m: 1 }} onClick={() => setOpen(false)} /> */}
-                <ViewTask data={card} setOpen={setOpen} />
-              </div>
-            </Modal>
-          </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <p className="text-sm   bg-gray-200 text-black border px-1 rounded-[3px]">
-            <div>
-              <div className="text-[11px]">
-                {truncateText(
-                  formattedDefaultDate || formattedFallbackDate,
-                  13
                 )}
               </div>
             </div>
-          </p>
-          <div className="flex text-[13px] px-2 bg-blue-200 rounded-[4px] font-semibold items-center gap-2 border">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="currentColor"
-              class="bi bi-person-check-fill"
-              viewBox="0 0 16 16"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M15.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0"
-              />
-              <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-            </svg>
-            {truncateText(
-              card?.people?.map((person) => person.name).join(", "),
-              8
-            )}
           </div>
-        </div>
-        <div className="flex justify-between mt-1 items-center">
-          <div className="flex font-bold text-gray-500 text-[13px]">
-            <svg
-              fill="#808080"
-              width="20px"
-              className=""
-              height="20px"
-              viewBox="-3 0 32 32"
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <title>group</title>
-              <path d="M20.906 20.75c1.313 0.719 2.063 2 1.969 3.281-0.063 0.781-0.094 0.813-1.094 0.938-0.625 0.094-4.563 0.125-8.625 0.125-4.594 0-9.406-0.094-9.75-0.188-1.375-0.344-0.625-2.844 1.188-4.031 1.406-0.906 4.281-2.281 5.063-2.438 1.063-0.219 1.188-0.875 0-3-0.281-0.469-0.594-1.906-0.625-3.406-0.031-2.438 0.438-4.094 2.563-4.906 0.438-0.156 0.875-0.219 1.281-0.219 1.406 0 2.719 0.781 3.25 1.938 0.781 1.531 0.469 5.625-0.344 7.094-0.938 1.656-0.844 2.188 0.188 2.469 0.688 0.188 2.813 1.188 4.938 2.344zM3.906 19.813c-0.5 0.344-0.969 0.781-1.344 1.219-1.188 0-2.094-0.031-2.188-0.063-0.781-0.188-0.344-1.625 0.688-2.25 0.781-0.5 2.375-1.281 2.813-1.375 0.563-0.125 0.688-0.469 0-1.656-0.156-0.25-0.344-1.063-0.344-1.906-0.031-1.375 0.25-2.313 1.438-2.719 1-0.375 2.125 0.094 2.531 0.938 0.406 0.875 0.188 3.125-0.25 3.938-0.5 0.969-0.406 1.219 0.156 1.375 0.125 0.031 0.375 0.156 0.719 0.313-1.375 0.563-3.25 1.594-4.219 2.188zM24.469 18.625c0.75 0.406 1.156 1.094 1.094 1.813-0.031 0.438-0.031 0.469-0.594 0.531-0.156 0.031-0.875 0.063-1.813 0.063-0.406-0.531-0.969-1.031-1.656-1.375-1.281-0.75-2.844-1.563-4-2.063 0.313-0.125 0.594-0.219 0.719-0.25 0.594-0.125 0.688-0.469 0-1.656-0.125-0.25-0.344-1.063-0.344-1.906-0.031-1.375 0.219-2.313 1.406-2.719 1.031-0.375 2.156 0.094 2.531 0.938 0.406 0.875 0.25 3.125-0.188 3.938-0.5 0.969-0.438 1.219 0.094 1.375 0.375 0.125 1.563 0.688 2.75 1.313z"></path>
-            </svg>
-            {card?.taskGroup?.groupName
-              ? truncateText(card.taskGroup.groupName, 9)
-              : "No Group"}
-          </div>
-          {card.status === "Cancelled" &&
-            card?.additionalDetails?.status === "rejected" && (
-              <div className="text-xs border p-1 px-2 rounded font-bold bg-red-400 ">
-                Rejected_Postponed
+          <div className="flex items-center justify-between">
+            <p className="text-sm   bg-gray-200 text-black border px-1 rounded-[3px]">
+              <div>
+                <div className="text-[11px]">
+                  {truncateText(
+                    formattedDefaultDate || formattedFallbackDate,
+                    13
+                  )}
+                </div>
               </div>
-            )}
-          {card.status === "Cancelled" &&
-            card?.additionalDetails?.status !== "rejected" && (
-              <div className="text-xs border p-1 px-2 rounded font-bold bg-red-400 ">
-                {card?.status === "Cancelled" ? "Postponed" : "Postponed"}
-              </div>
-            )}
-          {card.status === "Completed" && (
-            <Chip
-              className="text-[11px] border  px-1 rounded font-bold text-black  "
-              variant="soft"
-              color={
-                card.category === "Approved"
-                  ? "success"
-                  : card.category === "Unapproved"
-                  ? "#3c3c3c"
-                  : "gray"
-              }
-            >
-              {card?.category || "Awaiting approval"}
-            </Chip>
-          )}
-          {(card.status === "In Progress" ||
-            card.status === "" ||
-            !card.status) &&
-            dueMessage && (
-              <div
-                className="text-[11px] border bg-yellow-400 px-2 font-bold rounded py-0.5"
-                variant="soft"
+            </p>
+            <div className="flex text-[13px] px-2 bg-blue-200 rounded-[4px] font-semibold items-center gap-2 border">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-person-check-fill"
+                viewBox="0 0 16 16"
               >
-                {dueMessage}
-              </div>
+                <path
+                  fill-rule="evenodd"
+                  d="M15.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0"
+                />
+                <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+              </svg>
+              {truncateText(
+                card?.people?.map((person) => person.name).join(", "),
+                8
+              )}
+            </div>
+          </div>
+          <div className="flex justify-between mt-1 items-center">
+            <div className="flex font-bold text-gray-500 text-[13px]">
+              <svg
+                fill="#808080"
+                width="20px"
+                className=""
+                height="20px"
+                viewBox="-3 0 32 32"
+                version="1.1"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <title>group</title>
+                <path d="M20.906 20.75c1.313 0.719 2.063 2 1.969 3.281-0.063 0.781-0.094 0.813-1.094 0.938-0.625 0.094-4.563 0.125-8.625 0.125-4.594 0-9.406-0.094-9.75-0.188-1.375-0.344-0.625-2.844 1.188-4.031 1.406-0.906 4.281-2.281 5.063-2.438 1.063-0.219 1.188-0.875 0-3-0.281-0.469-0.594-1.906-0.625-3.406-0.031-2.438 0.438-4.094 2.563-4.906 0.438-0.156 0.875-0.219 1.281-0.219 1.406 0 2.719 0.781 3.25 1.938 0.781 1.531 0.469 5.625-0.344 7.094-0.938 1.656-0.844 2.188 0.188 2.469 0.688 0.188 2.813 1.188 4.938 2.344zM3.906 19.813c-0.5 0.344-0.969 0.781-1.344 1.219-1.188 0-2.094-0.031-2.188-0.063-0.781-0.188-0.344-1.625 0.688-2.25 0.781-0.5 2.375-1.281 2.813-1.375 0.563-0.125 0.688-0.469 0-1.656-0.156-0.25-0.344-1.063-0.344-1.906-0.031-1.375 0.25-2.313 1.438-2.719 1-0.375 2.125 0.094 2.531 0.938 0.406 0.875 0.188 3.125-0.25 3.938-0.5 0.969-0.406 1.219 0.156 1.375 0.125 0.031 0.375 0.156 0.719 0.313-1.375 0.563-3.25 1.594-4.219 2.188zM24.469 18.625c0.75 0.406 1.156 1.094 1.094 1.813-0.031 0.438-0.031 0.469-0.594 0.531-0.156 0.031-0.875 0.063-1.813 0.063-0.406-0.531-0.969-1.031-1.656-1.375-1.281-0.75-2.844-1.563-4-2.063 0.313-0.125 0.594-0.219 0.719-0.25 0.594-0.125 0.688-0.469 0-1.656-0.125-0.25-0.344-1.063-0.344-1.906-0.031-1.375 0.219-2.313 1.406-2.719 1.031-0.375 2.156 0.094 2.531 0.938 0.406 0.875 0.25 3.125-0.188 3.938-0.5 0.969-0.438 1.219 0.094 1.375 0.375 0.125 1.563 0.688 2.75 1.313z"></path>
+              </svg>
+              {card?.taskGroup?.groupName
+                ? truncateText(card.taskGroup.groupName, 9)
+                : "No Group"}
+            </div>
+            {card.status === "Cancelled" &&
+              card?.additionalDetails?.status === "rejected" && (
+                <div className="text-xs border p-1 px-2 rounded font-bold bg-red-400 ">
+                  Rejected_Postponed
+                </div>
+              )}
+            {card.status === "Cancelled" &&
+              card?.additionalDetails?.status !== "rejected" && (
+                <div className="text-xs border p-1 px-2 rounded font-bold bg-red-400 ">
+                  {card?.status === "Cancelled" ? "Postponed" : "Postponed"}
+                </div>
+              )}
+            {card.status === "Completed" && (
+              <Chip
+                className="text-[11px] border  px-1 rounded font-bold text-black  "
+                variant="soft"
+                color={
+                  card.category === "Approved"
+                    ? "success"
+                    : card.category === "Unapproved"
+                    ? "#3c3c3c"
+                    : "gray"
+                }
+              >
+                {card?.category || "Awaiting approval"}
+              </Chip>
             )}
+            {(card.status === "In Progress" ||
+              card.status === "" ||
+              !card.status) &&
+              dueMessage && (
+                <div
+                  className="text-[11px] border bg-yellow-400 px-2 font-bold rounded py-0.5"
+                  variant="soft"
+                >
+                  {dueMessage}
+                </div>
+              )}
+          </div>
         </div>
       </div>
+      <Modal
+        aria-labelledby="modal-title"
+        aria-describedby="modal-desc"
+        open={open}
+        onClose={closeAllModals} // Close both modals when View modal is closed
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <div className="bg-white rounded-lg h-[min-500px] overflow-x-hidden">
+          <ViewTask data={card} setOpen={setOpen} />
+        </div>
+      </Modal>
+      <Modal
+        aria-labelledby="modal-title"
+        aria-describedby="modal-desc"
+        open={edit}
+        onClose={handleEditModalClose} // Close both modals when Edit modal is closed
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Sheet
+          className="overflow-auto bg-white "
+          sx={{
+            borderRadius: "md",
+            boxShadow: "lg",
+          }}
+        >
+          <ModalClose
+            variant="plain"
+            sx={{ m: 1 }}
+            onClick={handleEditModalClose} // Close both modals when clicked
+          />
+          <EditTask data={card} fetchTasks={fetchTasks} setEdit={setEdit} />
+        </Sheet>
+      </Modal>
     </div>
   );
 };

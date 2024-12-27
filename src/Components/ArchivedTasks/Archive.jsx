@@ -199,7 +199,7 @@ function Archive() {
                         alignItems: "center",
                       }}
                     >
-                      <div className=" bg-white rounded-lg lg-[min-500px] h-[500px]  overflow-x-hidden ">
+                      <div className=" bg-white rounded-lg    overflow-x-hidden ">
                         {/* <ModalClose variant="plain" sx={{ m: 1 }} onClick={() => setOpen(false)} /> */}
                         {viewselectedTask && (
                           <ViewTask
