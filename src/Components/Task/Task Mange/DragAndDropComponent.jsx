@@ -387,8 +387,13 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
                 {" "}
                 (Subtask){" "}
               </p>
-            ) : card?.isSubtask===true?<>
-              <p className="text-center font-semibold text-gray-800">(Subtask)</p>
+            ) : card?.isSubtask===true?
+            <>
+             <div className="flex flex-col justify-start">
+             <p className=" font-semibold text-gray-800 mb-1">(Subtask)</p>
+             <p>{truncateText(card?.taskName, 26)}</p>
+             </div>
+
             </>:(
               <p>{truncateText(card?.taskName, 26)}</p>
             )}
@@ -503,7 +508,7 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
             </div>
 
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between gap-2">
             {/* status */}
             <div>
               {card.status === "Cancelled" &&
