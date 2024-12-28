@@ -387,7 +387,9 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
                 {" "}
                 (Subtask){" "}
               </p>
-            ) : (
+            ) : card?.isSubtask===true?<>
+              <p className="text-center font-semibold text-gray-800">(Subtask)</p>
+            </>:(
               <p>{truncateText(card?.taskName, 26)}</p>
             )}
             <div>
