@@ -90,12 +90,18 @@ const Section = ({ title, cards, moveCard, loading, fetchTasks }) => {
 };
 const Card = ({ id, text, status, card, fetchTasks }) => {
   const { userData } = useContext(UserContext);
+  const [allTasks, setAllTasks] = useState([]);
+
   const [showOptions, setShowOptions] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [edit, setEdit] = useState(false);
   const [canEdit, setCanEdit] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [currentCard, setCurrentCard] = useState(null);
+  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
 
   const checkEdit = () => {
     axios
@@ -307,6 +313,43 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
       setIsOpen(false);
     }
   };
+  const handleStatusChange = async (task, newStatus) => {
+    if (newStatus === "Completed") {
+      setCurrentCard(task);
+      setIsCompleteModalOpen(true);
+    } else if (newStatus === "Postponed") {
+      setCurrentCard(task);
+      setIsCancelModalOpen(true);
+    } else {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/tasks/${task._id}/status`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ status: newStatus }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to update status");
+        }
+
+        const updatedTask = await response.json();
+        setAllTasks((prevTasks) =>
+          prevTasks.map((t) =>
+            t._id === task._id ? { ...t, status: updatedTask.status } : t
+          )
+        );
+        fetchTasks(); // Ensure this function is defined and working
+        console.log("Task updated:", updatedTask);
+      } catch (error) {
+        console.error("Error updating task status:", error);
+      }
+    }
+  };
   const closeAllModals = () => {
     setEdit(false); // Close the Edit modal
     setOpen(false); // Close the View modal
@@ -456,44 +499,70 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
                 ? truncateText(card.taskGroup.groupName, 9)
                 : "No Group"}
             </div>
-            {card.status === "Cancelled" &&
-              card?.additionalDetails?.status === "rejected" && (
-                <div className="text-xs border p-1 px-2 rounded font-bold bg-red-400 ">
-                  Rejected_Postponed
-                </div>
-              )}
-            {card.status === "Cancelled" &&
-              card?.additionalDetails?.status !== "rejected" && (
-                <div className="text-xs border p-1 px-2 rounded font-bold bg-red-400 ">
-                  {card?.status === "Cancelled" ? "Postponed" : "Postponed"}
-                </div>
-              )}
-            {card.status === "Completed" && (
-              <Chip
-                className="text-[11px] border  px-1 rounded font-bold text-black  "
-                variant="soft"
-                color={
-                  card.category === "Approved"
-                    ? "success"
-                    : card.category === "Unapproved"
-                    ? "#3c3c3c"
-                    : "gray"
-                }
-              >
-                {card?.category || "Awaiting approval"}
-              </Chip>
-            )}
-            {(card.status === "In Progress" ||
-              card.status === "" ||
-              !card.status) &&
-              dueMessage && (
-                <div
-                  className="text-[11px] border bg-yellow-400 px-2 font-bold rounded py-0.5"
+
+          </div>
+          <div className="flex items-center gap-2">
+            {/* status */}
+            <div>
+              {card.status === "Cancelled" &&
+                card?.additionalDetails?.status === "rejected" && (
+                  <div className="text-xs border p-1 px-2 rounded font-bold bg-red-400 ">
+                    Rejected_Postponed
+                  </div>
+                )}
+              {card.status === "Cancelled" &&
+                card?.additionalDetails?.status !== "rejected" && (
+                  <div className="text-xs border p-1 px-2 rounded font-bold bg-red-400 ">
+                    {card?.status === "Cancelled" ? "Postponed" : "Postponed"}
+                  </div>
+                )}
+              {card.status === "Completed" && (
+                <Chip
+                  className="text-[11px] border  px-1 rounded font-bold text-black  "
                   variant="soft"
+                  color={
+                    card.category === "Approved"
+                      ? "success"
+                      : card.category === "Unapproved"
+                        ? "#3c3c3c"
+                        : "gray"
+                  }
                 >
-                  {dueMessage}
-                </div>
+                  {card?.category || "Awaiting approval"}
+                </Chip>
               )}
+              {(card.status === "In Progress" ||
+                card.status === "" ||
+                !card.status) &&
+                dueMessage && (
+                  <div
+                    className="text-[11px] border bg-yellow-400 px-2 font-bold rounded py-0.5"
+                    variant="soft"
+                  >
+                    {dueMessage}
+                  </div>
+                )}
+            </div>
+            {/* select tag */}
+            <div>
+              <select
+                onClick={(e) => e.stopPropagation()}
+                disabled={card.status === "Completed"}
+                id="card-status"
+                className="bg-gray-50 text-[11px] border rounded-[3px] px-1 border-gray-300 text-gray-900 h-7 focus:ring-blue-500 focus:border-blue-500 block w-[130px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                value={card.status || ""}
+                onChange={(e) => handleStatusChange(card, e.target.value)}
+              >
+                {/* <option value="" disabled>
+              Change Status
+            </option> */}
+                <option value="">To Do</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+                <option value="Postponed">Postponed</option>
+                <option value="Archive">Archive</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -742,7 +811,7 @@ const DragAndDropComponent = ({
       try {
         const response = await fetch(
           process.env.REACT_APP_API_URL +
-            `/api/tasks/${currentCard._id}/cancel`,
+          `/api/tasks/${currentCard._id}/cancel`,
           {
             method: "PUT",
             headers: {

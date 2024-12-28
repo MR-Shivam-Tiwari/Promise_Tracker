@@ -606,16 +606,15 @@ function ViewTask({ data, status, setOpen }) {
               onClick={() => handleCloseModal()} // Close modal on backdrop click
             >
               <div
-                className="bg-white p-6 rounded shadow-lg md:w-[80vw] h-[400px] md:h-[90vh] "
+                className="bg-white p-6 rounded shadow-lg md:w-[500px] "
                 onClick={(e) => e.stopPropagation()} // Prevent click inside modal from closing it
               >
                 <h2 className="text-2xl font-semibold mb-4">
                   {isEditing ? "Edit Subtask" : "Create Subtask"}
                 </h2>
                 <form >
-                  <div className="h-full">
-                   <div className="h-[80%] overflow-y-scroll">
-                   <div className="mb-4">
+                  <div>
+                    <div className="mb-4">
                       <label className="block text-md font-medium text-gray-700">
                         Subtask Name <span className="text-red-600">*</span>
                       </label>
@@ -698,7 +697,6 @@ function ViewTask({ data, status, setOpen }) {
 
 
                     </div>
-                   </div>
 
                     <div className="flex justify-end space-x-4">
                       <button
