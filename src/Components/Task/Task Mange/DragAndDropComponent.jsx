@@ -90,19 +90,48 @@ const Section = ({ title, cards, moveCard, loading, fetchTasks }) => {
 };
 const Card = ({ id, text, status, card, fetchTasks }) => {
   const { userData } = useContext(UserContext);
+    const textareaRef = useRef(null);
+    const inputRef = useRef(null);
+    const userDataString = localStorage.getItem("userData");
+    const [userid, setUserid] = useState(
+      JSON.parse(userDataString)?.userId || ""
+    );
   const [allTasks, setAllTasks] = useState([]);
 
   const [showOptions, setShowOptions] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
   const [edit, setEdit] = useState(false);
   const [canEdit, setCanEdit] = useState(false);
-  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [currentCard, setCurrentCard] = useState(null);
-  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
 
+
+
+  
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [fileLink, setFileLink] = useState(null);
+    const [selectedTask, setSelectedTask] = useState(null);
+    const [currentCard, setCurrentCard] = useState(null);
+    const [viewselectedTask, setviewSelectedTask] = useState(null);
+    const [proofText, setProofText] = useState("");
+    const [proofFile, setProofFile] = useState(null);
+    const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
+    const [remarks, setRemarks] = useState("");
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    useEffect(() => {
+      const userDataString = localStorage.getItem("userData");
+      if (userDataString) {
+        const userDataObj = JSON.parse(userDataString);
+        const userId = userDataObj.userId;
+        setUserid(userId);
+      }
+    }, []);
+
+     useEffect(() => {
+        if (isCompleteModalOpen && textareaRef.current) {
+          textareaRef.current.focus(); // Focus the textarea when the modal opens
+        }
+      }, [isCompleteModalOpen]);
   const checkEdit = () => {
     axios
       .get(
@@ -314,6 +343,7 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
     }
   };
   const handleStatusChange = async (task, newStatus) => {
+    console.log('newStatus', newStatus);
     if (newStatus === "Completed") {
       setCurrentCard(task);
       setIsCompleteModalOpen(true);
@@ -350,6 +380,150 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
       }
     }
   };
+    useEffect(() => {
+      if (isCompleteModalOpen && textareaRef.current) {
+        textareaRef.current.focus(); // Focus the textarea when the modal opens
+      }
+    }, [isCompleteModalOpen]);
+    useEffect(() => {
+      if (isCancelModalOpen && inputRef.current) {
+        inputRef.current.focus(); // Focus the textarea when the modal opens
+      }
+    }, [isCancelModalOpen]);
+      useEffect(() => {
+        if (isCompleteModalOpen && textareaRef.current) {
+          textareaRef.current.focus(); // Focus the textarea when the modal opens
+        }
+      }, [isCompleteModalOpen]);
+
+  const handleCompleteModalSubmit = async () => {
+      const proofTextValue = textareaRef.current.value; // Access the value from textarea using ref
+      const userId = userData?.userId;
+      if (!userId) {
+        console.error("User ID is required");
+        toast.error("User ID is required");
+        return;
+      }
+      if (!proofTextValue) {
+        console.error("Proof text is required");
+        toast.error("Proof text is required");
+        return;
+      }
+  
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/tasks/${currentCard._id}/complete`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              text: proofTextValue, // Use the value from ref
+              file: fileLink,
+              userId: userId,
+            }),
+          }
+        );
+  
+        if (!response.ok) {
+          throw new Error("Failed to update task status");
+        }
+  
+        const updatedTask = await response.json();
+  
+        setAllTasks((prevTasks) =>
+          prevTasks.map((t) =>
+            t._id === currentCard._id ? { ...t, status: updatedTask.status } : t
+          )
+        );
+        fetchTasks();
+        toast.dismiss();
+        toast.success("Task Status Updated");
+        handleCompleteModalClose();
+        textareaRef.current.value = ""; // Clear the textarea after submission
+        setFileLink(null);
+      } catch (error) {
+        console.error("Error updating task status:", error);
+        toast.error("Failed to update task status");
+      }
+    };
+  
+    const handleCancelModalSubmit = async () => {
+      const remarks = inputRef.current.value;
+      if (!remarks || !selectedDate) {
+        console.error("Remark text and date are required");
+        toast.error("Remark text and date are required");
+        return;
+      }
+  
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/tasks/${currentCard._id}/cancel`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              remark: {
+                text: remarks,
+                date: selectedDate.toISOString().split("T")[0],
+              },
+              additionalDetails: {}, // Add any other details if required
+            }),
+          }
+        );
+  
+        if (!response.ok) {
+          throw new Error("Failed to update task status");
+        }
+  
+        // generateLog(currentCard._id, "apply_postponed"); // Ensure you have this function defined elsewhere
+        fetchTasks();
+        toast.dismiss();
+        toast.success("Task Status Updated");
+        handleCancelModalClose();
+      } catch (error) {
+        console.error("Error updating task status:", error);
+        toast.error("Error updating task status");
+      }
+    };
+  const handleCompleteModalClose = () => {
+    setIsCompleteModalOpen(false);
+    setCurrentCard(null);
+    setProofText("");
+    setProofFile(null);
+  };
+
+  const handleCancelModalClose = () => {
+    setIsCancelModalOpen(false);
+    setCurrentCard(null);
+    setRemarks("");
+    setSelectedDate(new Date());
+  };
+  const generateLInk = (file) => {
+    console.log("file", file);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    console.log("formData", formData);
+
+    axios
+      .post(`${process.env.REACT_APP_API_URL}/api/upload-file`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        setFileLink(res?.data?.result);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  
   const closeAllModals = () => {
     setEdit(false); // Close the Edit modal
     setOpen(false); // Close the View modal
@@ -390,8 +564,8 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
             ) : card?.isSubtask === true ?
               <>
                 <div className="flex flex-col justify-start">
-                  <p className=" font-semibold text-gray-800 mb-1">(Subtask)</p>
-                  <p>{truncateText(card?.taskName, 26)}</p>
+                  <p className=" font-semibold text-gray-800 mb-1">{truncateText(card?.taskName, 26)}</p>
+                  <p className="text-gray-400">(Subtask of <span className="font-semibold text-gray-500 underline">{truncateText(card?.subtaskDetail?.parentTaskId?.taskName, 26)}</span>)</p>
                 </div>
 
               </> : (
@@ -614,6 +788,142 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
           <EditTask data={card} fetchTasks={fetchTasks} setEdit={setEdit} />
         </Sheet>
       </Modal>
+      {isCompleteModalOpen && (
+              <div
+                className="fixed inset-0 z-10 flex items-center justify-center bg-gray-900 bg-opacity-50"
+                //   onClick={handleCompleteModalClose}
+              >
+                <div
+                  className="bg-white rounded-lg shadow-lg w-11/12 max-w-lg p-6"
+                  onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
+                >
+                  <h2
+                    id="complete-modal-title"
+                    className="text-xl font-semibold text-gray-900 mb-4"
+                  >
+                    Complete Task
+                  </h2>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label htmlFor="proofFile" className="block text-gray-700">
+                        Proof of Work (File) <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        type="file"
+                        name="proofFile"
+                        className="w-full bg-gray-100 text-black rounded-md border border-gray-300 px-3 py-2 text-sm"
+                        id="proofFile"
+                        onChange={(e) => {
+                          generateLInk(e.target.files[0]);
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="proofText" className="block text-gray-700">
+                        Proof of Work (Text) <span className="text-red-600">*</span>
+                      </label>
+                      <textarea
+                        ref={textareaRef} // Assign the ref to textarea
+                        name="proofText"
+                        className="w-full h-24 bg-gray-100 text-black rounded-md border border-gray-300 px-3 py-2 text-sm "
+                        id="proofText"
+                        placeholder="Enter proof of work text..."
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2 mt-4">
+                    <button
+                      onClick={handleCompleteModalClose}
+                      className="bg-gray-300 text-gray-800 rounded-md px-4 py-2 text-sm font-semibold"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="bg-blue-500 px-3 text-white rounded "
+                      onClick={handleCompleteModalSubmit}
+                      // disabled={!proofText}
+                      // className={`${
+                      //   !proofText
+                      //     ? "bg-gray-400 text-gray-600"
+                      //     : "bg-blue-500 text-white"
+                      // } rounded-md px-4 py-2 text-sm font-semibold`}
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+      
+            {isCancelModalOpen && (
+              <Modal
+                aria-labelledby="postponed-modal-title"
+                aria-describedby="postponed-modal-desc"
+                open={isCancelModalOpen}
+                onClose={handleCancelModalClose}
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Sheet
+                  variant="outlined"
+                  sx={{
+                    maxWidth: 1000,
+                    borderRadius: "md",
+                    p: 3,
+                    boxShadow: "lg",
+                    width: 400,
+                  }}
+                >
+                  <Typography
+                    component="h2"
+                    id="postponed-modal-title"
+                    level="h4"
+                    textColor="inherit"
+                    fontWeight="lg"
+                    mb={1}
+                  >
+                    Postpone Task
+                  </Typography>
+                  <div className="grid gap-4">
+                    <div className="gap-2 grid">
+                      <label>
+                        Select New Deadline Date{" "}
+                        <span className="text-red-600 ">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        className="flex h-10 w-full bg-gray-300 text-black rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        name="selectedDate"
+                        id="selectedDate"
+                        value={selectedDate.toISOString().split("T")[0]} // Convert date to string
+                        onChange={(e) => setSelectedDate(new Date(e.target.value))} // Set selectedDate as Date object
+                      />
+                    </div>
+                    <div className="gap-2 grid">
+                      <label>
+                        Remarks <span className="text-red-600 ">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="remarks"
+                        className="flex h-10 w-full bg-gray-300 text-black rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        id="remarks"
+                        ref={inputRef}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2 mt-4">
+                    <Button onClick={handleCancelModalClose} variant="plain">
+                      Cancel
+                    </Button>
+                    <Button onClick={handleCancelModalSubmit}>Submit</Button>
+                  </div>
+                </Sheet>
+              </Modal>
+            )}
     </div>
   );
 };
@@ -807,6 +1117,7 @@ const DragAndDropComponent = ({
         toast.error("Internal Server Error");
       });
   };
+  
 
   const handleCancelModalSubmit = async () => {
     if (!remarks || !selectedDate) {

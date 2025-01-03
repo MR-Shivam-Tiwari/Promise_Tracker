@@ -89,14 +89,14 @@ function ViewTask({ data, status, setOpen }) {
     fetchRegisteredNames();
     getMember()
   }, []);
-  
+
 
   const [loader, setLoader] = useState(false);
   const [logs, setLogs] = useState([]);
 
   const [selectedOption, setSelectedOption] = useState("all");
   const [filterUserTasks, setFilterUserTasks] = useState([]);
-  const [isOpen, setIsOpen] = useState(false); // State to control accordion open/close
+  const [isOpen, setIsOpen] = useState(true); // State to control accordion open/close
   const [inputValue, setInputValue] = useState('');
 
 
@@ -146,8 +146,8 @@ function ViewTask({ data, status, setOpen }) {
         console.log(err);
       });
   };
-  
-  
+
+
 
   const getAllLogs = () => {
     axios
@@ -206,10 +206,10 @@ function ViewTask({ data, status, setOpen }) {
 
       const response = await axios.put(
         `${process.env.REACT_APP_API_URL}/api/tasks/${id}/status`, {
-          status:oldStatus==="Completed"?"In Progress":"Completed"
-        },
+        status: oldStatus === "Completed" ? "In Progress" : "Completed"
+      },
       );
-      
+
 
       getAllSubTasks();
     }
@@ -341,10 +341,10 @@ function ViewTask({ data, status, setOpen }) {
             {data?.taskGroup.groupName}
           </h1>
           <span className="text-gray-600 font-bold">
-            ({data?.status || "To Do"})
+            (Status : {data?.status || "To Do"})
           </span>
-         {data?.isSubtask && <span className="text-gray-600 font-bold">
-            (Subtask)
+          {data?.isSubtask && <span className="text-gray-600 font-semibold">
+            (Subtask of <span className="font-bold underline">{data?.subtaskDetail?.parentTaskId?.taskName}</span>)
           </span>}
         </div>
         <button
@@ -523,15 +523,15 @@ function ViewTask({ data, status, setOpen }) {
           <hr className="mt-4 mb-4 " />
 
           {/* comment show here */}
-          <div className="mt-4 select-none">
+       {!data?.isSubtask &&   <div className="mt-4 select-none">
             <div>
 
               <CommentComponent getAllLogs={getAllLogs} data={data} />
 
             </div>
-          </div>
+          </div>}
           <hr className="mt-4 mb-4 " />
-          <div>
+          {!data?.isSubtask && <div>
             <div className="flex justify-between items-center mb-8">
               <div>
                 <h3 className="text-lg font-bold">
@@ -622,13 +622,13 @@ function ViewTask({ data, status, setOpen }) {
                 </>
               );
             })}
-          </div>
+          </div>}
           {
             // sub task modal
             showModal &&
             (
               <>
-              <SubTaskModal currentTaskId={currentTaskId} isEditing={isEditing} parentTaskId={data._id} data={data} toggleModal={handleCloseModal} getAllSubTasks={getAllSubTasks}/>
+                <SubTaskModal  getAllLogs={getAllLogs} currentTaskId={currentTaskId} isEditing={isEditing} parentTaskId={data._id} data={data} toggleModal={handleCloseModal} getAllSubTasks={getAllSubTasks} />
               </>
             )
           }
@@ -636,7 +636,7 @@ function ViewTask({ data, status, setOpen }) {
             <div>{status}</div>
           </div>
           <hr className="font-bold text-gray-800" />
-          <div>
+          {!data?.isSubtask && <div>
             <h3
               className="text-black text-lg mb-5 font-bold cursor-pointer"
               onClick={toggleAccordion} // Trigger accordion open/close on click
@@ -656,7 +656,7 @@ function ViewTask({ data, status, setOpen }) {
                 ))}
               </div>
             )}
-          </div>
+          </div>}
 
         </div>
       </div>
@@ -669,32 +669,220 @@ export default ViewTask;
 
 // create subtask old code 
 
-const SubTaskModal = ({parentTaskId,data,isEditing, toggleModal, getAllSubTasks, currentTaskId}) => {
+const SubTaskModal = ({ parentTaskId, data, isEditing, toggleModal,getAllLogs, getAllSubTasks, currentTaskId }) => {
   const { userData } = useContext(UserContext);
+  const userDataString = localStorage.getItem("userData");
+  const [userid, setUserid] = useState(
+    JSON.parse(userDataString)?.userId || ""
+  );
+  const [tasksToDo, setTasksToDo] = useState([]);
+  const [tasksInProgress, setTasksInProgress] = useState([]);
+  const [tasksCompleted, setTasksCompleted] = useState([]);
+  const [tasksCancelled, setTasksCancelled] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [allTasks, setAllTasks] = useState([]);
+  const [taskGroups, setTaskGroups] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [modal, setModal] = useState(false);
+  const [groupData, setGroupData] = useState([]);
+  const [departmentHeads, setDepartmentHeads] = useState([]);
+  const [selectProjectLead, setProjectLead] = useState([]);
+  const [selectMembers, setMembers] = useState([]);
+  const [audioLoader, setAudioLoader] = useState(false);
+  const [allMemberOfGroup, setAllMemberOfGroup] = useState([]);
+  const [formData, setFormData] = useState({
+    owner: { id: "" },
+    taskGroup: data?.taskGroup,
+    taskName: "",
+    description: "",
+    audioFile: "",
+    startDate: "",
+    endDate: "",
+    reminder: "",
+    people: [],
+    isSubtask: true,
+    subtaskDetail: {
+      parentTaskId: parentTaskId
+    }
+  });
+
+
+
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioUrl, setAudioUrl] = useState("");
+  const [uploadResultVoice, setuploadResultVoice] = useState("");
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const [singleFile, setSingleFile] = useState("");
+  useEffect(() => {
     const userDataString = localStorage.getItem("userData");
-    const [userid, setUserid] = useState(
-      JSON.parse(userDataString)?.userId || ""
-    );
-    const [tasksToDo, setTasksToDo] = useState([]);
-    const [tasksInProgress, setTasksInProgress] = useState([]);
-    const [tasksCompleted, setTasksCompleted] = useState([]);
-    const [tasksCancelled, setTasksCancelled] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [allTasks, setAllTasks] = useState([]);
-    const [taskGroups, setTaskGroups] = useState([]);
-    const [selectedGroup, setSelectedGroup] = useState("");
-    const navigate = useNavigate();
-    const location = useLocation();
-    const [modal, setModal] = useState(false);
-    const [groupData, setGroupData] = useState([]);
-    const [departmentHeads, setDepartmentHeads] = useState([]);
-    const [selectProjectLead, setProjectLead] = useState([]);
-    const [selectMembers, setMembers] = useState([]);
-    const [audioLoader, setAudioLoader] = useState(false);
-    const [allMemberOfGroup, setAllMemberOfGroup] = useState([]);
-    const [formData, setFormData] = useState({
-      owner: { id: "" },
-      taskGroup: data?.taskGroup,
+    if (userDataString) {
+      const userDataObj = JSON.parse(userDataString);
+      const userId = userDataObj.userId;
+      setUserid(userId);
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        owner: { id: userId },
+      }));
+    }
+  }, []);
+
+  const generateLog = (taskId, action, customDetails) => {
+    console.log("customDetails");
+    const logData = {
+      userId: userData?.userId,
+      taskId,
+      action,
+      userName: userData?.name,
+      details: customDetails || {
+        subTaskName: formData?.taskName,
+        assign_to: formData?.people,
+      },
+    };
+    return axios
+      .post(`${process.env.REACT_APP_API_URL}/api/logs`, logData)
+      .then((res) => {
+        console.log("res", res.data);
+        getAllLogs();
+    console.log("customDetails");
+
+      })
+      .catch((err) => {
+        toast.dismiss();
+        toast.error("Internal Server Error");
+        throw err; // Throw error to handle it properly in the calling function
+      });
+  };
+  const getTaskDetail = () => {
+    axios.get(`${process.env.REACT_APP_API_URL}/api/tasks/${currentTaskId}`)
+      .then((res) => {
+        setFormData(prev => {
+          return { ...prev, ...res.data }
+        })
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+  useEffect(() => {
+    if (isEditing) {
+      getTaskDetail()
+    }
+  }, [currentTaskId]);
+
+
+
+  const handleChange = (fieldName, value) => {
+    if (fieldName === "people") {
+      const selectedUsers = value.map((name) => {
+        return selectMembers.find((member) => member.name === name);
+      });
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [fieldName]: selectedUsers,
+      }));
+    } else if (fieldName === "taskGroup") {
+      if (value) {
+        const [groupName, groupId] = value.split("||");
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          taskGroup: { groupName, groupId },
+        }));
+      } else {
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          taskGroup: { groupName: "", groupId: "" },
+        }));
+      }
+    } else {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [fieldName]: value,
+      }));
+    }
+  };
+  const generateAddTaskLog = (taskId, formData) => {
+    console.log("laskdfjalskfjladskfjsdlakfjsdafjsa", taskId);
+    const data = {
+      userId: userData?.userId,
+      taskId,
+      action: "create",
+      userName: userData?.name,
+      details: {
+        member: [...formData.people],
+      },
+    };
+    axios
+      .post(`${process.env.REACT_APP_API_URL}/api/logs`, data)
+      .then((res) => {
+        resetForm();
+        console.log("res", res.data);
+      })
+      .catch((err) => {
+        toast.dismiss();
+        toast.error("Internal Server Error");
+      });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { taskGroup, taskName, description, startDate, endDate } = formData;
+
+    if (
+      !taskGroup.groupId ||
+      !taskName ||
+      !description ||
+      !startDate ||
+      !endDate
+    ) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+
+    let apiUrl = "";
+    let method = "POST";
+
+    if (isEditing) {
+      apiUrl = "/api/tasksedit/" + currentTaskId;
+      method = "PUT";
+    } else {
+      apiUrl = "/api/tasksadd";
+    }
+
+    try {
+      const response = await axios({
+        method: method,
+        url: process.env.REACT_APP_API_URL + apiUrl,
+        data: {
+          ...formData,
+          audioFile: uploadResultVoice,
+          pdfFile: singleFile
+        }
+      });
+
+
+      await generateLog(data?._id, isEditing ? "edit_subtask" : "create_subtask");
+      
+      console.log("above tollge")
+      // Reset the form and close the modal immediately
+      resetForm();
+      // getAllLogs();
+      toggleModal(); // Close modal immediately after the task is saved
+      await fetchTasks(); // Refetch tasks after creating a new one
+      await fetchTasksmain();
+      getAllSubTasks();
+    } catch (error) {
+      console.error("Error creating or updating task:", error);
+    }
+  };
+
+
+  const resetForm = () => {
+    setFormData({
+      owner: { id: userid },
+      taskGroup: { groupName: "", groupId: "" },
       taskName: "",
       description: "",
       audioFile: "",
@@ -702,469 +890,300 @@ const SubTaskModal = ({parentTaskId,data,isEditing, toggleModal, getAllSubTasks,
       endDate: "",
       reminder: "",
       people: [],
-      isSubtask: true,
-      subtaskDetail:{
-        parentTaskId: parentTaskId
-      }
     });
+  };
 
+  const fetchGroupData = async () => {
+    try {
+      const response = await axios.get(
+        process.env.REACT_APP_API_URL + "/api/groups"
+      );
+      setGroupData(response.data);
+      // console.log("groupData", response.data);
+    } catch (error) {
+      // console.log("Error fetching Task: ", error);
+    }
+  };
 
-  
-    const [isRecording, setIsRecording] = useState(false);
-    const [audioUrl, setAudioUrl] = useState("");
-    const [uploadResultVoice, setuploadResultVoice] = useState("");
-    const mediaRecorderRef = useRef(null);
-    const audioChunksRef = useRef([]);
-    const [singleFile, setSingleFile] = useState("");
-    useEffect(() => {
-      const userDataString = localStorage.getItem("userData");
-      if (userDataString) {
-        const userDataObj = JSON.parse(userDataString);
-        const userId = userDataObj.userId;
-        setUserid(userId);
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          owner: { id: userId },
-        }));
-      }
-    }, []);
+  const fetchRegisteredNames = async () => {
+    try {
+      const response = await axios.get(
+        process.env.REACT_APP_API_URL + "/api/userData"
+      );
+      const filteredDepartmentHeads = response.data.filter(
+        (user) => user.userRole === 1
+      );
+      setDepartmentHeads(filteredDepartmentHeads);
+      const filteredProjectlead = response.data.filter(
+        (user) => user.userRole === 2
+      );
+      setProjectLead(filteredProjectlead);
+      const filterMember = response.data.filter(
+        (user) =>
+          user.userRole === 3 || user.userRole === 2 || user.userRole === 1
+      );
+      setMembers(filterMember);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
-    
-  const getTaskDetail = ()=>{
-    axios.get(`${process.env.REACT_APP_API_URL}/api/tasks/${currentTaskId}`)
-    .then((res) => {
-      setFormData(prev=>{
-        return {...prev, ...res.data}
+  const filterTasksByStatus = (tasks, status) =>
+    tasks.filter(
+      (task) => task.status === status || (status === "To Do" && !task.status)
+    );
+
+  const getAllMemberByGroup = () => {
+    axios.get(`${process.env.REACT_APP_API_URL}/api/members/${formData?.taskGroup?.groupId}`)
+      .then((res) => {
+        // console.log("res",res.data);
+        const apiData = res.data;
+        setAllMemberOfGroup([...apiData.members, ...apiData.deptHead, ...apiData.projectLead]);
       })
-    })
-    .catch(err => {
-      console.log(err)
-    })
   }
   useEffect(() => {
-    if(isEditing){
-      getTaskDetail()
+    // fetchRegisteredNames();
+    // fetchGroupData();
+    if (formData?.taskGroup?.groupId) {
+      getAllMemberByGroup();
     }
-  }, [currentTaskId]);
-    
+  }, [formData?.taskGroup?.groupId]);
 
-
-    const handleChange = (fieldName, value) => {
-      if (fieldName === "people") {
-        const selectedUsers = value.map((name) => {
-          return selectMembers.find((member) => member.name === name);
-        });
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          [fieldName]: selectedUsers,
-        }));
-      } else if (fieldName === "taskGroup") {
-        if (value) {
-          const [groupName, groupId] = value.split("||");
-          setFormData((prevFormData) => ({
-            ...prevFormData,
-            taskGroup: { groupName, groupId },
-          }));
-        } else {
-          setFormData((prevFormData) => ({
-            ...prevFormData,
-            taskGroup: { groupName: "", groupId: "" },
-          }));
-        }
-      } else {
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          [fieldName]: value,
-        }));
-      }
-    };
-    const generateAddTaskLog = (taskId, formData) => {
-      console.log("laskdfjalskfjladskfjsdlakfjsdafjsa", taskId);
-      const data = {
-        userId: userData?.userId,
-        taskId,
-        action: "create",
-        userName: userData?.name,
-        details: {
-          member: [...formData.people],
-        },
-      };
-      axios
-        .post(`${process.env.REACT_APP_API_URL}/api/logs`, data)
-        .then((res) => {
-          resetForm();
-          console.log("res", res.data);
-        })
-        .catch((err) => {
-          toast.dismiss();
-          toast.error("Internal Server Error");
-        });
-    };
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      const { taskGroup, taskName, description, startDate, endDate } = formData;
-    
-      if (
-        !taskGroup.groupId ||
-        !taskName ||
-        !description ||
-        !startDate ||
-        !endDate
-      ) {
-        toast.error("Please fill in all fields.");
-        return;
-      }
-      
-      let apiUrl = "";
-      let method = "POST";
-    
-      if (isEditing) {
-        apiUrl = "/api/tasksedit/" + currentTaskId;
-        method = "PUT";
-      } else {
-        apiUrl = "/api/tasksadd";
-      }
-    
-      try {
-        const response = await axios({
-          method: method,
-          url: process.env.REACT_APP_API_URL + apiUrl,
-          data: { 
-            ...formData, 
-            audioFile: uploadResultVoice, 
-            pdfFile: singleFile 
-          }
-        });
-    
-        console.log(response.data);
-    
-        // If editing, update logs and close the modal immediately
-        // if (isEditing) {
-        //   generateAddTaskLog(response.data.newTask._id, formData);
-        // }
-        
-        // // If creating a new task, do the same
-        // generateAddTaskLog(response.data.newTask._id, formData);
-        console.log("above tollge")
-        // Reset the form and close the modal immediately
-        resetForm();
-        toggleModal(); // Close modal immediately after the task is saved
-        
-        await fetchTasks(); // Refetch tasks after creating a new one
-        await fetchTasksmain();
-        getAllSubTasks();
-      } catch (error) {
-        console.error("Error creating or updating task:", error);
-      }
-    };
-    
-  
-    const resetForm = () => {
-      setFormData({
-        owner: { id: userid },
-        taskGroup: { groupName: "", groupId: "" },
-        taskName: "",
-        description: "",
-        audioFile: "",
-        startDate: "",
-        endDate: "",
-        reminder: "",
-        people: [],
-      });
-    };
-  
-    const fetchGroupData = async () => {
-      try {
-        const response = await axios.get(
-          process.env.REACT_APP_API_URL + "/api/groups"
-        );
-        setGroupData(response.data);
-        // console.log("groupData", response.data);
-      } catch (error) {
-        // console.log("Error fetching Task: ", error);
-      }
-    };
-  
-    const fetchRegisteredNames = async () => {
-      try {
-        const response = await axios.get(
-          process.env.REACT_APP_API_URL + "/api/userData"
-        );
-        const filteredDepartmentHeads = response.data.filter(
-          (user) => user.userRole === 1
-        );
-        setDepartmentHeads(filteredDepartmentHeads);
-        const filteredProjectlead = response.data.filter(
-          (user) => user.userRole === 2
-        );
-        setProjectLead(filteredProjectlead);
-        const filterMember = response.data.filter(
-          (user) =>
-            user.userRole === 3 || user.userRole === 2 || user.userRole === 1
-        );
-        setMembers(filterMember);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    
-    const filterTasksByStatus = (tasks, status) =>
-      tasks.filter(
-        (task) => task.status === status || (status === "To Do" && !task.status)
+  const fetchTasks = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/tasks`
       );
-  
-      const getAllMemberByGroup = ()=>{
-        axios.get(`${process.env.REACT_APP_API_URL}/api/members/${formData?.taskGroup?.groupId}`)
-        .then((res) => {
-          // console.log("res",res.data);
-          const apiData = res.data;
-          setAllMemberOfGroup([...apiData.members, ...apiData.deptHead, ...apiData.projectLead]);
-        })
-      }
-      useEffect(() => {
-        // fetchRegisteredNames();
-        // fetchGroupData();
-      if(formData?.taskGroup?.groupId){
-        getAllMemberByGroup();
-      }
-      }, [formData?.taskGroup?.groupId]);
-  
-    const fetchTasks = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/tasks`
-        );
-        const filteredTasks = response.data.filter((task) => {
-          const isOwner = task.owner.id === userid;
-          const isPerson = task.people.some((person) => person.userId === userid);
-          return isOwner || isPerson;
-        });
-  
-        setAllTasks(filteredTasks);
-        setTasksToDo(filterTasksByStatus(filteredTasks, "To Do"));
-        setTasksInProgress(filterTasksByStatus(filteredTasks, "In Progress"));
-        setTasksCompleted(filterTasksByStatus(filteredTasks, "Completed"));
-        setTasksCancelled(filterTasksByStatus(filteredTasks, "Cancelled"));
-        setTaskGroups([
-          ...new Set(filteredTasks.map((task) => task?.taskGroup?.groupName)),
-        ]);
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      }
+      const filteredTasks = response.data.filter((task) => {
+        const isOwner = task.owner.id === userid;
+        const isPerson = task.people.some((person) => person.userId === userid);
+        return isOwner || isPerson;
+      });
+
+      setAllTasks(filteredTasks);
+      setTasksToDo(filterTasksByStatus(filteredTasks, "To Do"));
+      setTasksInProgress(filterTasksByStatus(filteredTasks, "In Progress"));
+      setTasksCompleted(filterTasksByStatus(filteredTasks, "Completed"));
+      setTasksCancelled(filterTasksByStatus(filteredTasks, "Cancelled"));
+      setTaskGroups([
+        ...new Set(filteredTasks.map((task) => task?.taskGroup?.groupName)),
+      ]);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+    fetchTasksmain();
+  }, []);
+
+  // Inside your component
+
+  useEffect(() => {
+    // const debouncedFetchTasks = debounce(fetchTasks, 300); // 300ms debounce
+
+    socket.on("newTask", (data) => {
+      fetchTasks();
+    });
+    socket.on("taskStatusUpdate", (data) => {
+      fetchTasks();
+    });
+    socket.on("taskCompleted", (data) => {
+      fetchTasks();
+    });
+    // socket.on('taskStatusUpdate', debouncedFetchTasks);
+    // socket.on('taskCompleted', debouncedFetchTasks);
+
+    return () => {
+      socket.off("newTask");
+      socket.off("taskStatusUpdate");
+      socket.off("taskCompleted");
     };
-  
-    useEffect(() => {
+  }, []);
+
+  useEffect(() => {
+    fetchGroupData();
+    fetchRegisteredNames();
+  }, []);
+
+  useEffect(() => {
+    if (userid) {
       fetchTasks();
       fetchTasksmain();
-    }, []);
-  
-    // Inside your component
-  
-    useEffect(() => {
-      // const debouncedFetchTasks = debounce(fetchTasks, 300); // 300ms debounce
-  
-      socket.on("newTask", (data) => {
-        fetchTasks();
-      });
-      socket.on("taskStatusUpdate", (data) => {
-        fetchTasks();
-      });
-      socket.on("taskCompleted", (data) => {
-        fetchTasks();
-      });
-      // socket.on('taskStatusUpdate', debouncedFetchTasks);
-      // socket.on('taskCompleted', debouncedFetchTasks);
-  
-      return () => {
-        socket.off("newTask");
-        socket.off("taskStatusUpdate");
-        socket.off("taskCompleted");
+    }
+  }, [userid]);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const groupName = searchParams.get("groupName");
+    if (groupName) {
+      setSelectedGroup(groupName);
+    }
+  }, [location.search]);
+
+  useEffect(() => {
+    if (selectedGroup !== "") {
+      const filteredTasks = allTasks?.filter(
+        (task) => task?.taskGroup?.groupName === selectedGroup
+      );
+      setTasksToDo(
+        filteredTasks?.filter((task) => !task.status || task.status === "To Do")
+      );
+      setTasksInProgress(
+        filteredTasks?.filter((task) => task.status === "In Progress")
+      );
+      setTasksCompleted(
+        filteredTasks?.filter((task) => task.status === "Completed")
+      );
+      setTasksCancelled(
+        filteredTasks?.filter((task) => task.status === "Cancelled")
+      );
+    } else {
+      setTasksToDo(
+        allTasks?.filter((task) => !task.status || task.status === "To Do")
+      );
+      setTasksInProgress(
+        allTasks?.filter((task) => task.status === "In Progress")
+      );
+      setTasksCompleted(
+        allTasks?.filter((task) => task.status === "Completed")
+      );
+      setTasksCancelled(
+        allTasks?.filter((task) => task.status === "Cancelled")
+      );
+    }
+  }, [selectedGroup, allTasks]);
+
+  // const toggleModal = () => {
+  //   setModal(!modal);
+  //   // fetchGroupData();
+  //   // fetchRegisteredNames();
+  // };
+
+  const startRecording = async (e) => {
+    e.preventDefault();
+    setIsRecording(true);
+    audioChunksRef.current = [];
+    console.log("start ");
+    try {
+      console.log("first try");
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
       };
-    }, []);
-  
-    useEffect(() => {
-      fetchGroupData();
-      fetchRegisteredNames();
-    }, []);
-  
-    useEffect(() => {
-      if (userid) {
-        fetchTasks();
-        fetchTasksmain();
-      }
-    }, [userid]);
-  
-    useEffect(() => {
-      const searchParams = new URLSearchParams(location.search);
-      const groupName = searchParams.get("groupName");
-      if (groupName) {
-        setSelectedGroup(groupName);
-      }
-    }, [location.search]);
-  
-    useEffect(() => {
-      if (selectedGroup !== "") {
-        const filteredTasks = allTasks?.filter(
-          (task) => task?.taskGroup?.groupName === selectedGroup
-        );
-        setTasksToDo(
-          filteredTasks?.filter((task) => !task.status || task.status === "To Do")
-        );
-        setTasksInProgress(
-          filteredTasks?.filter((task) => task.status === "In Progress")
-        );
-        setTasksCompleted(
-          filteredTasks?.filter((task) => task.status === "Completed")
-        );
-        setTasksCancelled(
-          filteredTasks?.filter((task) => task.status === "Cancelled")
-        );
-      } else {
-        setTasksToDo(
-          allTasks?.filter((task) => !task.status || task.status === "To Do")
-        );
-        setTasksInProgress(
-          allTasks?.filter((task) => task.status === "In Progress")
-        );
-        setTasksCompleted(
-          allTasks?.filter((task) => task.status === "Completed")
-        );
-        setTasksCancelled(
-          allTasks?.filter((task) => task.status === "Cancelled")
-        );
-      }
-    }, [selectedGroup, allTasks]);
-  
-    // const toggleModal = () => {
-    //   setModal(!modal);
-    //   // fetchGroupData();
-    //   // fetchRegisteredNames();
-    // };
-  
-    const startRecording = async (e) => {
-      e.preventDefault();
-      setIsRecording(true);
-      audioChunksRef.current = [];
-      console.log("start ");
-      try {
-        console.log("first try");
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorderRef.current = new MediaRecorder(stream);
-        mediaRecorderRef.current.ondataavailable = (event) => {
-          audioChunksRef.current.push(event.data);
-        };
-        mediaRecorderRef.current.onstop = async () => {
-          const audioBlob = new Blob(audioChunksRef.current, {
-            type: "audio/wav",
-          });
-          const audioUrl = URL.createObjectURL(audioBlob);
-          setAudioUrl(audioUrl);
-          await uploadAudio(audioBlob);
-          console.log("last try", audioBlob);
-        };
-        mediaRecorderRef.current.start();
-      } catch (error) {
-        console.error("Error starting recording:", error);
-        setIsRecording(false);
-      }
-    };
-  
-    const stopRecording = (e) => {
-      e.preventDefault();
-      if (mediaRecorderRef.current) {
-        mediaRecorderRef.current.stop();
-        setIsRecording(false);
-      }
-    };
-  
-    const uploadAudio = async (audioBlob) => {
-      setAudioLoader(true);
-      console.log("alsjdfklsajfdlkafjdslkaf", audioBlob);
-      const formData = new FormData();
-      formData.append("voice", audioBlob, "recording.wav");
-  
-      try {
-        const response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/api/upload-voice`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        setAudioLoader(false);
-  
-        setuploadResultVoice(response.data.result);
-      } catch (error) {
-        setAudioLoader(false);
-      }
-    };
-    const uploadSingleFile = async (file) => {
-      if (!file) {
-        // setUploadResult('No file selected.');
-        toast.dismiss();
-        toast.error("Please select an file to upload.");
-        return;
-      }
-  
-      const formData = new FormData();
-      formData.append("file", file);
-  
-      try {
-        const response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/api/upload-file`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        setSingleFile(response.data.result);
-        toast.dismiss();
-        toast.success(response.data.message);
-      } catch (error) {
-        console.error(error);
-        toast.dismiss();
-        toast.error(error.response?.data?.error || error.message);
-      }
-    };
-  
-    const handleFileSelect = (event) => {
-      uploadSingleFile(event.target.files[0]);
-    };
-    const handleUploadClick = () => {
-      document.getElementById("image-upload").click();
-    };
-    const [allTasksmain, setAllTasksmain] = useState([]);
-    const [filter, setFilter] = useState("To Do");
-    const filteredTasks = filterTasksByStatus(allTasksmain, filter);
-  
-    useEffect(() => {
-      if (userid) {
-        fetchTasks();
-      }
-    }, [userid]);
-  
-    const fetchTasksmain = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/tasks`
-        );
-        const filteredTasks = response.data.filter((task) => {
-          const isOwner = task.owner.id === userid;
-          const isPerson = task.people.some((person) => person.userId === userid);
-          return isOwner || isPerson;
+      mediaRecorderRef.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/wav",
         });
-  
-        setAllTasksmain(filteredTasks);
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      }
-    };
-  
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudioUrl(audioUrl);
+        await uploadAudio(audioBlob);
+        console.log("last try", audioBlob);
+      };
+      mediaRecorderRef.current.start();
+    } catch (error) {
+      console.error("Error starting recording:", error);
+      setIsRecording(false);
+    }
+  };
+
+  const stopRecording = (e) => {
+    e.preventDefault();
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const uploadAudio = async (audioBlob) => {
+    setAudioLoader(true);
+    console.log("alsjdfklsajfdlkafjdslkaf", audioBlob);
+    const formData = new FormData();
+    formData.append("voice", audioBlob, "recording.wav");
+
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/upload-voice`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setAudioLoader(false);
+
+      setuploadResultVoice(response.data.result);
+    } catch (error) {
+      setAudioLoader(false);
+    }
+  };
+  const uploadSingleFile = async (file) => {
+    if (!file) {
+      // setUploadResult('No file selected.');
+      toast.dismiss();
+      toast.error("Please select an file to upload.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/upload-file`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setSingleFile(response.data.result);
+      toast.dismiss();
+      toast.success(response.data.message);
+    } catch (error) {
+      console.error(error);
+      toast.dismiss();
+      toast.error(error.response?.data?.error || error.message);
+    }
+  };
+
+  const handleFileSelect = (event) => {
+    uploadSingleFile(event.target.files[0]);
+  };
+  const handleUploadClick = () => {
+    document.getElementById("image-upload").click();
+  };
+  const [allTasksmain, setAllTasksmain] = useState([]);
+  const [filter, setFilter] = useState("To Do");
+  const filteredTasks = filterTasksByStatus(allTasksmain, filter);
+
+  useEffect(() => {
+    if (userid) {
+      fetchTasks();
+    }
+  }, [userid]);
+
+  const fetchTasksmain = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/tasks`
+      );
+      const filteredTasks = response.data.filter((task) => {
+        const isOwner = task.owner.id === userid;
+        const isPerson = task.people.some((person) => person.userId === userid);
+        return isOwner || isPerson;
+      });
+
+      setAllTasksmain(filteredTasks);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  };
+
 
   return (
     <>
@@ -1200,7 +1219,7 @@ const SubTaskModal = ({parentTaskId,data,isEditing, toggleModal, getAllSubTasks,
               </button>
               <div className="px-6 py-6 lg:px-8">
                 <h3 className="mb-4 text-xl font-medium text-gray-900 ">
-             {    isEditing?"Edit SubTask":" Add SubTask"}
+                  {isEditing ? "Edit SubTask" : " Add SubTask"}
                 </h3>
                 <form className="space-y-3" onSubmit={handleSubmit}>
                   <div className="grid grid-cols-2 gap-3">
@@ -1233,7 +1252,7 @@ const SubTaskModal = ({parentTaskId,data,isEditing, toggleModal, getAllSubTasks,
                         Task Group <span className="text-red-500 ">*</span>
                       </label>
                       <select
-                      disabled
+                        disabled
                         className="flex bg-white h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         value={`${formData.taskGroup.groupName || ""}||${formData.taskGroup.groupId || ""
                           }`}
@@ -1354,8 +1373,8 @@ const SubTaskModal = ({parentTaskId,data,isEditing, toggleModal, getAllSubTasks,
                           onClick={(e) => startRecording(e)}
                           disabled={isRecording}
                           className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${isRecording
-                              ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-blue-500 hover:bg-blue-600"
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-blue-500 hover:bg-blue-600"
                             }`}
                           aria-hidden={isRecording ? "true" : "false"}
                         >
@@ -1367,8 +1386,8 @@ const SubTaskModal = ({parentTaskId,data,isEditing, toggleModal, getAllSubTasks,
                           onClick={(e) => stopRecording(e)}
                           disabled={!isRecording}
                           className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${!isRecording
-                              ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-red-500 hover:bg-red-600"
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-red-500 hover:bg-red-600"
                             }`}
                         >
                           <svg
@@ -1497,127 +1516,6 @@ const SubTaskModal = ({parentTaskId,data,isEditing, toggleModal, getAllSubTasks,
         </div>
         <div className="fixed inset-0 bg-gray-900 opacity-50"></div>
       </div>
-    </>
-  )
-}
-
-const OldSubtask = () => {
-  return (
-    <>
-      {/* <div
-                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-                onClick={() => handleCloseModal()} // Close modal on backdrop click
-              >
-                <div
-                  className="bg-white p-6 rounded shadow-lg md:w-[500px] "
-                  onClick={(e) => e.stopPropagation()} // Prevent click inside modal from closing it
-                >
-                  <h2 className="text-2xl font-semibold mb-4">
-                    {isEditing ? "Edit Subtask" : "Create Subtask"}
-                  </h2>
-                  <form >
-                    <div>
-                      <div className="mb-4">
-                        <label className="block text-md font-medium text-gray-700">
-                          Subtask Name <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={newSubTask.subTaskName}
-                          onChange={(e) =>
-                            setNewSubTask({
-                              ...newSubTask,
-                              subTaskName: e.target.value,
-                            })
-                          }
-                          className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
-                          required
-                        />
-                      </div>
-                      <div className="mb-4">
-                        <label className="block text-md font-medium text-gray-700">
-                          Description <span className="text-red-600">*</span>
-                        </label>
-                        <textarea
-                          value={newSubTask.description}
-                          onChange={(e) =>
-                            setNewSubTask({
-                              ...newSubTask,
-                              description: e.target.value,
-                            })
-                          }
-                          className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
-                        />
-                      </div>
-                      <div className="mb-4">
-                        <label className="block text-md font-medium text-gray-700">
-                          Assign to <span className="text-red-600">*</span>
-                        </label>
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {selectedNames.map((name) => (
-                            <span
-                              key={name?.userId}
-                              className="flex items-center px-3 py-1 bg-blue-500 text-white rounded-full text-sm"
-                            >
-                              {name?.name}
-                              <button
-                                type="button"
-                                className="ml-2 text-white hover:text-gray-200"
-                                onClick={() => handleRemoveName(name?.userId)}
-                              >
-                                &times;
-                              </button>
-                            </span>
-                          ))}
-                        </div>
-                        <Autocomplete
-                          options={selectmembers?.filter((option) => option !== null && option !== undefined) || []}
-                          getOptionLabel={(option) => option?.name || ''}
-                          onChange={(event, newValue) => handleSelectChange(newValue)}
-                          inputValue={inputValue}
-                          onInputChange={(event, newInputValue) => setInputValue(newInputValue)}
-                          isOptionEqualToValue={(option, value) => option?.userId === value?.userId}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              label="Select names"
-                              placeholder="Type to search..."
-                              className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
-                            />
-                          )}
-                          renderOption={(props, option, { selected }) => (
-                            option ? (
-                              <li {...props} className={`px-4 py-2 ${selected ? 'bg-blue-500 text-white' : 'text-gray-900'}`}>
-                                {option.name}
-                              </li>
-                            ) : null // Render nothing if option is null or undefined
-                          )}
-                          className="w-full"
-                        />
-
-
-
-                      </div>
-
-                      <div className="flex justify-end space-x-4">
-                        <button
-                          type="button"
-                          className="px-2 py-1 text-md font-normal bg-gray-500 text-white rounded"
-                          onClick={() => setShowModal(false)}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          onClick={handleCreateOrUpdateSubTask}
-                          className="px-2 py-1 text-md font-normal bg-blue-500 text-white rounded"
-                        >
-                          {isEditing ? "Update" : "Create"}
-                        </button>
-                      </div>
-                    </div>
-                  </form>
-                </div>
-              </div> */}
     </>
   )
 }
