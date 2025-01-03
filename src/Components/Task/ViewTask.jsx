@@ -523,7 +523,7 @@ function ViewTask({ data, status, setOpen }) {
           <hr className="mt-4 mb-4 " />
 
           {/* comment show here */}
-       {!data?.isSubtask &&   <div className="mt-4 select-none">
+       {(!data?.isSubtask && data?.status !== "Archive") &&   <div className="mt-4 select-none">
             <div>
 
               <CommentComponent getAllLogs={getAllLogs} data={data} />
@@ -531,7 +531,7 @@ function ViewTask({ data, status, setOpen }) {
             </div>
           </div>}
           <hr className="mt-4 mb-4 " />
-          {!data?.isSubtask && <div>
+          {(!data?.isSubtask && data?.status !== "Archive")&& <div>
             <div className="flex justify-between items-center mb-8">
               <div>
                 <h3 className="text-lg font-bold">
@@ -636,7 +636,7 @@ function ViewTask({ data, status, setOpen }) {
             <div>{status}</div>
           </div>
           <hr className="font-bold text-gray-800" />
-          {!data?.isSubtask && <div>
+          {( !data?.isSubtask && data?.status !=="Archive")&& <div>
             <h3
               className="text-black text-lg mb-5 font-bold cursor-pointer"
               onClick={toggleAccordion} // Trigger accordion open/close on click
