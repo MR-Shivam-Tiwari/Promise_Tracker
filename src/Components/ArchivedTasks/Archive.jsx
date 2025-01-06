@@ -2,8 +2,9 @@ import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { UserContext } from "../../global/UserContext";
-import { Modal } from "@mui/joy";
 import ViewTask from "../Task/ViewTask";
+import moment from "moment";
+import Logs from "../logs/Logs";
 
 function Archive() {
   const { userData } = useContext(UserContext);
@@ -11,7 +12,9 @@ function Archive() {
   const [loading, setLoading] = useState(true);
   const [archiveTasks, setArchiveTasks] = useState([]);
   const [viewselectedTask, setviewSelectedTask] = useState(null);
-  const [open, setOpen] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [logs, setLogs] = useState([]);
+
   const generateAddTaskLog = (taskId, to) => {
     const data = {
       userId: userData?.userId,
@@ -43,7 +46,7 @@ function Archive() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ status, ...body }), // Include additional data in the body
+          body: JSON.stringify({ status, ...body }),
         }
       );
 
@@ -112,7 +115,7 @@ function Archive() {
     try {
       console.log(`Updating task ${taskId} to Completed`);
       await updateTaskStatus(taskId, "Completed", {});
-      fetchTasks(userid); // Re-fetch tasks after unarchiving
+      fetchTasks(userid);
     } catch (error) {
       console.error("Failed to update task status:", error);
       toast.error("Failed to update task status");
@@ -123,8 +126,41 @@ function Archive() {
     if (text && text.length > maxLength) {
       return text.substring(0, maxLength) + "...";
     }
-    return text || ""; // Return an empty string if text is undefined
+    return text || "";
   };
+
+  const getAllComments = () => {
+    if (viewselectedTask?._id) {
+      axios
+        .get(
+          `${process.env.REACT_APP_API_URL}/api/comments/get/${viewselectedTask._id}/allCommentByTask`
+        )
+        .then((res) => {
+          setComments(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
+
+  const getAllLogs = () => {
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/api/logs/${viewselectedTask?._id}`)
+      .then((res) => {
+        setLogs(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    if (viewselectedTask) {
+      getAllComments();
+      getAllLogs();
+    }
+  }, [viewselectedTask]);
 
   return (
     <div>
@@ -166,7 +202,6 @@ function Archive() {
                     <div
                       onClick={() => {
                         setviewSelectedTask(task);
-                        setOpen(true);
                       }}
                       className="border p-2 rounded hover:bg-gray-300"
                     >
@@ -175,7 +210,7 @@ function Archive() {
                         width="16"
                         height="16"
                         fill="currentColor"
-                        class="bi bi-eye"
+                        className="bi bi-eye"
                         viewBox="0 0 16 16"
                       >
                         <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
@@ -188,222 +223,6 @@ function Archive() {
                     >
                       Unarchive
                     </button>
-                    <Modal
-                      aria-labelledby="modal-title"
-                      aria-describedby="modal-desc"
-                      open={!!viewselectedTask}
-                      onClose={() => setviewSelectedTask(false)}
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        px: 2,
-                      }}
-                    >
-                      <div className="fixed inset-0   bg-opacity-50 flex justify-center items-center p-4">
-                        <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full overflow-hidden">
-                          <div className="p-6 space-y-6">
-                            {/* Header */}
-                            <div className="flex justify-between items-center pb-4 border-b border-gray-200">
-                              <h2
-                                id="modal-title"
-                                className="text-3xl font-bold text-gray-900"
-                              >
-                                Group :{" "}
-                                <span className="text-gray-500">
-                                  {viewselectedTask?.taskGroup?.groupName ||
-                                    "Loading..."}{" "}
-                                </span>
-                              </h2>
-                              <button
-                                onClick={() => {
-                                  setviewSelectedTask(false);
-                                  setviewSelectedTask(null);
-                                }}
-                                className="text-gray-500 hover:text-red-600 transition"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-6 w-6"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M6 18L18 6M6 6l12 12"
-                                  />
-                                </svg>
-                              </button>
-                            </div>
-
-                            {/* Task Details */}
-                            {viewselectedTask ? (
-                              <div
-                                id="modal-desc"
-                                className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                              >
-                                <div className="space-y-4 col-span-full">
-                                  <div>
-                                    <h3 className="text-sm font-medium text-gray-500">
-                                      Task Name
-                                    </h3>
-                                    <p className="text-xl font-semibold text-indigo-600">
-                                      {viewselectedTask.taskName}
-                                    </p>
-                                  </div>
-
-                                  <div>
-                                    <h3 className="text-sm font-medium text-gray-500">
-                                      Description
-                                    </h3>
-                                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">
-                                      {viewselectedTask.description}
-                                    </p>
-                                  </div>
-                                </div>
-
-                                <div className="space-y-4">
-                                  <div>
-                                    <h3 className="text-sm font-medium text-gray-500">
-                                      Owner
-                                    </h3>
-                                    <p className="text-gray-700 flex items-center">
-                                      <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-5 w-5 text-indigo-500 mr-2"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                      >
-                                        <path
-                                          fillRule="evenodd"
-                                          d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                                          clipRule="evenodd"
-                                        />
-                                      </svg>
-                                      {viewselectedTask.owner?.name ||
-                                        "Unknown"}
-                                    </p>
-                                  </div>
-
-                                  <div>
-                                    <h3 className="text-sm font-medium text-gray-500">
-                                      People
-                                    </h3>
-                                    <ul className="list-none flex gap-3 items-center space-y-1">
-                                      {viewselectedTask.people?.map(
-                                        (person) => (
-                                          <li
-                                            key={person._id}
-                                            className="flex items-center text-gray-700"
-                                          >
-                                            <svg
-                                              xmlns="http://www.w3.org/2000/svg"
-                                              className="h-4 w-4 text-indigo-500 mr-2"
-                                              viewBox="0 0 20 20"
-                                              fill="currentColor"
-                                            >
-                                              <path
-                                                fillRule="evenodd"
-                                                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                                                clipRule="evenodd"
-                                              />
-                                            </svg>
-                                            {person.name}
-                                          </li>
-                                        )
-                                      )}
-                                    </ul>
-                                  </div>
-                                </div>
-
-                                <div className="space-y-4">
-                                  <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                      <h3 className="text-sm font-medium text-gray-500">
-                                        Start Date
-                                      </h3>
-                                      <p className="text-gray-700 flex items-center">
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          className="h-5 w-5 text-green-500 mr-2"
-                                          viewBox="0 0 20 20"
-                                          fill="currentColor"
-                                        >
-                                          <path
-                                            fillRule="evenodd"
-                                            d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                            clipRule="evenodd"
-                                          />
-                                        </svg>
-                                        {viewselectedTask.startDate ||
-                                          "Not set"}
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <h3 className="text-sm font-medium text-gray-500">
-                                        End Date
-                                      </h3>
-                                      <p className="text-gray-700 flex items-center">
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          className="h-5 w-5 text-red-500 mr-2"
-                                          viewBox="0 0 20 20"
-                                          fill="currentColor"
-                                        >
-                                          <path
-                                            fillRule="evenodd"
-                                            d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                            clipRule="evenodd"
-                                          />
-                                        </svg>
-                                        {viewselectedTask.endDate || "Not set"}
-                                      </p>
-                                    </div>
-                                  </div>
-
-                                  <div>
-                                    <h3 className="text-sm font-medium text-gray-500">
-                                      Status
-                                    </h3>
-                                    <span
-                                      className={`text-sm font-medium text-white px-3 py-1 rounded-full inline-flex items-center ${
-                                        viewselectedTask.status === "Completed"
-                                          ? "bg-green-500"
-                                          : viewselectedTask.status ===
-                                            "Pending"
-                                          ? "bg-yellow-500"
-                                          : "bg-red-500"
-                                      }`}
-                                    >
-                                      <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-4 w-4 mr-1"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                      >
-                                        <path
-                                          fillRule="evenodd"
-                                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                          clipRule="evenodd"
-                                        />
-                                      </svg>
-                                      {viewselectedTask.status}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="text-gray-700">
-                                Loading task details...
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </Modal>
                   </div>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900">
@@ -428,6 +247,280 @@ function Archive() {
       ) : (
         <div className="text-3xl text-center mt-10">
           No Archive Task Available
+        </div>
+      )}
+
+      {/* Tailwind CSS Modal */}
+      {viewselectedTask && (
+        <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="relative bg-white rounded-lg shadow-xl max-w-3xl w-full m-4">
+            <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+              {/* Header */}
+              <div className="flex justify-between items-center pb-4 border-b border-gray-200">
+                <h2
+                  id="modal-title"
+                  className="text-3xl font-bold text-gray-900"
+                >
+                  Group :{" "}
+                  <span className="text-gray-500">
+                    {viewselectedTask?.taskGroup?.groupName || "Loading..."}
+                  </span>
+                </h2>
+                <button
+                  onClick={() => setviewSelectedTask(null)}
+                  className="text-gray-500 hover:text-red-600 transition"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Task Details */}
+              <div>
+                <div
+                  id="modal-desc"
+                  className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                >
+                  <div className="space-y-4 col-span-full">
+                    <div>
+                      <h3 className="text-sm font-mediumtext-gray-500">
+                        Task Name
+                      </h3>
+                      <p className="text-xl font-semibold text-indigo-600">
+                        {viewselectedTask.taskName}
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500">
+                        Description
+                      </h3>
+                      <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">
+                        {viewselectedTask.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500">
+                        Owner
+                      </h3>
+                      <p className="text-gray-700 flex items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 text-indigo-500 mr-2"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        {viewselectedTask.owner?.name || "Unknown"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500">
+                        People
+                      </h3>
+                      <ul className="list-none flex gap-3 items-center space-y-1">
+                        {viewselectedTask.people?.map((person) => (
+                          <li
+                            key={person._id}
+                            className="flex items-center text-gray-700"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4 text-indigo-500 mr-2"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            {person.name}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-500">
+                          Start Date
+                        </h3>
+                        <p className="text-gray-700 flex items-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 text-green-500 mr-2"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          {viewselectedTask.startDate || "Not set"}
+                        </p>
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-500">
+                          End Date
+                        </h3>
+                        <p className="text-gray-700 flex items-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 text-red-500 mr-2"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          {viewselectedTask.endDate || "Not set"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500">
+                        Status
+                      </h3>
+                      <span
+                        className={`text-sm font-medium text-white px-3 py-1 rounded-full inline-flex items-center ${
+                          viewselectedTask.status === "Completed"
+                            ? "bg-green-500"
+                            : viewselectedTask.status === "Pending"
+                            ? "bg-yellow-500"
+                            : "bg-red-500"
+                        }`}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 mr-1"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        {viewselectedTask.status}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="w-full">
+                  <div className=" w-full">
+                    <div className="text-bold text-lg mb-2">All Comments</div>
+                    {comments.length > 0 ? (
+                      <>
+                        <div className="w-full max-h-[25vh] overflow-y-auto p-4 border border-gray-300 rounded-lg bg-white shadow-md">
+                          <div className="space-y-6">
+                            {comments.map((comment, index) => (
+                              <div
+                                key={index}
+                                className="flex items-start space-x-4 bg-gray-100 p-3 rounded-lg"
+                              >
+                                <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-300">
+                                  {comment.userId.profilePic && (
+                                    <img
+                                      className="w-full h-full object-cover"
+                                      alt="Profile"
+                                      src={comment.userId.profilePic}
+                                    />
+                                  )}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <h4 className="font-semibold text-gray-800 capitalize">
+                                      {comment.userId.name}
+                                    </h4>
+                                    <p className="text-sm text-gray-500">
+                                      {moment(comment.createdAt).format(
+                                        "D MMMM YYYY [at] h:mm A"
+                                      )}
+                                    </p>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <p className="mt-1 text-gray-700">
+                                      {comment.text}
+                                    </p>
+                                    {comment.file && (
+                                      <a
+                                        href={comment.file}
+                                        className="inline-block mt-2 text-sm font-medium text-blue-600 hover:underline"
+                                      >
+                                        Download File
+                                      </a>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-gray-500 text-start font-bold">
+                        No comments yet.
+                      </p>
+                    )}
+                  </div>
+                  <div className="mt-2 w-full">
+                    <h3 className="text-black text-lg mb-2 font-bold">
+                      All logs{" "}
+                      <span className="text-gray-500 font-bold text-md">
+                        ({logs?.length || 0})
+                      </span>
+                    </h3>
+                    {logs?.length > 0 ? (
+                      <div className="space-y-2 w-full max-h-[25vh] overflow-y-auto p-4 border border-gray-300 rounded-lg bg-white shadow-md">
+                        {logs.map((log, index) => (
+                          <div key={index}>
+                            <Logs log={log} />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-start font-bold text-gray-500 ">
+                        No logs available
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

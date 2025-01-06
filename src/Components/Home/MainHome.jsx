@@ -247,7 +247,7 @@ function MainHome() {
       const response = await axios.get(
         process.env.REACT_APP_API_URL + `/api/groups`
       );
-  
+
       // Filter groups based on userId match in deptHead, projectLead, or members
       const filteredGroups = response.data.filter((group) => {
         // Check if userId matches in deptHead, projectLead, or members
@@ -260,10 +260,10 @@ function MainHome() {
         const isUserInMembers = group.members.some(
           (member) => member.userId === userid
         );
-  
+
         return isUserInDeptHead || isUserInProjectLead || isUserInMembers;
       });
-  
+
       setGroupData(filteredGroups);
     } catch (error) {
       console.log("Error fetching Group Data: ", error);
@@ -271,7 +271,7 @@ function MainHome() {
       setpingroupLoading(false);
     }
   };
-  
+
   useEffect(() => {
     if (userid) {
       fetchGroupData();
@@ -280,7 +280,7 @@ function MainHome() {
 
   // Find the current user based on the frontendUserId
   const currentUser = userData;
-    // Array.isArray(userData) && userData.find((user) => user.userId === userid);
+  // Array.isArray(userData) && userData.find((user) => user.userId === userid);
 
   // Check if the current user has userRole 0, 1, or 2
   const showButton =
@@ -362,6 +362,14 @@ function MainHome() {
     }
     return text;
   };
+  console.log("Task Data:", taskData);
+
+  const filteredTasks = taskData.filter((task) => {
+    console.log("Task isSubtask:", task?.isSubtask); // Debug to ensure it logs
+    return task?.isSubtask === true; // Only filter tasks where isSubtask is true
+  });
+
+  console.log("Filtered Tasks:", filteredTasks);
 
   return (
     <div>
@@ -414,9 +422,9 @@ function MainHome() {
 
           <div>
             <h2 className="text-xl text-black font-semibold mb-2">
-              In Progress
+              In Progress Task
             </h2>
-            <main className="flex flex-col gap-6 bg-gray-100 py-3 lg:rounded-lg rounded-[3px] justify-center mt-4 mb-4">
+            <main className="flex flex-col gap-6 bg-gray-100 py-3 lg:rounded-lg rounded-[3px] justify-center mt-4 ">
               <div className="">
                 {loading ? (
                   <div className="flex justify-center items-center  w-full">
@@ -473,6 +481,83 @@ function MainHome() {
               </div>
             </main>
           </div>
+          <div>
+            <h2 className="text-xl text-black font-semibold mb-2">
+              In Progress Subtask
+            </h2>
+            <main className="flex flex-col gap-6 bg-gray-100 py-3 lg:rounded-lg rounded-[3px] justify-center mt-4 mb-4">
+              <div>
+                {loading ? (
+                  <div className="flex justify-center items-center w-full">
+                    <span className="loader"></span>
+                  </div>
+                ) : (
+                  Array.isArray(taskData) && (
+                    <div className="flex flex-wrap gap-3 px-3">
+                      {taskData
+                        .filter((task) => {
+                          console.log("Filtering Task:", task); // Debug each task
+                          return (
+                            task?.status === "In Progress" &&
+                            task?.isSubtask === true
+                          );
+                        })
+                        .map((task) => (
+                          <div
+                            onClick={() => navigate("/task")}
+                            key={task?._id}
+                            className="cursor-pointer lg:w-[300px] w-full mb-3 bg-blue-50 bg-card text-card-foreground shadow hover:shadow-md transition-all lg:rounded-lg rounded-[3px]"
+                            style={randomColor}
+                          >
+                            <div className="p-3" data-v0-t="card">
+                              <div className="flex items-center justify-between">
+                                <div className="font-medium text-lg">
+                                  {truncateText(task?.taskName, 20)}
+                                </div>
+                                <div
+                                  className="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 text-xs"
+                                  data-v0-t="badge"
+                                ></div>
+                              </div>
+                              <p className="text-gray-400 text-xs">
+                                (Subtask of{" "}
+                                <span className=" text-gray-500 underline">
+                                  {truncateText(
+                                    task?.subtaskDetail?.parentTaskId?.taskName,
+                                    20
+                                  )}
+                                </span>
+                                )
+                              </p>
+                              <div className="grid grid-cols-2 gap-4 mt-4">
+                                <div>
+                                  <div className="text-xs font-medium">
+                                    Date
+                                  </div>
+                                  <div className="text-lg flex">
+                                    <DateComponent taskData={task} />
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <div className="text-xs font-medium">
+                                    Group
+                                  </div>
+                                  <div className="text-xs mt-1.5">
+                                    {task?.taskGroup?.groupName}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )
+                )}
+              </div>
+            </main>
+          </div>
+
           <div className="grid ">
             <div className="flex items-center justify-between">
               <h2 className="text-xl text-black font-semibold">Task Groups</h2>
@@ -731,7 +816,10 @@ function MainHome() {
                                   <div class="text-sm text-muted-foreground flex lg:justify-end justify-center gap-3 items-center ">
                                     <button
                                       onClick={() =>
-                                        handleTaskView(task._id, task?.groupName)
+                                        handleTaskView(
+                                          task._id,
+                                          task?.groupName
+                                        )
                                       }
                                       class="inline-flex bg-white hover:bg-gray-300  items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-7 rounded-[3px] px-3"
                                     >
@@ -747,8 +835,6 @@ function MainHome() {
                                     >
                                       View Group
                                     </button>
-
-                                 
 
                                     {isModalOpen && (
                                       <div
@@ -871,7 +957,6 @@ function MainHome() {
                                         </div>
                                       </div>
                                     )}
-                                    
                                   </div>
                                 </div>
                               </div>
@@ -882,40 +967,34 @@ function MainHome() {
                     </div>
 
                     {iseditModalOpen && (
-                                      <div
-                                        id="modal-background"
-                                        className="fixed inset-0 z-10 bg-opacity-20 bg-gray-700  flex justify-center items-center"
-                                        onClick={handleeditOutsideClick}
-                                      >
-                                        <div></div>
-                                        <div className="bg-white p-4 lg:rounded-lg rounded-[3px]  relative ">
-                                          <div className="flex justify-end">
-                                            <button
-                                              onClick={() =>
-                                                setIseditModalOpen(false)
-                                              }
-                                              class="text-muted-foreground hover:text-muted"
-                                            >
-                                              ✖️
-                                            </button>
-                                          </div>
-                                          {editedgroup && (
-                                            <EditGroup
-                                              dpthead={dpthead}
-                                              prjtlead={prjtlead}
-                                              Editid={editedgroup?._id}
-                                              fetchGroupData={fetchGroupData}
-                                              setIseditModalOpen={
-                                                setIseditModalOpen
-                                              }
-                                              fetchpinnedGroup={
-                                                fetchpinnedGroup
-                                              }
-                                            />
-                                          )}
-                                        </div>
-                                      </div>
-                                    )}
+                      <div
+                        id="modal-background"
+                        className="fixed inset-0 z-10 bg-opacity-20 bg-gray-700  flex justify-center items-center"
+                        onClick={handleeditOutsideClick}
+                      >
+                        <div></div>
+                        <div className="bg-white p-4 lg:rounded-lg rounded-[3px]  relative ">
+                          <div className="flex justify-end">
+                            <button
+                              onClick={() => setIseditModalOpen(false)}
+                              class="text-muted-foreground hover:text-muted"
+                            >
+                              ✖️
+                            </button>
+                          </div>
+                          {editedgroup && (
+                            <EditGroup
+                              dpthead={dpthead}
+                              prjtlead={prjtlead}
+                              Editid={editedgroup?._id}
+                              fetchGroupData={fetchGroupData}
+                              setIseditModalOpen={setIseditModalOpen}
+                              fetchpinnedGroup={fetchpinnedGroup}
+                            />
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -38,11 +38,13 @@ function ViewTask({ data, status, setOpen }) {
   });
   const [selectedNames, setSelectedNames] = useState([]);
 
-  const names = ['Alice', 'Bob', 'Charlie', 'David', 'Emma'];
+  const names = ["Alice", "Bob", "Charlie", "David", "Emma"];
 
   const handleSelectChange = (selectedMember) => {
     // Check if the member is already in the selected array
-    const isAlreadySelected = selectedNames.some(member => member?.userId === selectedMember?.userId);
+    const isAlreadySelected = selectedNames.some(
+      (member) => member?.userId === selectedMember?.userId
+    );
 
     if (!isAlreadySelected && selectedMember != null) {
       // Add the new member object to the selectedNames array
@@ -78,18 +80,21 @@ function ViewTask({ data, status, setOpen }) {
       }
     };
     const getMember = () => {
-      axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/${data?.taskGroup?.groupId}/members`)
+      axios
+        .get(
+          `${process.env.REACT_APP_API_URL}/api/subtask/${data?.taskGroup?.groupId}/members`
+        )
         .then((res) => {
-          setMembers(res.data?.members)
-        }).catch(err => {
-          console.log(err)
+          setMembers(res.data?.members);
         })
-    }
+        .catch((err) => {
+          console.log(err);
+        });
+    };
 
     fetchRegisteredNames();
-    getMember()
+    getMember();
   }, []);
-
 
   const [loader, setLoader] = useState(false);
   const [logs, setLogs] = useState([]);
@@ -97,8 +102,7 @@ function ViewTask({ data, status, setOpen }) {
   const [selectedOption, setSelectedOption] = useState("all");
   const [filterUserTasks, setFilterUserTasks] = useState([]);
   const [isOpen, setIsOpen] = useState(true); // State to control accordion open/close
-  const [inputValue, setInputValue] = useState('');
-
+  const [inputValue, setInputValue] = useState("");
 
   const handleEditModal = (subTaskId) => {
     // const currentSubTask = subTasks.find((subTask) => subTask._id === subTaskId);
@@ -111,13 +115,11 @@ function ViewTask({ data, status, setOpen }) {
     setCurrentTaskId(subTaskId);
     setShowModal(true);
     // setSelectedNames(currentSubTask?.assignedTo || []);
-  }
-
+  };
 
   const toggleAccordion = () => {
     setIsOpen(!isOpen); // Toggle open/close state
   };
-
 
   const getAllUserSubTasks = () => {
     axios
@@ -135,9 +137,7 @@ function ViewTask({ data, status, setOpen }) {
 
   const getAllSubTasks = () => {
     axios
-      .get(
-        `${process.env.REACT_APP_API_URL}/api/subtask/${data?._id}`
-      )
+      .get(`${process.env.REACT_APP_API_URL}/api/subtask/${data?._id}`)
       .then((res) => {
         setSubTasks(res.data);
         // setSelectedNames(res.data?.assignedTo || []);
@@ -146,8 +146,6 @@ function ViewTask({ data, status, setOpen }) {
         console.log(err);
       });
   };
-
-
 
   const getAllLogs = () => {
     axios
@@ -182,7 +180,7 @@ function ViewTask({ data, status, setOpen }) {
 
   useEffect(() => {
     // getAllUserSubTasks();
-    getAllSubTasks()
+    getAllSubTasks();
     getAllUserTasks();
   }, []);
 
@@ -203,20 +201,17 @@ function ViewTask({ data, status, setOpen }) {
     // const taskToUpdate = subTasks.find((task) => task._id === id);
     // const newStatus = taskToUpdate.status === "pending" ? "done" : "pending";
     try {
-
       const response = await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/tasks/${id}/status`, {
-        status: oldStatus === "Completed" ? "In Progress" : "Completed"
-      },
+        `${process.env.REACT_APP_API_URL}/api/tasks/${id}/status`,
+        {
+          status: oldStatus === "Completed" ? "In Progress" : "Completed",
+        }
       );
 
-
       getAllSubTasks();
+    } catch (err) {
+      console.log(err);
     }
-    catch (err) {
-      console.log(err)
-    }
-
   };
 
   const handleCreateOrUpdateSubTask = async (e) => {
@@ -238,11 +233,14 @@ function ViewTask({ data, status, setOpen }) {
       });
 
       // Log creation action
-      await generateLog(data._id, isEditing ? "edit_subtask" : "create_subtask");
+      await generateLog(
+        data._id,
+        isEditing ? "edit_subtask" : "create_subtask"
+      );
 
       // Perform actions after log creation
       // getAllUserSubTasks();
-      getAllSubTasks()
+      getAllSubTasks();
       setShowModal(false);
       setNewSubTask({ subTaskName: "", description: "" });
       setIsEditing(false);
@@ -254,9 +252,8 @@ function ViewTask({ data, status, setOpen }) {
     }
   };
 
-
   const handleCloseModal = () => {
-    console.log('closed');
+    console.log("closed");
     setShowModal(false);
     // setNewSubTask({ subTaskName: "", description: "" });
     // setIsEditing(false);
@@ -285,27 +282,27 @@ function ViewTask({ data, status, setOpen }) {
 
   const authorizedPersonForEdit = (subTask) => {
     if (userData?.userId === data?.owner?.id) {
-      return true
+      return true;
     }
     if (userData?.userId === subTask?._id) {
-      return true
+      return true;
     }
 
-    return false
-  }
+    return false;
+  };
 
   const authorizedPersonForDone = (subTask) => {
     if (userData?.userId === data?.owner?.id) {
-      return true
+      return true;
     }
     if (userData?.userId === subTask?.userId) {
-      return true
+      return true;
     }
     if (subTask?.assignedTo?.find((i) => i.userId === userData?.userId)) {
-      return true
+      return true;
     }
-    return false
-  }
+    return false;
+  };
 
   const generateLog = (taskId, action, customDetails) => {
     const data = {
@@ -331,8 +328,6 @@ function ViewTask({ data, status, setOpen }) {
       });
   };
 
-
-
   return (
     <div className="lg:rounded-lg rounded-[3px] ">
       <div class="flex lg:px-5 px-3 pt-2 lg:pt-4 items-center justify-between mb-6 ">
@@ -343,9 +338,15 @@ function ViewTask({ data, status, setOpen }) {
           <span className="text-gray-600 font-bold">
             (Status : {data?.status || "To Do"})
           </span>
-          {data?.isSubtask && <span className="text-gray-600 font-semibold">
-            (Subtask of <span className="font-bold underline">{data?.subtaskDetail?.parentTaskId?.taskName}</span>)
-          </span>}
+          {data?.isSubtask && (
+            <span className="text-gray-600 font-semibold">
+              (Subtask of{" "}
+              <span className="font-bold underline">
+                {data?.subtaskDetail?.parentTaskId?.taskName}
+              </span>
+              )
+            </span>
+          )}
         </div>
         <button
           onClick={(e) => {
@@ -487,7 +488,7 @@ function ViewTask({ data, status, setOpen }) {
               <h2 className="text-lg font-medium text-gray-900  mb-2">Dates</h2>
               <div className="bg-gray-200 p-2 lg:flex items-center rounded">
                 <p className="text-gray-700  text-xs lg:text-[15px] gap-2 flex  ">
-                  Start  :
+                  Start :
                   <p className="border px-2 font-bold text-xs  lg:text-[15px] rounded bg-gray-200">
                     {data?.startDate ? formatDate(data.startDate) : "N/A"}
                   </p>
@@ -495,10 +496,7 @@ function ViewTask({ data, status, setOpen }) {
                 <div className="bg-gray-200 p-2 lg:flex items-center rounded">
                   <p className="text-xs lg:text-[15px] text-start flex gap-2 ">
                     End :{" "}
-                    <p
-
-                      className="border px-2 font-bold text-xs  lg:text-[15px] rounded bg-gray-200"
-                    >
+                    <p className="border px-2 font-bold text-xs  lg:text-[15px] rounded bg-gray-200">
                       {data?.endDate ? formatDate(data.endDate) : "N/A"}
                     </p>
                   </p>
@@ -523,112 +521,128 @@ function ViewTask({ data, status, setOpen }) {
           <hr className="mt-4 mb-4 " />
 
           {/* comment show here */}
-       {(!data?.isSubtask && data?.status !== "Archive") &&   <div className="mt-4 select-none">
-            <div>
-
-              <CommentComponent getAllLogs={getAllLogs} data={data} />
-
-            </div>
-          </div>}
-          <hr className="mt-4 mb-4 " />
-          {(!data?.isSubtask && data?.status !== "Archive")&& <div>
-            <div className="flex justify-between items-center mb-8">
+          {/* {!data?.isSubtask && data?.status !== "Archive" && ( */}
+            <div className="mt-4 select-none">
               <div>
-                <h3 className="text-lg font-bold">
-                  Sub Tasks{" "}
-                  <span className="text-white cursor-pointer px-1 py-1 text-[10px] bg-orange-500 rounded-lg  font-bold">
-                    {" "}
-                    {
-                      subTasks?.filter((subTask) => subTask.status === "done")
-                        .length
-                    }
-                    /{subTasks?.length}
-                  </span>
-                </h3>
-                {/* <p className="text-gray-500 w-[200px] ">
+                <CommentComponent getAllLogs={getAllLogs} data={data} />
+              </div>
+            </div>
+          {/* )} */}
+          <hr className="mt-4 mb-4 " />
+          {!data?.isSubtask && data?.status !== "Archive" && (
+            <div>
+              <div className="flex justify-between items-center mb-8">
+                <div>
+                  <h3 className="text-lg font-bold">
+                    Sub Tasks{" "}
+                    <span className="text-white cursor-pointer px-1 py-1 text-[10px] bg-orange-500 rounded-lg  font-bold">
+                      {" "}
+                      {
+                        subTasks?.filter((subTask) => subTask.status === "done")
+                          .length
+                      }
+                      /{subTasks?.length}
+                    </span>
+                  </h3>
+                  {/* <p className="text-gray-500 w-[200px] ">
                   Below Subtasks are only visible to you
                 </p> */}
+                </div>
+                <button
+                  className={`px-4 py-1 text-md rounded text-white hover:bg-green-700 active:bg-green-900 ${"bg-green-800"}`}
+                  onClick={() => {
+                    setIsEditing(false);
+                    setShowModal(true);
+                  }}
+                >
+                  Create
+                </button>
               </div>
-              <button
-                className={`px-4 py-1 text-md rounded text-white hover:bg-green-700 active:bg-green-900 ${"bg-green-800"}`}
-                onClick={() => {
-                  setIsEditing(false);
-                  setShowModal(true);
-                }}
-              >
-                Create
-              </button>
-            </div>
-            {subTasks?.map((subTask) => {
-              return (
-                <>
-                  <div key={subTask._id} className="mx-4 mb-4">
-                    <div
-                      className="flex justify-between items-center px-2 py-1 bg-white rounded shadow cursor-pointer"
-                      onClick={() => toggleTask(subTask._id)}
-                    >
-                      <div className="flex gap-6">
-                        <div className="flex items-center">
-                          <span
-                            className={`h-4 w-4 rounded-full mr-3 ${subTask.status === "done"
-                              ? "bg-green-600"
-                              : "bg-gray-300"
-                              }`}
-                          ></span>
-                          <span
-                            className={`text-md font-semibold ${subTask.status === "done"
-                              ? "line-through text-gray-500"
-                              : ""
-                              } cursor-pointer select-none`}
-                          >
-                            {subTask.taskName}
-                          </span>
-                        </div>
-                        <div className="flex justify-start items-center gap-2">
-                          {subTask?.assignedTo?.map((name) => (
+              {subTasks?.map((subTask) => {
+                return (
+                  <>
+                    <div key={subTask._id} className="mx-4 mb-4">
+                      <div
+                        className="flex justify-between items-center px-2 py-1 bg-white rounded shadow cursor-pointer"
+                        onClick={() => toggleTask(subTask._id)}
+                      >
+                        <div className="flex gap-6">
+                          <div className="flex items-center">
                             <span
-                              key={name.userId}
-                              className=" px-3 py-1 bg-blue-500 text-white rounded-full text-xs"
+                              className={`h-4 w-4 rounded-full mr-3 ${
+                                subTask.status === "done"
+                                  ? "bg-green-600"
+                                  : "bg-gray-300"
+                              }`}
+                            ></span>
+                            <span
+                              className={`text-md font-semibold ${
+                                subTask.status === "done"
+                                  ? "line-through text-gray-500"
+                                  : ""
+                              } cursor-pointer select-none`}
                             >
-                              {name.name}
-
+                              {subTask.taskName}
                             </span>
-                          ))}
+                          </div>
+                          <div className="flex justify-start items-center gap-2">
+                            {subTask?.assignedTo?.map((name) => (
+                              <span
+                                key={name.userId}
+                                className=" px-3 py-1 bg-blue-500 text-white rounded-full text-xs"
+                              >
+                                {name.name}
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex  items-center space-x-4">
-                        {authorizedPersonForEdit(subTask) && <button onClick={() => {
-                          handleEditModal(subTask._id)
-                        }} className=" px-2 py-1 text-sm bg-yellow-500 text-white rounded">
-                          Edit
-                        </button>}
-                        {authorizedPersonForDone(subTask) && <button
-                          className={`px-2 py-1 text-sm rounded text-white ${subTask.status === "Completed"
-                            ? "bg-red-500"
-                            : "bg-green-500"
-                            }`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleCompletion(subTask._id, subTask.status);
-                          }}
-                        >
-                          {subTask.status === "Completed" ? "Undo" : "Done"}
-                        </button>}
-
+                        <div className="flex  items-center space-x-4">
+                          {authorizedPersonForEdit(subTask) && (
+                            <button
+                              onClick={() => {
+                                handleEditModal(subTask._id);
+                              }}
+                              className=" px-2 py-1 text-sm bg-yellow-500 text-white rounded"
+                            >
+                              Edit
+                            </button>
+                          )}
+                          {authorizedPersonForDone(subTask) && (
+                            <button
+                              className={`px-2 py-1 text-sm rounded text-white ${
+                                subTask.status === "Completed"
+                                  ? "bg-red-500"
+                                  : "bg-green-500"
+                              }`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleCompletion(subTask._id, subTask.status);
+                              }}
+                            >
+                              {subTask.status === "Completed" ? "Undo" : "Done"}
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
-
-                  </div>
-                </>
-              );
-            })}
-          </div>}
+                  </>
+                );
+              })}
+            </div>
+          )}
           {
             // sub task modal
-            showModal &&
-            (
+            showModal && (
               <>
-                <SubTaskModal  getAllLogs={getAllLogs} currentTaskId={currentTaskId} isEditing={isEditing} parentTaskId={data._id} data={data} toggleModal={handleCloseModal} getAllSubTasks={getAllSubTasks} />
+                <SubTaskModal
+                  getAllLogs={getAllLogs}
+                  currentTaskId={currentTaskId}
+                  isEditing={isEditing}
+                  parentTaskId={data._id}
+                  data={data}
+                  toggleModal={handleCloseModal}
+                  getAllSubTasks={getAllSubTasks}
+                />
               </>
             )
           }
@@ -636,13 +650,15 @@ function ViewTask({ data, status, setOpen }) {
             <div>{status}</div>
           </div>
           <hr className="font-bold text-gray-800" />
-          {( !data?.isSubtask && data?.status !=="Archive")&& <div>
+          <div>
             <h3
               className="text-black text-lg mb-5 font-bold cursor-pointer"
               onClick={toggleAccordion} // Trigger accordion open/close on click
             >
               All logs{" "}
-              <span className="text-gray-500 font-bold text-md">({logs?.length})</span>
+              <span className="text-gray-500 font-bold text-md">
+                ({logs?.length})
+              </span>
               <span className="ml-2 text-sm text-gray-500">
                 {isOpen ? "▲" : "▼"}
               </span>
@@ -656,8 +672,7 @@ function ViewTask({ data, status, setOpen }) {
                 ))}
               </div>
             )}
-          </div>}
-
+          </div>
         </div>
       </div>
     </div>
@@ -666,10 +681,17 @@ function ViewTask({ data, status, setOpen }) {
 
 export default ViewTask;
 
+// create subtask old code
 
-// create subtask old code 
-
-const SubTaskModal = ({ parentTaskId, data, isEditing, toggleModal,getAllLogs, getAllSubTasks, currentTaskId }) => {
+const SubTaskModal = ({
+  parentTaskId,
+  data,
+  isEditing,
+  toggleModal,
+  getAllLogs,
+  getAllSubTasks,
+  currentTaskId,
+}) => {
   const { userData } = useContext(UserContext);
   const userDataString = localStorage.getItem("userData");
   const [userid, setUserid] = useState(
@@ -704,11 +726,9 @@ const SubTaskModal = ({ parentTaskId, data, isEditing, toggleModal,getAllLogs, g
     people: [],
     isSubtask: true,
     subtaskDetail: {
-      parentTaskId: parentTaskId
-    }
+      parentTaskId: parentTaskId,
+    },
   });
-
-
 
   const [isRecording, setIsRecording] = useState(false);
   const [audioUrl, setAudioUrl] = useState("");
@@ -746,8 +766,7 @@ const SubTaskModal = ({ parentTaskId, data, isEditing, toggleModal,getAllLogs, g
       .then((res) => {
         console.log("res", res.data);
         getAllLogs();
-    console.log("customDetails");
-
+        console.log("customDetails");
       })
       .catch((err) => {
         toast.dismiss();
@@ -756,23 +775,22 @@ const SubTaskModal = ({ parentTaskId, data, isEditing, toggleModal,getAllLogs, g
       });
   };
   const getTaskDetail = () => {
-    axios.get(`${process.env.REACT_APP_API_URL}/api/tasks/${currentTaskId}`)
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/api/tasks/${currentTaskId}`)
       .then((res) => {
-        setFormData(prev => {
-          return { ...prev, ...res.data }
-        })
+        setFormData((prev) => {
+          return { ...prev, ...res.data };
+        });
       })
-      .catch(err => {
-        console.log(err)
-      })
-  }
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   useEffect(() => {
     if (isEditing) {
-      getTaskDetail()
+      getTaskDetail();
     }
   }, [currentTaskId]);
-
-
 
   const handleChange = (fieldName, value) => {
     if (fieldName === "people") {
@@ -858,14 +876,16 @@ const SubTaskModal = ({ parentTaskId, data, isEditing, toggleModal,getAllLogs, g
         data: {
           ...formData,
           audioFile: uploadResultVoice,
-          pdfFile: singleFile
-        }
+          pdfFile: singleFile,
+        },
       });
 
+      await generateLog(
+        data?._id,
+        isEditing ? "edit_subtask" : "create_subtask"
+      );
 
-      await generateLog(data?._id, isEditing ? "edit_subtask" : "create_subtask");
-      
-      console.log("above tollge")
+      console.log("above tollge");
       // Reset the form and close the modal immediately
       resetForm();
       // getAllLogs();
@@ -877,7 +897,6 @@ const SubTaskModal = ({ parentTaskId, data, isEditing, toggleModal,getAllLogs, g
       console.error("Error creating or updating task:", error);
     }
   };
-
 
   const resetForm = () => {
     setFormData({
@@ -934,13 +953,20 @@ const SubTaskModal = ({ parentTaskId, data, isEditing, toggleModal,getAllLogs, g
     );
 
   const getAllMemberByGroup = () => {
-    axios.get(`${process.env.REACT_APP_API_URL}/api/members/${formData?.taskGroup?.groupId}`)
+    axios
+      .get(
+        `${process.env.REACT_APP_API_URL}/api/members/${formData?.taskGroup?.groupId}`
+      )
       .then((res) => {
         // console.log("res",res.data);
         const apiData = res.data;
-        setAllMemberOfGroup([...apiData.members, ...apiData.deptHead, ...apiData.projectLead]);
-      })
-  }
+        setAllMemberOfGroup([
+          ...apiData.members,
+          ...apiData.deptHead,
+          ...apiData.projectLead,
+        ]);
+      });
+  };
   useEffect(() => {
     // fetchRegisteredNames();
     // fetchGroupData();
@@ -1184,7 +1210,6 @@ const SubTaskModal = ({ parentTaskId, data, isEditing, toggleModal,getAllLogs, g
     }
   };
 
-
   return (
     <>
       <div>
@@ -1254,8 +1279,9 @@ const SubTaskModal = ({ parentTaskId, data, isEditing, toggleModal,getAllLogs, g
                       <select
                         disabled
                         className="flex bg-white h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        value={`${formData.taskGroup.groupName || ""}||${formData.taskGroup.groupId || ""
-                          }`}
+                        value={`${formData.taskGroup.groupName || ""}||${
+                          formData.taskGroup.groupId || ""
+                        }`}
                         onChange={(e) =>
                           handleChange("taskGroup", e.target.value)
                         }
@@ -1372,10 +1398,11 @@ const SubTaskModal = ({ parentTaskId, data, isEditing, toggleModal,getAllLogs, g
                         <button
                           onClick={(e) => startRecording(e)}
                           disabled={isRecording}
-                          className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${isRecording
-                            ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-blue-500 hover:bg-blue-600"
-                            }`}
+                          className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${
+                            isRecording
+                              ? "bg-gray-400 cursor-not-allowed"
+                              : "bg-blue-500 hover:bg-blue-600"
+                          }`}
                           aria-hidden={isRecording ? "true" : "false"}
                         >
                           {isRecording ? "Recording..." : "Start Recording"}
@@ -1385,10 +1412,11 @@ const SubTaskModal = ({ parentTaskId, data, isEditing, toggleModal,getAllLogs, g
                         <button
                           onClick={(e) => stopRecording(e)}
                           disabled={!isRecording}
-                          className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${!isRecording
-                            ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-red-500 hover:bg-red-600"
-                            }`}
+                          className={`flex items-center px-4 py-2 text-white font-medium lg:rounded-lg rounded-[3px] focus:outline-none ${
+                            !isRecording
+                              ? "bg-gray-400 cursor-not-allowed"
+                              : "bg-red-500 hover:bg-red-600"
+                          }`}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -1456,8 +1484,6 @@ const SubTaskModal = ({ parentTaskId, data, isEditing, toggleModal,getAllLogs, g
                         onChange={handleFileSelect}
                       />
                       <div className="flex justify-center">
-
-
                         <button
                           onClick={handleUploadClick}
                           className=" items-center w-[200px] flex justify-center gap-3 px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
@@ -1491,10 +1517,7 @@ const SubTaskModal = ({ parentTaskId, data, isEditing, toggleModal,getAllLogs, g
                             >
                               <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h4.5L14 4.5zM10 4a1 1 0 0 1-1-1V1.5L14 5h-3.5A1.5 1.5 0 0 1 9 3.5V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5H10z" />
                             </svg>
-                            <a
-                              href={singleFile}
-                              className="ml-2 text-gray-700"
-                            >
+                            <a href={singleFile} className="ml-2 text-gray-700">
                               File
                             </a>
                           </div>
@@ -1517,5 +1540,5 @@ const SubTaskModal = ({ parentTaskId, data, isEditing, toggleModal,getAllLogs, g
         <div className="fixed inset-0 bg-gray-900 opacity-50"></div>
       </div>
     </>
-  )
-}
+  );
+};

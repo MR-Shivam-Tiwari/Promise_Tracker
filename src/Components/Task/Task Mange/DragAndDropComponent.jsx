@@ -611,7 +611,7 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
                         <button
                           className="text-gray-700 block px-4 hover:bg-gray-200 py-2 text-sm w-full text-left"
                           onClick={(e) => {
-                            e.stopPropagation(); // Prevent "View" modal from opening
+                            e?.stopPropagation(); // Prevent "View" modal from opening
                             setEdit(true); // Open Edit Modal
                           }}
                         >
@@ -949,7 +949,6 @@ const DragAndDropComponent = ({
   const [remarks, setRemarks] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [fileLink, setFileLink] = useState(null);
-  const [pendingSubTasks, setPendingSubTasks] = useState([]);
   const generateLInk = (file) => {
     console.log("file", file);
 
@@ -979,25 +978,25 @@ const DragAndDropComponent = ({
     }
     handleCompleteModalSubmit(); // Call the submit handler if validation passes
   };
-  const fetchPendingSubTask = () => {
-    axios
-      .get(
-        `${process.env.REACT_APP_API_URL}/api/subtask/alreadyAssigned/${userData?.userId}`
-      )
-      .then((res) => {
-        console.log(
-          "dafasfdsafdsaflkasdjflasdkfjlasdfjasdklfjasdkfjasdkfjasdkfjasdkfjlasdfj",
-          [...tasksToDo, ...res?.data]
-        );
-        setPendingSubTasks(res?.data);
-      });
-  };
-  useEffect(() => {
-    fetchPendingSubTask();
-  }, []);
+  // const fetchPendingSubTask = () => {
+  //   axios
+  //     .get(
+  //       `${process.env.REACT_APP_API_URL}/api/subtask/alreadyAssigned/${userData?.userId}`
+  //     )
+  //     .then((res) => {
+  //       console.log(
+  //         "dafasfdsafdsaflkasdjflasdkfjlasdfjasdklfjasdkfjasdkfjasdkfjasdkfjlasdfj",
+  //         [...tasksToDo, ...res?.data]
+  //       );
+  //       setPendingSubTasks(res?.data);
+  //     });
+  // };
+  // useEffect(() => {
+  //   fetchPendingSubTask();
+  // }, []);
   useEffect(() => {
     setSections({
-      Todo: [...tasksToDo, ...pendingSubTasks],
+      Todo: [...tasksToDo],
       "In Progress": tasksInProgress,
       Completed: tasksCompleted,
       Postponed: tasksCancelled,
@@ -1007,7 +1006,6 @@ const DragAndDropComponent = ({
     tasksInProgress,
     tasksCompleted,
     tasksCancelled,
-    pendingSubTasks,
   ]);
 
   const updateTaskStatus = async (id, status, body) => {

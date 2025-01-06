@@ -112,62 +112,53 @@ const CommentComponent = ({ data, getAllLogs }) => {
             {isOpenComment ? "▲" : "▼"}
           </span>
         </h3>
-        <div>
-          <button
-            onClick={() => setShowModal(true)} // Open modal when clicked
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-2 rounded text-sm"
-          >
-            Add Comment
-          </button>
-        </div>
+        {!data?.isSubtask && data?.status !== "Archive" && (
+          <div>
+            <button
+              onClick={() => setShowModal(true)} // Open modal when clicked
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-2 rounded text-sm"
+            >
+              Add Comment
+            </button>
+          </div>
+        )}
       </div>
 
       {isOpenComment && (
-        <div className=" mx-7 p-4">
-          <div className="space-y-4">
+        <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 shadow-md">
+          <div className="space-y-6">
             {comments.map((comment, index) => (
-              <div
-                key={index}
-                className="bg-white p-2 rounded-lg shadow-md cursor-pointer hover:bg-gray-100 hover:shadow-lg"
-              >
-                <div className="flex justify-between">
-                  <div className="flex items-center mb-2">
-                    <div className="bg-blue-500 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold mr-3">
-                      {comment.userId.profilePic && (
-                        <img
-                          className="w-full h-full object-cover rounded-full"
-                          alt=""
-                          src={comment.userId.profilePic}
-                        />
-                      )}
-                    </div>
-                    <div>
-                      <h4 className="font-bold capitalize text-blue-700 ">
-                        {comment.userId.name}
-                      </h4>
-                      <p className="text-[10px] text-gray-500 capitalize font-semibold">
-                        {moment(comment.createdAt).format(
-                          "D MMMM YYYY [at] h:mm A"
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center gap-2">
-                    <div>
-                      {comment.file && (
-                        <>
-                          <a
-                            href={comment.file}
-                            className="font-semibold text-[11px] px-2 py-1 rounded-lg text-white bg-blue-600"
-                          >
-                            Download File
-                          </a>
-                        </>
-                      )}
-                    </div>
-                  </div>
+              <div key={index} className="flex items-start space-x-4">
+                <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-300">
+                  {comment.userId.profilePic && (
+                    <img
+                      className="w-full h-full object-cover"
+                      alt="Profile"
+                      src={comment.userId.profilePic}
+                    />
+                  )}
                 </div>
-                <p className="text-gray-800 ">{comment.text}</p>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-gray-800 capitalize">
+                      {comment.userId.name}
+                    </h4>
+                    <p className="text-sm text-gray-500">
+                      {moment(comment.createdAt).format(
+                        "D MMMM YYYY [at] h:mm A"
+                      )}
+                    </p>
+                  </div>
+                  <p className="mt-1 text-gray-700">{comment.text}</p>
+                  {comment.file && (
+                    <a
+                      href={comment.file}
+                      className="inline-block mt-2 text-sm font-medium text-blue-600 hover:underline"
+                    >
+                      Download File
+                    </a>
+                  )}
+                </div>
               </div>
             ))}
           </div>
