@@ -24,6 +24,7 @@ import EditTask from "../EditTask";
 import Load from "./Loading.gif";
 import axios from "axios";
 import { UserContext } from "../../../global/UserContext";
+import { CircularProgress } from "@mui/material";
 const ItemTypes = {
   CARD: "card",
 };
@@ -103,7 +104,7 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
   const navigate = useNavigate();
   const [edit, setEdit] = useState(false);
   const [canEdit, setCanEdit] = useState(false);
-
+  const [linkLoader, setLinkLoader] = useState(false);
 
 
   
@@ -132,19 +133,19 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
           textareaRef.current.focus(); // Focus the textarea when the modal opens
         }
       }, [isCompleteModalOpen]);
-  const checkEdit = () => {
-    axios
-      .get(
-        `${process.env.REACT_APP_API_URL}/api/tasks/canEdit/${id}/${userData._id}/canEdit`
-      )
-      .then((response) => {
-        // setEdit(response.data);
-        setCanEdit(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
+          const checkEdit = () => {
+            axios
+              .get(
+                `${process.env.REACT_APP_API_URL}/api/tasks/canEdit/${id}/${userData?.userId}/canEdit`
+              )
+              .then((response) => {
+                // setEdit(response.data);
+                setCanEdit(response.data);
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          };
   useEffect(() => {
     checkEdit();
   }, []);
@@ -410,6 +411,8 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
         return;
       }
   
+      setLinkLoader(true);
+  
       try {
         const response = await fetch(
           `${process.env.REACT_APP_API_URL}/api/tasks/${currentCard._id}/complete`,
@@ -431,7 +434,7 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
         }
   
         const updatedTask = await response.json();
-  
+        setLinkLoader(false);
         setAllTasks((prevTasks) =>
           prevTasks.map((t) =>
             t._id === currentCard._id ? { ...t, status: updatedTask.status } : t
@@ -503,6 +506,7 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
     setSelectedDate(new Date());
   };
   const generateLInk = (file) => {
+    setLinkLoader(true);
     console.log("file", file);
 
     const formData = new FormData();
@@ -517,9 +521,13 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
         },
       })
       .then((res) => {
+    setLinkLoader(false);
+
         setFileLink(res?.data?.result);
       })
       .catch((err) => {
+    setLinkLoader(false);
+
         console.log(err);
       });
   };
@@ -611,7 +619,7 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
                         <button
                           className="text-gray-700 block px-4 hover:bg-gray-200 py-2 text-sm w-full text-left"
                           onClick={(e) => {
-                            e?.stopPropagation(); // Prevent "View" modal from opening
+                            e.stopPropagation(); // Prevent "View" modal from opening
                             setEdit(true); // Open Edit Modal
                           }}
                         >
@@ -839,6 +847,7 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
                       Cancel
                     </button>
                     <button
+                      disabled={linkLoader}
                       className="bg-blue-500 px-3 text-white rounded "
                       onClick={handleCompleteModalSubmit}
                       // disabled={!proofText}
@@ -848,7 +857,7 @@ const Card = ({ id, text, status, card, fetchTasks }) => {
                       //     : "bg-blue-500 text-white"
                       // } rounded-md px-4 py-2 text-sm font-semibold`}
                     >
-                      Submit
+                      {linkLoader?<CircularProgress size={20} />:"Submit"}
                     </button>
                   </div>
                 </div>
@@ -949,9 +958,11 @@ const DragAndDropComponent = ({
   const [remarks, setRemarks] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [fileLink, setFileLink] = useState(null);
+  const [pendingSubTasks, setPendingSubTasks] = useState([]);
+  const [linkLoader, setLinkLoader] = useState(false);
   const generateLInk = (file) => {
     console.log("file", file);
-
+    setLinkLoader(true);
     const formData = new FormData();
     formData.append("file", file);
 
@@ -964,9 +975,11 @@ const DragAndDropComponent = ({
         },
       })
       .then((res) => {
+        setLinkLoader(false);
         setFileLink(res?.data?.result);
       })
       .catch((err) => {
+        setLinkLoader(false);
         console.log(err);
       });
   };
@@ -978,25 +991,25 @@ const DragAndDropComponent = ({
     }
     handleCompleteModalSubmit(); // Call the submit handler if validation passes
   };
-  // const fetchPendingSubTask = () => {
-  //   axios
-  //     .get(
-  //       `${process.env.REACT_APP_API_URL}/api/subtask/alreadyAssigned/${userData?.userId}`
-  //     )
-  //     .then((res) => {
-  //       console.log(
-  //         "dafasfdsafdsaflkasdjflasdkfjlasdfjasdklfjasdkfjasdkfjasdkfjasdkfjlasdfj",
-  //         [...tasksToDo, ...res?.data]
-  //       );
-  //       setPendingSubTasks(res?.data);
-  //     });
-  // };
-  // useEffect(() => {
-  //   fetchPendingSubTask();
-  // }, []);
+  const fetchPendingSubTask = () => {
+    axios
+      .get(
+        `${process.env.REACT_APP_API_URL}/api/subtask/alreadyAssigned/${userData?.userId}`
+      )
+      .then((res) => {
+        console.log(
+          "dafasfdsafdsaflkasdjflasdkfjlasdfjasdklfjasdkfjasdkfjasdkfjasdkfjlasdfj",
+          [...tasksToDo, ...res?.data]
+        );
+        setPendingSubTasks(res?.data);
+      });
+  };
+  useEffect(() => {
+    fetchPendingSubTask();
+  }, []);
   useEffect(() => {
     setSections({
-      Todo: [...tasksToDo],
+      Todo: [...tasksToDo, ...pendingSubTasks],
       "In Progress": tasksInProgress,
       Completed: tasksCompleted,
       Postponed: tasksCancelled,
@@ -1006,6 +1019,7 @@ const DragAndDropComponent = ({
     tasksInProgress,
     tasksCompleted,
     tasksCancelled,
+    pendingSubTasks,
   ]);
 
   const updateTaskStatus = async (id, status, body) => {
@@ -1187,6 +1201,7 @@ const DragAndDropComponent = ({
       toast.error("Proof text is required");
       return;
     }
+    setLinkLoader(true);
 
     try {
       // Use the helper function to get userId
@@ -1215,6 +1230,8 @@ const DragAndDropComponent = ({
       if (!response.ok) {
         throw new Error("Failed to update task status");
       }
+    setLinkLoader(false);
+
 
       const updatedTask = await response.json(); // Updated task object from API response
 
@@ -1411,8 +1428,8 @@ const DragAndDropComponent = ({
               <Button onClick={handleCompleteModalClose} variant="plain">
                 Cancel
               </Button>
-              <Button onClick={handleCompleteModalSubmit} disabled={!proofText}>
-                Submit
+              <Button onClick={handleCompleteModalSubmit} disabled={!proofText || linkLoader}>
+                 {linkLoader ? <CircularProgress size={20} />:"Submit"}
               </Button>{" "}
               {/* Disable if proofText is empty */}
             </div>
