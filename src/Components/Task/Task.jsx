@@ -641,7 +641,8 @@ function Task() {
                       <Autocomplete
                         placeholder="Assign to"
                         multiple
-                        options={allMemberOfGroup?.map((option) => option.name)}
+                        // options={allMemberOfGroup?.map((option) => option.name)}
+                        options={selectMembers?.map((option) => option.name)}
                         onChange={(event, newValue) =>
                           handleChange("people", newValue)
                         }
