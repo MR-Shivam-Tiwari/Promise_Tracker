@@ -14,10 +14,10 @@ const AutocompleteMultiSelect = ({ options, selectedOptions, onChange }) => {
 
   useEffect(() => {
     setFilteredOptions(
-      options.filter(
+      options?.filter(
         (option) =>
-          option.name.toLowerCase().includes(inputValue.toLowerCase()) &&
-          !selectedOptions.some((selected) => selected.userId === option.userId)
+          option?.name.toLowerCase().includes(inputValue.toLowerCase()) &&
+          !selectedOptions?.some((selected) => selected?.userId === option?.userId)
       )
     );
   }, [inputValue, options, selectedOptions]);
@@ -44,11 +44,11 @@ const AutocompleteMultiSelect = ({ options, selectedOptions, onChange }) => {
         onChange={(e) => setInputValue(e.target.value)}
         onFocus={() => setIsOpen(true)}
       />
-      {isOpen && filteredOptions.length > 0 && (
+      {isOpen && filteredOptions?.length > 0 && (
         <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
-          {filteredOptions.map((option) => (
+          {filteredOptions?.map((option, index) => (
             <li
-              key={option.userId}
+              key={index}
               className="px-3 py-2 cursor-pointer hover:bg-gray-100"
               onClick={() => {
                 onChange([...selectedOptions, option]);
@@ -56,18 +56,18 @@ const AutocompleteMultiSelect = ({ options, selectedOptions, onChange }) => {
                 setIsOpen(false);
               }}
             >
-              {option.name}
+              {option?.name}
             </li>
           ))}
         </ul>
       )}
       <div className="mt-2 flex flex-wrap gap-2">
-        {selectedOptions.map((option) => (
+        {selectedOptions.map((option, index) => (
           <div
-            key={option.userId}
+            key={index}
             className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center"
           >
-            {option.name}
+            {option?.name}
             <button
               onClick={() => onChange(selectedOptions.filter((o) => o.userId !== option.userId))}
               className="ml-2 text-blue-600 hover:text-blue-800 focus:outline-none"
@@ -86,12 +86,16 @@ function EditTask({ data, setEdit, fetchTasks }) {
   const Taskid = data?._id;
   const { userData } = useContext(UserContext);
   const [GroupData, setGroupData] = useState([]);
+  const [departmentHeads, setDepartmentHeads] = useState([]);
+  const [userid, setuserid] = useState("");
+  const [selectProjectLead, setProjectLead] = useState([]);
+  const [selectmembers, setMembers] = useState([]);
   const [allMemberOfGroup, setAllMemberOfGroup] = useState([]);
   const [isRecording, setIsRecording] = useState(false);
   const [audioLoader, setAudioLoader] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
-
+  const [audioUrl, setAudioUrl] = useState("");
   const [formData, setFormData] = useState({
     owner: data?.owner || {},
     taskGroup: data?.taskGroup || {},
@@ -105,29 +109,35 @@ function EditTask({ data, setEdit, fetchTasks }) {
     pdfFile: data?.pdfFile || "",
     status: data?.status || '',
   });
-
-  const [initialFormData, setInitialData] = useState({ ...formData });
-  const [uploadResultVoice, setUploadResultVoice] = useState(formData?.audioFile);
+   const [initialFormData, setInitialData] = useState({
+    owner: data?.owner,
+    taskGroup: data?.taskGroup,
+    taskName: data?.taskName,
+    description: data?.description,
+    audioFile: data?.audioFile,
+    startDate: data?.startDate ? new Date(data.startDate).toISOString().split('T')[0] : '',
+    endDate: data?.endDate ? new Date(data.endDate).toISOString().split('T')[0] : '',
+    reminder: data?.reminder,
+    people: data?.people,
+    pdfFile: data?.pdfFile,
+  });
+  const [userNamesEmail, setUserNamesEmail] = useState([]);
+  const [uploadResultVoice, setUploadResultVoice] = useState(
+    formData?.audioFile
+  );
   const [singleFile, setSingleFile] = useState(formData?.pdfFile);
+
+ useEffect(()=>{
+  console.log("initialFormData",initialFormData);
+ },[initialFormData])
 
   useEffect(() => {
     const fetchTaskData = async () => {
       if (Taskid) {
         try {
           const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/tasks/${Taskid}`);
-          const taskData = response.data;
-          setFormData({
-            ...taskData,
-            startDate: taskData.startDate ? new Date(taskData.startDate).toISOString().split('T')[0] : '',
-            endDate: taskData.endDate ? new Date(taskData.endDate).toISOString().split('T')[0] : '',
-            people: taskData.people || [],
-          });
-          setInitialData({
-            ...taskData,
-            startDate: taskData.startDate ? new Date(taskData.startDate).toISOString().split('T')[0] : '',
-            endDate: taskData.endDate ? new Date(taskData.endDate).toISOString().split('T')[0] : '',
-            people: taskData.people || [],
-          });
+          setFormData(response.data.task);
+          setInitialData(response.data.task);
         } catch (error) {
           console.error("Error fetching task data:", error);
         }
@@ -136,6 +146,24 @@ function EditTask({ data, setEdit, fetchTasks }) {
 
     fetchTaskData();
   }, [Taskid]);
+  useEffect(() => {
+    const userDataString = localStorage.getItem("userData");
+    if (userDataString) {
+      const userDataObj = JSON.parse(userDataString);
+      const userId = userDataObj.userId;
+      // // console.log("userid:", userId);
+      setuserid(userId);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (userid) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        owner: { id: userid },
+      }));
+    }
+  }, [userid]);
 
   useEffect(() => {
     const fetchGroupData = async () => {
@@ -170,8 +198,8 @@ function EditTask({ data, setEdit, fetchTasks }) {
     setFormData((prevFormData) => ({
       ...prevFormData,
       [fieldName]: value,
-    }));
-  };
+    }))
+    };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -197,9 +225,86 @@ function EditTask({ data, setEdit, fetchTasks }) {
   };
 
   const getChanges = (initialData, updatedData) => {
+    console.log("initialData", initialData)
+    console.log("updatedData", updatedData)
     const changes = {};
+
+    for (const key in initialData) {
+      if (
+        typeof initialData[key] === "object" &&
+        initialData[key] !== null &&
+        !Array.isArray(initialData[key])
+      ) {
+        // Recursively check nested objects
+        const nestedChanges = getChanges(initialData[key], updatedData[key]);
+        if (Object.keys(nestedChanges).length > 0) {
+          changes[key] = nestedChanges;
+        }
+      } else if (Array.isArray(initialData[key])) {
+        // Handle array changes (e.g., for 'people')
+        const initialArray = initialData[key];
+        const updatedArray = updatedData[key] || [];
+
+        const added = [];
+        const removed = [];
+        const updated = [];
+
+        const initialMap = new Map(initialArray.map((item) => [item.userId, item]));
+        const updatedMap = new Map(updatedArray.map((item) => [item.userId, item]));
+
+        // Find added and updated items
+        updatedArray.forEach((item) => {
+          if (!initialMap.has(item.userId)) {
+            added.push(item); // Added item
+          } else {
+            const diff = getChanges(initialMap.get(item.userId), item);
+            if (Object.keys(diff).length > 0) {
+              updated.push({ userId: item.userId, changes: diff }); // Updated item
+            }
+          }
+        });
+
+        // Find removed items
+        initialArray.forEach((item) => {
+          if (!updatedMap.has(item.userId)) {
+            removed.push(item); // Removed item
+          }
+        });
+
+        if (added.length > 0 || removed.length > 0 || updated.length > 0) {
+          changes[key] = {};
+          if (added.length > 0) changes[key].added = added;
+          if (removed.length > 0) changes[key].removed = removed;
+          if (updated.length > 0) changes[key].updated = updated;
+        }
+      } else if (initialData[key] !== updatedData[key]) {
+        // Track changes in non-object keys
+        if (key === "pdfFile" || key === "audioFile" || key === "taskName") {
+          changes[key] = {
+            status: updatedData[key] ? (initialData[key] ? "updated" : "added") : "removed",
+            value: updatedData[key],
+          };
+
+          if (key === "taskName") {
+            changes[key] = {
+              oldValue: initialData[key],
+              newValue: updatedData[key],
+            };
+          }
+          if (key == "description") {
+            changes[key] = {
+              oldValue: initialData[key],
+              newValue: updatedData[key],
+            };
+          }
+        } else {
+          changes[key] = updatedData[key];
+        }
+      }
+    }
+
     for (const key in updatedData) {
-      if (JSON.stringify(initialData[key]) !== JSON.stringify(updatedData[key])) {
+      if (!(key in initialData)) {
         changes[key] = updatedData[key];
       }
     }
@@ -341,28 +446,29 @@ function EditTask({ data, setEdit, fetchTasks }) {
               Group Name
             </label>
             <select
-              id="group-name"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md  focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              value={formData?.taskGroup?.groupId || ""}
-              onChange={(e) => {  
-                const selectedGroupId = e.target.value;
-                const selectedGroup = GroupData.find(group => group._id === selectedGroupId);
-                const data = {
-                  groupName: selectedGroup?.groupName,
-                  groupId: selectedGroup?._id
-                }
-                if (selectedGroup) {
-                  handleChange("taskGroup", data);
-                }
-              }}
-            >
-              <option value="">Select a Group</option>
-              {GroupData.map((group) => (
-                <option key={group?._id} value={group?._id}>
-                  {group?.groupName}
-                </option>
-              ))}
-            </select>
+                className="flex bg-gray-50 h-10 w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm"
+                value={formData?.taskGroup?.groupId || ""}  // Bind the select value to groupId
+                onChange={(e) => {
+                  const selectedGroupId = e.target.value;
+                  const selectedGroup = GroupData.find(group => group._id === selectedGroupId);
+                  const data = {
+                    groupName: selectedGroup?.groupName,
+                    groupId: selectedGroup?._id
+                  }
+
+                  console.log("Selected Group:", data); // Log the selected group
+                  if (selectedGroup) {
+                    handleChange("taskGroup", data);
+                  }
+                }}
+              >
+                <option value="">Select a Group</option>
+                {GroupData.map((group) => (
+                  <option key={group?._id} value={group?._id}>  {/* Use groupId as value */}
+                    {group?.groupName}  {/* Display groupName */}
+                  </option>
+                ))}
+              </select>
           </div>
           <div>
             <label htmlFor="task-name" className="block text-sm font-medium text-gray-700 mb-1">
