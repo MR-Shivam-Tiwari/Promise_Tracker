@@ -446,29 +446,28 @@ function EditTask({ data, setEdit, fetchTasks }) {
               Group Name
             </label>
             <select
-                className="flex bg-gray-50 h-10 w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm"
-                value={formData?.taskGroup?.groupId || ""}  // Bind the select value to groupId
-                onChange={(e) => {
-                  const selectedGroupId = e.target.value;
-                  const selectedGroup = GroupData.find(group => group._id === selectedGroupId);
-                  const data = {
-                    groupName: selectedGroup?.groupName,
-                    groupId: selectedGroup?._id
-                  }
-
-                  console.log("Selected Group:", data); // Log the selected group
-                  if (selectedGroup) {
-                    handleChange("taskGroup", data);
-                  }
-                }}
-              >
-                <option value="">Select a Group</option>
-                {GroupData.map((group) => (
-                  <option key={group?._id} value={group?._id}>  {/* Use groupId as value */}
-                    {group?.groupName}  {/* Display groupName */}
-                  </option>
-                ))}
-              </select>
+              id="group-name"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md  focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              value={formData?.taskGroup?.groupId || ""}
+              onChange={(e) => {
+                const selectedGroupId = e.target.value;
+                const selectedGroup = GroupData.find(group => group._id === selectedGroupId);
+                const data = {
+                  groupName: selectedGroup?.groupName,
+                  groupId: selectedGroup?._id
+                }
+                if (selectedGroup) {
+                  handleChange("taskGroup", data);
+                }
+              }}
+            >
+              <option value="">Select a Group</option>
+              {GroupData.map((group) => (
+                <option key={group?._id} value={group?._id}>
+                  {group?.groupName}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label htmlFor="task-name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -544,7 +543,7 @@ function EditTask({ data, setEdit, fetchTasks }) {
           ) : null}
         </div> */}
 
-        <div className="mt-10" style={{marginTop:"50px"}}>
+        <div className="mt-10" style={{ marginTop: "50px" }}>
           <label htmlFor="file-upload" className="block text-sm font-medium text-gray-700 mb-1">
             Upload File
           </label>
@@ -644,7 +643,7 @@ function EditTask({ data, setEdit, fetchTasks }) {
 
         <button
           type="submit"
-          style={{marginBottom:"30px"}}
+          style={{ marginBottom: "30px" }}
           className="w-full  bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
           Update Task
