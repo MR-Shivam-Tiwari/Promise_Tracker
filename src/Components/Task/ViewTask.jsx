@@ -703,6 +703,7 @@ const SubTaskModal = ({
   const [tasksCancelled, setTasksCancelled] = useState([]);
   const [loading, setLoading] = useState(true);
   const [allTasks, setAllTasks] = useState([]);
+  const [allRolesUsers, setAllRolesUsers] = useState([]);
   const [taskGroups, setTaskGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
   const navigate = useNavigate();
@@ -924,7 +925,64 @@ const SubTaskModal = ({
     }
   };
 
-  const fetchRegisteredNames = async () => {
+  
+
+const fetchRegisteredNames = async () => {
+    try {
+      const response = await axios.get(
+        process.env.REACT_APP_API_URL + "/api/userData"
+      );
+
+      const filteredDepartmentHeads = response.data.filter(
+        (user) => user.userRole === 1
+      );
+      setDepartmentHeads(filteredDepartmentHeads);
+
+      const filteredProjectlead = response.data.filter(
+        (user) => user.userRole === 2
+      );
+      setProjectLead(filteredProjectlead);
+
+      const filterMember = response.data.filter(
+        (user) =>
+          user.userRole === 3 || user.userRole === 2 || user.userRole === 1
+      );
+      setMembers(filterMember);
+
+      // ✅ New State to Store Users with Role 1, 2, 3
+      const allRoles = response.data.filter(
+        (user) => [1, 2, 3].includes(user.userRole)
+      );
+      setAllRolesUsers(allRoles);
+
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+};
+
+
+  const filterTasksByStatus = (tasks, status) =>
+    tasks.filter(
+      (task) => task.status === status || (status === "To Do" && !task.status)
+    );
+
+  // const getAllMemberByGroup = () => {
+  //   axios
+  //     .get(
+  //       `${process.env.REACT_APP_API_URL}/api/members/${formData?.taskGroup?.groupId}`
+  //     )
+  //     .then((res) => {
+  //       // console.log("res",res.data);
+  //       const apiData = res.data;
+  //       setAllMemberOfGroup([
+  //         ...apiData.members,
+  //         ...apiData.deptHead,
+  //         ...apiData.projectLead,
+  //       ]);
+  //     });
+  // };
+
+  const getAllMemberByGroup = async () => {
     try {
       const response = await axios.get(
         process.env.REACT_APP_API_URL + "/api/userData"
@@ -945,27 +1003,6 @@ const SubTaskModal = ({
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
-
-  const filterTasksByStatus = (tasks, status) =>
-    tasks.filter(
-      (task) => task.status === status || (status === "To Do" && !task.status)
-    );
-
-  const getAllMemberByGroup = () => {
-    axios
-      .get(
-        `${process.env.REACT_APP_API_URL}/api/members/${formData?.taskGroup?.groupId}`
-      )
-      .then((res) => {
-        // console.log("res",res.data);
-        const apiData = res.data;
-        setAllMemberOfGroup([
-          ...apiData.members,
-          ...apiData.deptHead,
-          ...apiData.projectLead,
-        ]);
-      });
   };
   useEffect(() => {
     // fetchRegisteredNames();
@@ -1371,7 +1408,7 @@ const SubTaskModal = ({
                     <Autocomplete
                       placeholder="Assign to"
                       multiple
-                      options={allMemberOfGroup?.map((option) => option.name)}
+                      options={allRolesUsers?.map((option) => option.name)}
                       onChange={(event, newValue) =>
                         handleChange("people", newValue)
                       }

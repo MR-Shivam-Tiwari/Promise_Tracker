@@ -39,12 +39,12 @@ function Home() {
                 </Box>
 
 
-                <div className=' flex justify-center items-center' style={{ marginTop: "350px" }}>
+                <div className=' flex justify-center items-center' style={{ marginTop: "300px" }}>
                     <div className="flex flex-col">
                         <main className="flex-1">
-                            <section className="py-12 md:py-24"> {/* Adjusted the padding */}
+                            <section className=""> {/* Adjusted the padding */}
                                 <div className="px-4 md:px-6">
-                                    <div className="space-y-4 text-center">
+                                    <div className="space-y-7 text-center">
                                         <div className="space-y-2">
                                             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl">
                                                 Promise Tracker
@@ -52,7 +52,7 @@ function Home() {
                                             <p className="mx-auto text-gray-700  md:text-xl ">
                                                 This productive tool is designed to help you better manage your tasks project-wise
                                                 conveniently
-                                            </p>
+                                            </p> 
                                         </div>
                                         <div className="space-x-4">
                                             <a

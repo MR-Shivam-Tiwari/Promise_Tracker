@@ -434,7 +434,11 @@ function MainHome() {
                   Array.isArray(taskData) && (
                     <div className="flex flex-wrap gap-3 px-3   ">
                       {taskData
-                        .filter((task) => task.status === "In Progress")
+                        .filter(
+                          (task) =>
+                            task.status === "In Progress" &&
+                            task?.isSubtask === false
+                        )
                         .map((task) => (
                           <div
                             onClick={() => navigate("/task")}

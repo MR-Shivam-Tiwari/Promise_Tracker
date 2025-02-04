@@ -636,7 +636,7 @@ function Task() {
                         htmlFor="people"
                         className="block mb-2 text-sm font-medium text-gray-900 "
                       >
-                        Select Members <span className="text-red-500 ">*</span>
+                        Select Members  <span className="text-red-500 ">*</span>
                       </label>
                       <Autocomplete
                         placeholder="Assign to"
