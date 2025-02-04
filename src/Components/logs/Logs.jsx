@@ -2,7 +2,7 @@ import moment from 'moment';
 import React from 'react';
 
 const Logs = ({ log }) => {
-  const time  = moment(log?.timestamp).format('Do MMMM [at] hh:mm A')
+  const time = moment(log?.timestamp).format('Do MMMM [at] hh:mm A')
   const renderLogMessage = () => {
     switch (log.action) {
       case 'create':
@@ -56,39 +56,39 @@ const Logs = ({ log }) => {
       case 'edit':
         return (
           <>
-         {log?.details?.changes?.taskName  && <div className='text-gray-600 mt-2 mb-2'>
-              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to 
+            {log?.details?.changes?.taskName && <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to
               <span className='font-bold text-orange-500'> "{log?.taskId?.taskName}"</span> on {time}
             </div>}
             <hr />
-            {log?.details?.changes?.description  && <div className='text-gray-600 mt-2 mb-2'>
-              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to 
+            {log?.details?.changes?.description && <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to
               <span className='font-bold text-orange-500'> "{log?.taskId?.taskName}"</span> on {time}
             </div>}
             <hr />
-            {log?.details?.changes?.audioFile  && <div className='text-gray-600 mt-2 mb-2'>
-              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to 
+            {log?.details?.changes?.audioFile && <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to
               <span className='font-bold text-orange-500'> "{log?.taskId?.taskName}"</span> on {time}
             </div>}
             <hr />
-            {log?.details?.changes?.startDate  && <div className='text-gray-600 mt-2 mb-2'>
-              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to 
+            {log?.details?.changes?.startDate && <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to
               <span className='font-bold text-orange-500'> "{log?.taskId?.taskName}"</span> on {time}
             </div>}
             <hr />
-            {log?.details?.changes?.endDate  && <div className='text-gray-600 mt-2 mb-2'>
-              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to 
+            {log?.details?.changes?.endDate && <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to
               <span className='font-bold text-orange-500'> "{log?.taskId?.taskName}"</span> on {time}
             </div>}
             <hr />
 
-            {log?.details?.changes?.people  && <div className='text-gray-600 mt-2 mb-2'>
-              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to 
+            {log?.details?.changes?.people && <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to
               <span className='font-bold text-orange-500'> "{log?.taskId?.taskName}"</span> on {time}
             </div>}
             <hr />
-            {log?.details?.changes?.pdfFile  && <div className='text-gray-600 mt-2 mb-2'>
-              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to 
+            {log?.details?.changes?.pdfFile && <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Task Name to
               <span className='font-bold text-orange-500'> "{log?.taskId?.taskName}"</span> on {time}
             </div>}
             <hr />
@@ -145,12 +145,12 @@ const Logs = ({ log }) => {
           <>
             <div className='text-gray-600 mt-2 mb-2'>
               <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> <span className='text-gray-500 '><span className='font-bold text-green-500'>Approve </span>this Task </span>  on {time}
-            </div>   
+            </div>
             <hr />
           </>
         );
-        // subTask logs started here
-        case 'create_subtask':
+      // subTask logs started here
+      case 'create_subtask':
         return (
           <>
             <div className='mb-2 mt-2'>
@@ -165,31 +165,31 @@ const Logs = ({ log }) => {
             <hr />
           </>
         );
-        case 'edit_subtask':
+      case 'edit_subtask':
         return (
           <>
-          <div className='mb-2 mt-2'>
-            <p className='text-gray-600'>
-              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Sub-Task
-              <span className='font-bold text-orange-500 capitalize'> "{log?.details?.subTaskName}"</span> on {time}
-            </p>
-            <span className='font-bold text-md ml-4'>Assigned To :</span>
-            <span className='font-bold text-gray-600'> {
-              log?.details?.assign_to?.map((user, index) => { return (user?.name) }).join(', ')}</span>
-          </div>
-          <hr />
-        </>
-        );
-        case 'create_comment':
-        return (
-          <>
-            <div className='text-gray-600 mt-2 mb-2'>
-              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> <span className='text-gray-500 '>Add a comment<span className='font-semibold text-orange-500'>{ ` "${log?.details?.text}"`}</span> </span>  on {time}
+            <div className='mb-2 mt-2'>
+              <p className='text-gray-600'>
+                <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> udpate Sub-Task
+                <span className='font-bold text-orange-500 capitalize'> "{log?.details?.subTaskName}"</span> on {time}
+              </p>
+              <span className='font-bold text-md ml-4'>Assigned To :</span>
+              <span className='font-bold text-gray-600'> {
+                log?.details?.assign_to?.map((user, index) => { return (user?.name) }).join(', ')}</span>
             </div>
             <hr />
           </>
         );
-        case 'done_subtask':
+      case 'create_comment':
+        return (
+          <>
+            <div className='text-gray-600 mt-2 mb-2'>
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> <span className='text-gray-500 '>Add a comment<span className='font-semibold text-orange-500'>{` "${log?.details?.text}"`}</span> </span>  on {time}
+            </div>
+            <hr />
+          </>
+        );
+      case 'done_subtask':
         return (
           <>
             <div className='mb-2 mt-2'>
@@ -197,12 +197,12 @@ const Logs = ({ log }) => {
                 <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> change subtask
                 <span className='font-bold text-orange-500 capitalize'> "{log?.details?.subTaskName}"</span> status to <span className='font-bold text-green-500'>Done</span> on {time}
               </p>
-              
+
             </div>
             <hr />
           </>
         );
-        case 'pending_subtask':
+      case 'pending_subtask':
         return (
           <>
             <div className='mb-2 mt-2'>
@@ -210,7 +210,7 @@ const Logs = ({ log }) => {
                 <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> change subtask
                 <span className='font-bold text-orange-500 capitalize'> "{log?.details?.subTaskName}"</span> status to <span className='font-bold text-red-500'>Pending</span> on {time}
               </p>
-              
+
             </div>
             <hr />
           </>
@@ -226,23 +226,23 @@ const Logs = ({ log }) => {
         {log?.details?.changes?.taskName && (
           <div className='px-2 py-1 bg-purple-100 rounded-lg mb-4'>
             <div className='text-gray-600 mt-2 mb-2'>
-              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> updated Task Name from <span className='font-bold text-orange-500'>{log?.details?.changes?.taskName?.oldValue}</span> to 
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> updated Task Name from <span className='font-bold text-orange-500'>{log?.details?.changes?.taskName?.oldValue}</span> to
               <span className='font-bold text-green-500'> "{log?.details?.changes?.taskName?.newValue}"</span> on {time}
             </div>
             <hr />
           </div>
         )}
-        
+
         {log?.details?.changes?.description && (
           <div className='px-2 py-1 bg-purple-100 rounded-lg mb-4'>
             <div className='text-gray-600 mt-2 mb-2'>
-              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> updated Description to 
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> updated Description to
               <span className='font-bold text-orange-500' dangerouslySetInnerHTML={{ __html: `${log?.details?.changes?.description}` }}></span> on {time}
             </div>
             <hr />
           </div>
         )}
-  
+
         {log?.details?.changes?.audioFile && (
           <div className='px-2 py-1 bg-purple-100 rounded-lg mb-4'>
             <div className='text-gray-600 mt-2 mb-2'>
@@ -251,7 +251,7 @@ const Logs = ({ log }) => {
             <hr />
           </div>
         )}
-  
+
         {log?.details?.changes?.startDate && (
           <div className='px-2 py-1 bg-purple-100 rounded-lg mb-4'>
             <div className='text-gray-600 mt-2 mb-2'>
@@ -260,7 +260,7 @@ const Logs = ({ log }) => {
             <hr />
           </div>
         )}
-  
+
         {log?.details?.changes?.endDate && (
           <div className='px-2 py-1 bg-purple-100 rounded-lg mb-4'>
             <div className='text-gray-600 mt-2 mb-2'>
@@ -270,15 +270,15 @@ const Logs = ({ log }) => {
             <hr />
           </div>
         )}
-  
+
         {log?.details?.changes?.people?.added && (
           <div className='px-2 py-1 bg-purple-100 rounded-lg mb-4'>
             <div className='text-gray-600 mt-2 mb-2'>
-              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> added  
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> added
               {
-                log?.details?.changes?.people?.added?.map((i)=>(
+                log?.details?.changes?.people?.added?.map((i) => (
                   <>
-                    <span className='font-semibold text-green-600 py-1  bg-green-300 mx-1 rounded-xl '> {i.name} </span> 
+                    <span className='font-semibold text-green-600 py-1  bg-green-300 mx-1 rounded-xl '> {i.name} </span>
                   </>
                 ))
               } on task assignment
@@ -291,11 +291,11 @@ const Logs = ({ log }) => {
         {log?.details?.changes?.people?.removed && (
           <div className='px-2 py-1 bg-purple-100 rounded-lg mb-4'>
             <div className='text-gray-600 mt-2 mb-2'>
-              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> removed 
+              <span className='font-bold text-blue-500'>"{log?.userId?.name}"</span> removed
               {
-                log?.details?.changes?.people?.removed?.map((i)=>(
+                log?.details?.changes?.people?.removed?.map((i) => (
                   <>
-                    <span className='font-semibold text-red-600 py-1  bg-red-300 mx-1 rounded-xl '> {i.name} </span> 
+                    <span className='font-semibold text-red-600 py-1  bg-red-300 mx-1 rounded-xl '> {i.name} </span>
                   </>
                 ))
               } on task assignment
@@ -304,7 +304,7 @@ const Logs = ({ log }) => {
             <hr />
           </div>
         )}
-  
+
         {log?.details?.changes?.pdfFile && (
           <div className='px-2 py-1 bg-purple-100 rounded-lg mb-4'>
             <div className='text-gray-600 mt-2 mb-2'>
@@ -316,14 +316,14 @@ const Logs = ({ log }) => {
       </>
     );
   };
-  
+
 
   return (
-   <>
-    {log?.action=="edit"? <EditLogs/>: <div className='px-2 py-1  bg-purple-100 rounded-lg mb-4'>
-      {renderLogMessage()}
-    </div>}
-   </>
+    <>
+      {log?.action == "edit" ? <EditLogs /> : <div className='px-2 py-1  bg-purple-100 rounded-lg mb-4'>
+        {renderLogMessage()}
+      </div>}
+    </>
   );
 };
 
